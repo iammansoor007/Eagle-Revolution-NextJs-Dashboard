@@ -1,0 +1,1061 @@
+{
+  "navbar": {
+    "services": [
+      {
+        "title": "WINDOWS & DOORS",
+        "description": "Energy-efficient vinyl windows and premium doors that enhance beauty and insulation",
+        "icon": "Layout",
+        "items": [
+          "Vinyl Windows",
+          "Double-Hung Windows",
+          "Casement Windows",
+          "Sliding Patio Doors",
+          "Entry Doors"
+        ],
+        "features": [
+          "Energy Efficient",
+          "Lifetime Warranty",
+          "Professional Installation"
+        ]
+      },
+      {
+        "title": "DECKS & OUTDOOR LIVING",
+        "description": "Custom decks and outdoor living spaces designed for lasting beauty and durability",
+        "icon": "TreePine",
+        "items": [
+          "Composite Decking",
+          "Pressure Treated Wood",
+          "Custom Designs",
+          "Covered Decks",
+          "Pergolas"
+        ],
+        "features": [
+          "TimberTech Certified",
+          "50-Year Warranty",
+          "Low Maintenance"
+        ]
+      },
+      {
+        "title": "RESIDENTIAL ROOFING",
+        "description": "Expert roofing services with premium materials and 5-year workmanship guarantee",
+        "icon": "Home",
+        "items": [
+          "Asphalt Shingles",
+          "Metal Roofing",
+          "Roof Replacement",
+          "Roof Repairs",
+          "Roof Inspections"
+        ],
+        "features": [
+          "IKO Certified Pro",
+          "CertainTeed Certified",
+          "50-Year Transferable Warranty"
+        ]
+      }
+    ],
+    "companyLinks": [
+      {
+        "label": "Home",
+        "href": "#",
+        "icon": "Home"
+      },
+      {
+        "label": "About",
+        "href": "#about",
+        "icon": "Users"
+      },
+      {
+        "label": "Gallery",
+        "href": "#gallery",
+        "icon": "Image"
+      },
+      {
+        "label": "Reviews",
+        "href": "#reviews",
+        "icon": "Star"
+      },
+      {
+        "label": "FAQ",
+        "href": "#faq",
+        "icon": "MessageSquare"
+      },
+      {
+        "label": "Contact",
+        "href": "#contact",
+        "icon": "Phone"
+      }
+    ],
+    "stats": [
+      {
+        "value": "500+",
+        "label": "Projects",
+        "icon": "ClipboardCheck"
+      },
+      {
+        "value": "50+",
+        "label": "Years Experience",
+        "icon": "Star"
+      },
+      {
+        "value": "24/7",
+        "label": "Support",
+        "icon": "Clock"
+      },
+      {
+        "value": "Lifetime",
+        "label": "Warranty",
+        "icon": "Shield"
+      }
+    ],
+    "cta": {
+      "title": "Get Your Free Quote",
+      "description": "Book your free consultation today and save 15%",
+      "buttonText": "Get Free Quote",
+      "buttonLink": "#quote"
+    }
+  },
+  "hero": {
+    "badge": "Veteran Owned & Operated",
+    "headlines": [
+      "Soaring Beyond",
+      "Expectations"
+    ],
+    "description": "One of the Top Window, Deck, and Roofing Companies in St. Louis. Veteran owned and operated with easy financing options and long-lasting transferable warranties.",
+    "buttons": [
+      {
+        "text": "Book a FREE Quote Now",
+        "href": "#contact",
+        "primary": true,
+        "icon": "FiArrowRight"
+      },
+      {
+        "text": "View Our Work",
+        "href": "#portfolio",
+        "primary": false,
+        "icon": "FiArrowRight"
+      }
+    ],
+    "stats": [
+      {
+        "value": "25+",
+        "label": "Years Experience",
+        "icon": "RiBuildingLine"
+      },
+      {
+        "value": "Veteran",
+        "label": "Owned",
+        "icon": "FiStar"
+      },
+      {
+        "value": "50-Year",
+        "label": "Warranty",
+        "icon": "FiThumbsUp"
+      },
+      {
+        "value": "0%",
+        "label": "Financing",
+        "icon": "RiShieldCheckLine"
+      }
+    ],
+    "promoBadge": {
+      "text": "15% off your next project if you book your free quote by the end of the month!",
+      "cta": "Book a FREE Quote Now"
+    }
+  },
+  "about": {
+    "badge": "Since 2002",
+    "headline": {
+      "prefix": "Soaring Beyond",
+      "highlight": "Expectations",
+      "suffix": ""
+    },
+    "description": "Eagle Revolution was founded to do more than just build roofs, windows, decks, and siding. We are here to build a movement. Born in St. Charles, Missouri, Eagle Revolution was launched by Brandon Anderson, a U.S. Army veteran and globally licensed combat sports official who brings battlefield discipline and boardroom precision to every project.",
+    "image": {
+      "src": "EagleRevolutionTeam",
+      "alt": "Eagle Revolution team - Veteran owned roofing and exterior remodeling company",
+      "badge": "Veteran Owned"
+    },
+    "stats": [
+      {
+        "value": 500,
+        "suffix": "+",
+        "label": "Projects Completed"
+      },
+      {
+        "value": 100,
+        "suffix": "%",
+        "label": "Client Satisfaction"
+      },
+      {
+        "value": 50,
+        "suffix": "+",
+        "label": "Years Combined Experience"
+      }
+    ],
+    "buttons": [
+      {
+        "text": "GET FREE ESTIMATE",
+        "href": "#contact",
+        "primary": true
+      },
+      {
+        "text": "VIEW GALLERY",
+        "href": "#portfolio",
+        "primary": false
+      }
+    ],
+    "trustBadges": {
+      "happyClients": 500,
+      "emergency": "24/7"
+    },
+    "coreValues": [
+      "Extreme Ownership",
+      "Integrity",
+      "Humility",
+      "Customer First",
+      "Growth",
+      "Gratitude"
+    ]
+  },
+  "services": {
+    "badge": "Premium Exterior Remodeling",
+    "headline": {
+      "prefix": "St. Louis's Trusted",
+      "highlight": "Exterior Remodeling",
+      "suffix": "Company"
+    },
+    "description": [
+      "Eagle Revolution provides expert exterior remodeling services for homes and businesses. From windows and doors to roofing and decks, our team delivers quality craftsmanship with military precision.",
+      "<span class=\"font-semibold text-primary\">Veteran Owned • Licensed • Insured</span>"
+    ],
+    "stats": [
+      {
+        "value": 500,
+        "suffix": "+",
+        "label": "Projects"
+      },
+      {
+        "value": 50,
+        "suffix": "+",
+        "label": "Years Combined"
+      },
+      {
+        "value": 4.9,
+        "suffix": "",
+        "label": "Rating"
+      }
+    ],
+    "services": [
+      {
+        "number": "01",
+        "title": "Residential Roofing",
+        "description": "Expert roofing services for homes using premium materials from IKO and CertainTeed. Full replacement, repairs, and inspections with 50-year transferable warranties.",
+        "icon": "Home",
+        "tag": "Roofing",
+        "features": [
+          "Asphalt Shingles",
+          "Metal Roofing",
+          "Roof Replacement",
+          "Emergency Repairs"
+        ]
+      },
+      {
+        "number": "02",
+        "title": "Windows & Doors",
+        "description": "Energy-efficient vinyl windows and premium doors that enhance curb appeal and reduce energy costs. ProVia Certified Installer.",
+        "icon": "Layout",
+        "tag": "Windows",
+        "features": [
+          "Vinyl Windows",
+          "Patio Doors",
+          "Entry Doors",
+          "Energy Efficient"
+        ]
+      },
+      {
+        "number": "03",
+        "title": "Custom Decks",
+        "description": "Beautiful, low-maintenance decks designed for outdoor living. TimberTech/Azek Certified installers for premium composite decking.",
+        "icon": "TreePine",
+        "tag": "Decks",
+        "features": [
+          "Composite Decking",
+          "Custom Designs",
+          "Pergolas",
+          "Covered Decks"
+        ]
+      },
+      {
+        "number": "04",
+        "title": "Siding, Soffit & Fascia",
+        "description": "Protect your home and enhance curb appeal with professional siding, soffit, and fascia installation and repair services.",
+        "icon": "Building2",
+        "tag": "Siding",
+        "features": [
+          "Vinyl Siding",
+          "Soﬀit Installation",
+          "Fascia Repair",
+          "Gutter Systems"
+        ]
+      },
+      {
+        "number": "05",
+        "title": "Commercial Roofing",
+        "description": "Specialized commercial roofing solutions including TPO and EPDM systems. Installation, repair, and maintenance for businesses.",
+        "icon": "Building",
+        "tag": "Commercial",
+        "features": [
+          "TPO Roofing",
+          "EPDM Systems",
+          "Maintenance Programs",
+          "Large Scale Projects"
+        ]
+      },
+      {
+        "number": "06",
+        "title": "Gutters & Protection",
+        "description": "Professional gutter installation and gutter protection systems to prevent water damage and maintain proper drainage.",
+        "icon": "Droplets",
+        "tag": "Gutters",
+        "features": [
+          "Seamless Gutters",
+          "Gutter Guards",
+          "Downspouts",
+          "Leaf Protection"
+        ]
+      }
+    ],
+    "cta": {
+      "title": "Ready for Your Free Estimate?",
+      "description": "Transform your home with St. Louis's expert builders. Contact us today for quality craftsmanship and unparalleled service.",
+      "buttonText": "Get Free Estimate",
+      "buttonLink": "#contact"
+    }
+  },
+  "leadership": {
+    "section": {
+      "badge": "Our Leadership",
+      "headline": "Veteran-Owned & <span class=\"font-semibold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80\">Mission-Driven</span>",
+      "description": "Battlefield discipline meets boardroom precision. Eagle Revolution brings honor, integrity, and craftsmanship back to the remodeling industry."
+    },
+    "ceo": {
+      "name": "Brandon Anderson",
+      "title": "Founder • U.S. Army Veteran",
+      "image": "brandon",
+      "alt": "Brandon Anderson - Founder, Eagle Revolution",
+      "badges": {
+        "top": "VETERAN OWNED",
+        "bottom": "ProVia • IKO • CertainTeed"
+      },
+      "quotes": [
+        "Eagle Revolution was founded to do more than just build roofs, windows, decks, and siding. We are here to build a movement. Born in St. Charles, Missouri, I launched Eagle Revolution to bring battlefield discipline and boardroom precision to every project."
+      ],
+      "description": [
+        "With years of high-level leadership experience at some of the largest home improvement companies in North America, Brandon saw firsthand how the industry had lost its way. It had become driven by profit margins instead of people.",
+        "Eagle Revolution is the local force that fights back. We go toe-to-toe with billion-dollar corporations and win—not with gimmicks or flash, but with fire, integrity, and a relentless commitment to the customer."
+      ],
+      "social": {
+        "linkedin": "#",
+        "email": "banderson@eaglerevolution.com"
+      }
+    }
+  },
+  "portfolio": {
+    "section": {
+      "badge": "Our Work",
+      "headline": "Precision & <span class=\"text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70\">Craftsmanship</span>"
+    },
+    "projects": [
+      {
+        "number": "01",
+        "title": "St. Charles Custom Deck",
+        "category": "Deck Installation",
+        "image": "deck1",
+        "location": "St. Charles, MO",
+        "year": "2024",
+        "accent": "from-primary to-primary/80",
+        "scope": "Composite Decking",
+        "desc": "Beautiful TimberTech composite deck with custom pergola and built-in seating for outdoor entertaining."
+      },
+      {
+        "number": "02",
+        "title": "Window Replacement Project",
+        "category": "Windows",
+        "image": "windows1",
+        "location": "O'Fallon, MO",
+        "year": "2024",
+        "accent": "from-primary to-primary/70",
+        "scope": "30+ Windows",
+        "desc": "Complete vinyl window replacement for energy efficiency and improved curb appeal."
+      },
+      {
+        "number": "03",
+        "title": "Residential Roof Replacement",
+        "category": "Roofing",
+        "image": "roof1",
+        "location": "St. Louis, MO",
+        "year": "2024",
+        "accent": "from-primary/90 to-primary/60",
+        "scope": "Full Replacement",
+        "desc": "Complete roof replacement using CertainTeed architectural shingles with 50-year warranty."
+      },
+      {
+        "number": "04",
+        "title": "Commercial TPO Roof",
+        "category": "Commercial",
+        "image": "commercial1",
+        "location": "St. Charles, MO",
+        "year": "2023",
+        "accent": "from-primary to-primary/80",
+        "scope": "TPO Installation",
+        "desc": "Large-scale commercial TPO roofing system for enhanced energy efficiency and durability."
+      },
+      {
+        "number": "05",
+        "title": "Siding & Gutter Upgrade",
+        "category": "Exterior",
+        "image": "siding1",
+        "location": "St. Louis County, MO",
+        "year": "2024",
+        "accent": "from-primary/80 to-primary/60",
+        "scope": "Full Exterior",
+        "desc": "Complete siding, soffit, fascia, and gutter replacement for improved protection and aesthetics."
+      }
+    ],
+    "button": {
+      "text": "View All Projects",
+      "link": "#portfolio"
+    }
+  },
+  "testimonials": {
+    "section": {
+      "badge": "Client Testimonials",
+      "headline": "What Our Clients Say",
+      "description": "Real stories from real clients about their experience with Eagle Revolution",
+      "featured": "⭐️⭐️⭐️⭐️⭐️ Rated on Google"
+    },
+    "testimonials": [
+      {
+        "id": 1,
+        "name": "Jason K.",
+        "position": "Homeowner",
+        "company": "St. Louis",
+        "avatar": "JK",
+        "videoId": null,
+        "duration": null,
+        "views": null,
+        "text": "Eagle Revolution is top-notch. The owner is one of the hardest-working, most professional people you'll meet. His attention to detail and pride in his work really stand out — you can tell he truly cares about doing things the right way. He's reliable, respectful, and easy to work with — the kind of person you can trust to get the job done right."
+      },
+      {
+        "id": 2,
+        "name": "Nathan Gearing",
+        "position": "Homeowner",
+        "company": "St. Charles",
+        "avatar": "NG",
+        "videoId": null,
+        "duration": null,
+        "views": null,
+        "text": "I had the pleasure of working with Eagle Revolution for a recent construction project, and I couldn't be more impressed with their professionalism, quality of work, and attention to detail. From the initial consultation to project completion, the team was communicative, punctual, and dedicated to getting the job done right."
+      },
+      {
+        "id": 3,
+        "name": "Lucas Barth",
+        "position": "Homeowner",
+        "company": "O'Fallon",
+        "avatar": "LB",
+        "videoId": null,
+        "duration": null,
+        "views": null,
+        "text": "Eagle Revolution did a great job at my house with over 30 window replacements. There was clear, transparent and timely communication through the entire process and the installation went really well. I will recommend Brandon and Eagle Revolution to anyone looking for windows."
+      },
+      {
+        "id": 4,
+        "name": "Sarah Mitchell",
+        "position": "Homeowner",
+        "company": "St. Louis County",
+        "avatar": "SM",
+        "videoId": null,
+        "duration": null,
+        "views": null,
+        "text": "Brandon and his team replaced our roof after storm damage. They handled everything with the insurance company and made the process stress-free. The quality of work is outstanding and the new roof looks amazing!"
+      },
+      {
+        "id": 5,
+        "name": "Mike Thompson",
+        "position": "Business Owner",
+        "company": "St. Peters",
+        "avatar": "MT",
+        "videoId": null,
+        "duration": null,
+        "views": null,
+        "text": "We hired Eagle Revolution for a commercial TPO roof installation. Professional, on time, and within budget. Highly recommend their commercial roofing services."
+      }
+    ],
+    "videos": [],
+    "stats": {
+      "subscribers": null,
+      "views": null,
+      "totalVideos": null
+    }
+  },
+  "whyChooseUs": {
+    "section": {
+      "badge": "WHY CHOOSE EAGLE REVOLUTION",
+      "headline": "The Trusted Choice for <span class=\"text-primary\">Exterior Remodeling</span>",
+      "description": "Customers choose Eagle Revolution for their exterior remodeling projects because they trust a local, veteran-owned and operated company that prioritizes quality and reliability."
+    },
+    "features": [
+      {
+        "icon": "Veteran",
+        "title": "Veteran-Owned & Operated",
+        "description": "We bring military precision, discipline, and integrity to every job. Battlefield discipline meets boardroom precision."
+      },
+      {
+        "icon": "Experience",
+        "title": "50+ Years Combined Experience",
+        "description": "Our leadership and crews deliver consistent excellence across every project with decades of industry expertise."
+      },
+      {
+        "icon": "Warranty",
+        "title": "Lifetime & Transferable Warranties",
+        "description": "Premium products backed by 50-year transferable warranties and a Five-Year Workmanship Guarantee on every project."
+      },
+      {
+        "icon": "Financing",
+        "title": "Easy & Affordable Financing",
+        "description": "Flexible financing options and payment plans make high-quality exterior upgrades accessible for all homeowners."
+      },
+      {
+        "icon": "Certified",
+        "title": "Certified Expertise",
+        "description": "ProVia Certified Installer, IKO Certified Pro, CertainTeed Certified Shingle Master, and TimberTech/Azek Certified."
+      },
+      {
+        "icon": "Community",
+        "title": "Community Commitment",
+        "description": "We give back through local initiatives and donate a free roof every year to a family in need."
+      }
+    ],
+    "stats": [
+      {
+        "value": "500",
+        "suffix": "+",
+        "label": "Projects"
+      },
+      {
+        "value": "50",
+        "suffix": "+",
+        "label": "Years Combined"
+      },
+      {
+        "value": "100",
+        "suffix": "%",
+        "label": "Satisfaction"
+      },
+      {
+        "value": "Lifetime",
+        "suffix": "",
+        "label": "Warranty"
+      }
+    ],
+    "cta": {
+      "badge": "15% OFF",
+      "title": "Book Your Free Quote <span class=\"text-primary block mt-2\">By End of Month!</span>",
+      "description": "Transform your home with St. Louis's expert builders. Contact us today for quality craftsmanship and unparalleled service.",
+      "trustBadges": [
+        "Veteran Owned",
+        "Licensed",
+        "Insured"
+      ],
+      "buttons": [
+        {
+          "text": "Get Free Estimate",
+          "href": "#contact",
+          "primary": true
+        },
+        {
+          "text": "View Gallery",
+          "href": "#portfolio",
+          "primary": false
+        }
+      ]
+    }
+  },
+  "faq": {
+    "section": {
+      "badge": "Knowledge Base",
+      "headline": "Frequently Asked Questions",
+      "description": "Answers to common questions about our exterior remodeling services in St. Louis."
+    },
+    "categories": [
+      {
+        "id": "all",
+        "label": "All Questions",
+        "icon": null
+      },
+      {
+        "id": "general",
+        "label": "General",
+        "icon": "Home"
+      },
+      {
+        "id": "roofing",
+        "label": "Roofing",
+        "icon": "Home"
+      },
+      {
+        "id": "windows",
+        "label": "Windows & Doors",
+        "icon": "Layout"
+      },
+      {
+        "id": "decks",
+        "label": "Decks",
+        "icon": "TreePine"
+      }
+    ],
+    "items": [
+      {
+        "id": 1,
+        "category": "general",
+        "question": "What services do you offer?",
+        "answer": "We offer a range of services including residential roofing, commercial roofing, vinyl windows, entry doors, custom decks, siding, soffit, fascia, and gutters. We're your complete exterior remodeling solution in St. Louis.",
+        "metadata": [
+          {
+            "label": "Services",
+            "value": "Roofing, Windows, Decks, Siding"
+          }
+        ],
+        "links": [
+          {
+            "label": "View all services",
+            "url": "/services"
+          }
+        ]
+      },
+      {
+        "id": 2,
+        "category": "general",
+        "question": "Do you provide free estimates?",
+        "answer": "Yes, we provide free inspections and estimates for all projects. Book your free quote today and get 15% off your project if you schedule by the end of the month!",
+        "metadata": [
+          {
+            "label": "Service",
+            "value": "Free estimates"
+          }
+        ],
+        "links": [
+          {
+            "label": "Get free estimate",
+            "url": "/estimate"
+          }
+        ]
+      },
+      {
+        "id": 3,
+        "category": "general",
+        "question": "Are you licensed and insured?",
+        "answer": "Absolutely. We are fully licensed, bonded, and insured to ensure you receive professional and secure services. We're also IKO Certified Pro, CertainTeed Certified Shingle Master, and ProVia Certified Installers.",
+        "metadata": [
+          {
+            "label": "Status",
+            "value": "Licensed & Insured"
+          }
+        ],
+        "links": []
+      },
+      {
+        "id": 4,
+        "category": "general",
+        "question": "Do you offer financing or payment plans?",
+        "answer": "Yes, we offer flexible financing options and convenient payment plans to make your project affordable and stress-free. We partner with some of the largest financing companies in the country to provide easy approval options.",
+        "metadata": [
+          {
+            "label": "Financing",
+            "value": "Available"
+          }
+        ],
+        "links": [
+          {
+            "label": "Get preapproved",
+            "url": "/financing"
+          }
+        ]
+      },
+      {
+        "id": 5,
+        "category": "roofing",
+        "question": "How long does a roof replacement take?",
+        "answer": "Most residential roof replacements are completed within 1-3 days, depending on the size of your home and weather conditions. Larger or commercial projects may take longer. We'll provide a detailed timeline during your free estimate.",
+        "metadata": [
+          {
+            "label": "Timeline",
+            "value": "1-3 days"
+          }
+        ],
+        "links": []
+      },
+      {
+        "id": 6,
+        "category": "roofing",
+        "question": "What warranties do you offer on roofing?",
+        "answer": "We install premium materials backed by 50-year transferable manufacturer warranties. Additionally, every project includes our Five-Year Workmanship Guarantee, giving you peace of mind long after installation.",
+        "metadata": [
+          {
+            "label": "Warranty",
+            "value": "50-year + Workmanship"
+          }
+        ],
+        "links": []
+      },
+      {
+        "id": 7,
+        "category": "windows",
+        "question": "What types of windows do you install?",
+        "answer": "We install premium vinyl windows including double-hung, casement, sliding, and bay windows. As ProVia Certified Installers, we ensure professional installation and energy-efficient products that reduce your utility bills.",
+        "metadata": [
+          {
+            "label": "Types",
+            "value": "Vinyl, Double-hung, Casement"
+          }
+        ],
+        "links": []
+      },
+      {
+        "id": 8,
+        "category": "decks",
+        "question": "What decking materials do you use?",
+        "answer": "As TimberTech/Azek Certified installers, we specialize in premium composite decking that offers durability, low maintenance, and beautiful aesthetics. We also offer pressure-treated wood options for traditional decks.",
+        "metadata": [
+          {
+            "label": "Materials",
+            "value": "Composite, Wood"
+          }
+        ],
+        "links": []
+      },
+      {
+        "id": 9,
+        "category": "general",
+        "question": "What areas do you serve?",
+        "answer": "We serve Missouri (St. Louis County, St. Louis City, St. Charles County, Jefferson County, Franklin County) and Illinois (Saint Clair County, Monroe County, Madison County).",
+        "metadata": [
+          {
+            "label": "Service Area",
+            "value": "Greater St. Louis Region"
+          }
+        ],
+        "links": []
+      },
+      {
+        "id": 10,
+        "category": "general",
+        "question": "Can you handle large-scale projects?",
+        "answer": "Yes, we have the expertise and resources to handle both small and large-scale construction projects. We have a proven track record working with large federal roofing and construction projects.",
+        "metadata": [
+          {
+            "label": "Capacity",
+            "value": "Small to Large Scale"
+          }
+        ],
+        "links": []
+      }
+    ],
+    "knowledgeCard": {
+      "title": "Still have questions?",
+      "description": "Our team is ready to help with your specific project needs.",
+      "buttonText": "Contact Our Team",
+      "buttonLink": "/contact"
+    }
+  },
+  "quote": {
+    "section": {
+      "badge": "GET PREAPPROVED IN SECONDS",
+      "headline": "Request Your <span class=\"font-black italic text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary to-primary/80\">Free Estimate</span>",
+      "description": "Book your free consultation today and save 15% on your next project. Veteran-owned, quality guaranteed."
+    },
+    "services": [
+      {
+        "id": 1,
+        "title": "Residential Roofing",
+        "desc": "Asphalt shingles, metal roofing",
+        "icon": "⌗"
+      },
+      {
+        "id": 2,
+        "title": "Windows & Doors",
+        "desc": "Energy-efficient vinyl windows",
+        "icon": "⎔"
+      },
+      {
+        "id": 3,
+        "title": "Custom Decks",
+        "desc": "Composite & wood decking",
+        "icon": "⌖"
+      },
+      {
+        "id": 4,
+        "title": "Siding & Gutters",
+        "desc": "Full exterior protection",
+        "icon": "⌘"
+      },
+      {
+        "id": 5,
+        "title": "Commercial Roofing",
+        "desc": "TPO, EPDM systems",
+        "icon": "⚡"
+      },
+      {
+        "id": 6,
+        "title": "Free Inspection",
+        "desc": "No obligation consultation",
+        "icon": "◈"
+      }
+    ],
+    "projectTypes": [
+      {
+        "value": "roofing",
+        "label": "Residential Roofing"
+      },
+      {
+        "value": "windows",
+        "label": "Windows & Doors"
+      },
+      {
+        "value": "decks",
+        "label": "Custom Deck"
+      },
+      {
+        "value": "siding",
+        "label": "Siding & Gutters"
+      },
+      {
+        "value": "commercial",
+        "label": "Commercial Roofing"
+      }
+    ],
+    "timelines": [
+      {
+        "value": "urgent",
+        "label": "Urgent (within 2 weeks)"
+      },
+      {
+        "value": "standard",
+        "label": "Standard (1-3 months)"
+      },
+      {
+        "value": "planned",
+        "label": "Planned (3-6 months)"
+      },
+      {
+        "value": "future",
+        "label": "Future (6+ months)"
+      }
+    ],
+    "email": "banderson@eaglerevolution.com",
+    "success": {
+      "title": "Request Received",
+      "message": "Thank you for choosing Eagle Revolution.",
+      "response": "We'll contact you within 24 hours to schedule your free estimate.",
+      "buttonText": "Close"
+    }
+  },
+  "footer": {
+    "company": {
+      "name": "Eagle Revolution",
+      "tagline": "SOARING BEYOND EXPECTATIONS",
+      "description": "Veteran-owned and operated exterior remodeling company serving St. Louis and surrounding areas. We specialize in roofing, windows, doors, decks, and siding with premium materials and lifetime warranties."
+    },
+    "services": {
+      "title": "Our Services",
+      "main": [
+        {
+          "label": "Residential Roofing",
+          "href": "/roofing",
+          "icon": "Home"
+        },
+        {
+          "label": "Windows & Doors",
+          "href": "/windows-doors",
+          "icon": "Layout"
+        },
+        {
+          "label": "Custom Decks",
+          "href": "/decks",
+          "icon": "TreePine"
+        },
+        {
+          "label": "Siding, Soffit & Fascia",
+          "href": "/siding",
+          "icon": "Building2"
+        },
+        {
+          "label": "Commercial Roofing",
+          "href": "/commercial-roofing",
+          "icon": "Building"
+        },
+        {
+          "label": "Gutters & Protection",
+          "href": "/gutters",
+          "icon": "Droplets"
+        },
+        {
+          "label": "Free Estimates",
+          "href": "/estimate",
+          "icon": "ClipboardCheck"
+        },
+        {
+          "label": "Financing Options",
+          "href": "/financing",
+          "icon": "CreditCard"
+        }
+      ],
+      "materials": {
+        "title": "Certifications",
+        "items": [
+          {
+            "label": "ProVia Certified Installer",
+            "href": "/provia"
+          },
+          {
+            "label": "IKO Certified Pro",
+            "href": "/iko"
+          },
+          {
+            "label": "CertainTeed Certified",
+            "href": "/certainteed"
+          },
+          {
+            "label": "TimberTech/Azek Certified",
+            "href": "/timbertech"
+          }
+        ]
+      }
+    },
+    "contact": {
+      "title": "Contact Us",
+      "email": "banderson@eaglerevolution.com",
+      "phone": "636-449-9714",
+      "address": "1077 E Terra Ln, O'fallon, MO 63366",
+      "emergency": "24/7 Emergency Service Available",
+      "areas": "Serving Missouri: St. Louis County, St. Louis City, St. Charles County, Jefferson County, Franklin County • Illinois: Saint Clair County, Monroe County, Madison County"
+    },
+    "certifications": [
+      {
+        "cert": "Veteran Owned",
+        "number": "U.S. Army",
+        "icon": "Star"
+      },
+      {
+        "cert": "ProVia",
+        "number": "Certified Installer",
+        "icon": "Warranty"
+      },
+      {
+        "cert": "IKO",
+        "number": "Certified Pro",
+        "icon": "Warranty"
+      },
+      {
+        "cert": "CertainTeed",
+        "number": "SELECT ShingleMaster",
+        "icon": "Warranty"
+      },
+      {
+        "cert": "TimberTech",
+        "number": "Azek Certified",
+        "icon": "Warranty"
+      },
+      {
+        "cert": "NRCA",
+        "number": "Member",
+        "icon": "Warranty"
+      }
+    ],
+    "quickLinks": [
+      {
+        "label": "About Us",
+        "href": "/about",
+        "icon": "Users"
+      },
+      {
+        "label": "Gallery",
+        "href": "/gallery",
+        "icon": "Image"
+      },
+      {
+        "label": "Reviews",
+        "href": "/reviews",
+        "icon": "Star"
+      },
+   
+      {
+        "label": "Warranty",
+        "href": "/warranty",
+        "icon": "Shield"
+      },
+      {
+        "label": "Financing",
+        "href": "/financing",
+        "icon": "CreditCard"
+      }
+    ],
+    "social": [
+      {
+        "platform": "Facebook",
+        "icon": "Facebook",
+        "href": "#"
+      },
+      {
+        "platform": "Instagram",
+        "icon": "Instagram",
+        "href": "#"
+      },
+      {
+        "platform": "Google",
+        "icon": "Google",
+        "href": "#"
+      }
+    ],
+    "bottom": {
+      "copyright": "© 2026 Eagle Revolution",
+      "rights": "Veteran Owned & Operated. All rights reserved.",
+      "links": [
+        {
+          "label": "Privacy Policy",
+          "href": "/privacy"
+        },
+        {
+          "label": "Terms of Service",
+          "href": "/terms"
+        },
+        {
+          "label": "Licenses",
+          "href": "/licenses"
+        },
+        {
+          "label": "Sitemap",
+          "href": "/sitemap"
+        }
+      ],
+      "tagline": "VETERAN OWNED • INTEGRITY • CRAFTSMANSHIP"
+    },
+    "marquee": {
+      "texts": [
+        "VETERAN OWNED & OPERATED",
+        "SOARING BEYOND EXPECTATIONS",
+        "50-YEAR TRANSFERABLE WARRANTIES",
+        "FREE ESTIMATES"
+      ]
+    }
+  },
+  "hours": {
+    "monday": "09:00 AM – 05:00 PM",
+    "tuesday": "09:00 AM – 05:00 PM",
+    "wednesday": "09:00 AM – 05:00 PM",
+    "thursday": "09:00 AM – 05:00 PM",
+    "friday": "09:00 AM – 05:00 PM",
+    "saturday": "Closed",
+    "sunday": "Closed"
+  }
+}

@@ -1,0 +1,234 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@media (min-width: 350px) and (max-width: 750px) {
+  .logooo {
+    transform: translateX(-35px) !important;
+  }
+}
+
+@layer base {
+  :root {
+    /* Background - Clean White */
+    --background: 0 0% 100%;
+    /* Foreground - Navy Blue for ALL text */
+    --foreground: 217 33% 17%;  /* #1A2A4A Navy Blue */
+
+    /* Card - White background with Navy text */
+    --card: 0 0% 100%;
+    --card-foreground: 217 33% 17%;  /* Navy Blue */
+
+    /* Popover */
+    --popover: 0 0% 100%;
+    --popover-foreground: 217 33% 17%;  /* Navy Blue */
+
+    /* Primary - American Red (ACCENT color only) */
+    --primary: 0 91% 56%;  /* #E32B2B American Red */
+    --primary-foreground: 0 0% 100%;  /* White text on red */
+
+    /* Secondary - Navy Blue for dark sections */
+    --secondary: 217 33% 17%;  /* #1A2A4A Navy Blue */
+    --secondary-foreground: 0 0% 100%;  /* White text on navy */
+
+    /* Muted - Light gray background */
+    --muted: 210 20% 96%;
+    --muted-foreground: 215 16% 47%;  /* Medium gray */
+
+    /* Accent - Red for highlights */
+    --accent: 0 91% 56%;
+    --accent-foreground: 0 0% 100%;
+
+    /* Destructive */
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 210 40% 98%;
+
+    /* Borders */
+    --border: 214.3 31.8% 91.4%;
+    --input: 214.3 31.8% 91.4%;
+    --ring: 0 91% 56%;  /* Red ring focus */
+
+    --radius: 0.5rem;
+
+    /* Deep - Navy for dark backgrounds */
+    --deep: 217 33% 17%;
+    --surface: 0 0% 98%;
+    --surface-light: 0 0% 100%;
+    --text-dark: 217 33% 17%;
+
+    /* Sidebar - Navy Blue */
+    --sidebar-background: 217 33% 17%;
+    --sidebar-foreground: 0 0% 100%;
+    --sidebar-primary: 0 91% 56%;
+    --sidebar-primary-foreground: 0 0% 100%;
+    --sidebar-accent: 0 91% 56%;
+    --sidebar-accent-foreground: 0 0% 100%;
+    --sidebar-border: 215 25% 27%;
+    --sidebar-ring: 0 91% 56%;
+
+    /* Fonts */
+    --font-heading: 'Space Grotesk', sans-serif;
+    --font-body: 'DM Sans', sans-serif;
+  }
+
+  /* Optional dark mode if needed */
+  .dark {
+    --background: 217 33% 10%;
+    --foreground: 0 0% 100%;
+    --card: 217 33% 12%;
+    --card-foreground: 0 0% 100%;
+    --popover: 217 33% 12%;
+    --popover-foreground: 0 0% 100%;
+    --primary: 0 91% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 217 33% 17%;
+    --secondary-foreground: 0 0% 100%;
+    --muted: 217 33% 17%;
+    --muted-foreground: 215 20% 65%;
+    --accent: 0 91% 56%;
+    --accent-foreground: 0 0% 100%;
+    --border: 217 33% 20%;
+    --input: 217 33% 20%;
+    --ring: 0 91% 56%;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-background text-foreground;
+    font-family: var(--font-body);
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+  }
+
+  /* ALL headings default to NAVY BLUE */
+  h1, h2, h3, h4, h5, h6 {
+    @apply text-foreground;
+    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
+    line-height: 1.05;
+  }
+
+  /* Paragraphs default to NAVY BLUE */
+  p {
+    @apply text-foreground;
+  }
+
+  /* Links default to NAVY BLUE, hover to RED */
+  a {
+    @apply text-foreground transition-colors duration-300;
+  }
+  
+  a:hover {
+    @apply text-primary;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  .section-padding {
+    @apply px-6 md:px-12 lg:px-24 py-20 md:py-32;
+  }
+
+  .heading-xl {
+    @apply text-5xl md:text-7xl lg:text-8xl xl:text-9xl font-medium text-foreground;
+    font-family: var(--font-heading);
+    letter-spacing: -0.04em;
+    line-height: 0.95;
+  }
+
+  .heading-lg {
+    @apply text-4xl md:text-5xl lg:text-6xl font-medium text-foreground;
+    font-family: var(--font-heading);
+    letter-spacing: -0.03em;
+    line-height: 1;
+  }
+
+  .heading-md {
+    @apply text-2xl md:text-3xl lg:text-4xl font-medium text-foreground;
+    font-family: var(--font-heading);
+    letter-spacing: -0.02em;
+    line-height: 1.1;
+  }
+
+  .body-lg {
+    @apply text-lg md:text-xl text-foreground;
+    font-family: var(--font-body);
+    line-height: 1.6;
+  }
+
+  .body-sm {
+    @apply text-sm md:text-base text-foreground;
+    font-family: var(--font-body);
+    line-height: 1.5;
+  }
+
+  .accent-line {
+    @apply w-12 h-0.5 bg-primary;
+  }
+
+  .grid-editorial {
+    @apply grid grid-cols-1 md:grid-cols-12 gap-6 md:gap-8;
+  }
+
+  /* Red to Navy gradient for special text */
+  .text-gradient {
+    background: linear-gradient(135deg, #E32B2B 0%, #1A2A4A 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Red gradient for CTAs */
+  .bg-gradient-cta {
+    background: linear-gradient(135deg, #E32B2B 0%, #C41E1E 100%);
+    color: white;
+  }
+
+  /* Navy gradient for dark sections */
+  .bg-patriotic {
+    background: linear-gradient(135deg, #1A2A4A 0%, #0F1A2E 100%);
+    color: white;
+  }
+
+  .border-american {
+    border-color: #E32B2B;
+  }
+
+  .hover-lift {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+  }
+  
+  .hover-lift:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.02);
+  }
+
+  /* Text color utilities */
+  .text-navy {
+    color: #1A2A4A;
+  }
+  
+  .text-american-red {
+    color: #E32B2B;
+  }
+  
+  .bg-navy {
+    background-color: #1A2A4A;
+  }
+  
+  .bg-american-red {
+    background-color: #E32B2B;
+  }
+}
