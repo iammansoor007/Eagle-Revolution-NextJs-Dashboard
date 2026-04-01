@@ -1,12 +1,14 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState, useCallback } from "react";
 import {
     motion,
     useScroll,
     useTransform,
     useInView,
-    AnimatePresence
+    AnimatePresence,
+    useSpring,
+    useMotionValue,
 } from "framer-motion";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -15,921 +17,1003 @@ import { useContent } from "../../hooks/useContent";
 
 gsap.registerPlugin(ScrollTrigger);
 
-// Liquid Parallax Component
-const LiquidParallax = ({ children, speed = 0.1, className = "" }: { children: React.ReactNode; speed?: number; className?: string }) => {
-    const ref = useRef(null);
-    const { scrollYProgress } = useScroll({
-        target: ref,
-        offset: ["start end", "end start"]
-    });
+// ============================================================================
+// HELPER FUNCTIONS
+// ============================================================================
+const getVideoThumbnail = (videoId: string) => {
+    return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
+};
 
-    const y = useTransform(scrollYProgress, [0, 1], [0, speed * 50]);
-    const opacity = useTransform(scrollYProgress, [0, 0.5, 1], [0.4, 0.6, 0.4]);
+const FALLBACK_IMAGE = "https://images.unsplash.com/photo-1579546929518-9e396f3cc809?w=400&h=225&fit=crop";
+
+// ============================================================================
+// 3D TILT CARD COMPONENT
+// ============================================================================
+const TiltCard = ({ children, className = "" }: { children: React.ReactNode; className?: string }) => {
+    const ref = useRef<HTMLDivElement>(null);
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+    const rotateX = useSpring(useTransform(y, [-0.5, 0.5], [8, -8]), { stiffness: 300, damping: 30 });
+    const rotateY = useSpring(useTransform(x, [-0.5, 0.5], [-8, 8]), { stiffness: 300, damping: 30 });
+
+    const handleMouseMove = (e: React.MouseEvent) => {
+        if (!ref.current) return;
+        const rect = ref.current.getBoundingClientRect();
+        const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+        const mouseY = (e.clientY - rect.top) / rect.height - 0.5;
+        x.set(mouseX);
+        y.set(mouseY);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
 
     return (
         <motion.div
             ref={ref}
-            style={{ y, opacity }}
-            className={`absolute inset-0 will-change-transform ${className}`}
+            style={{ rotateX, rotateY, transformPerspective: 1000 }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={handleMouseLeave}
+            className={className}
         >
             {children}
         </motion.div>
     );
 };
 
-// Holographic Input
-const HolographicInput = ({ icon: IconName, label, type = "text", ...props }: { icon: string; label: string; type?: string;[key: string]: any }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [hasValue, setHasValue] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
-    const inputRef = useRef<HTMLInputElement>(null);
-
+// ============================================================================
+// GLOWING BORDER CARD
+// ============================================================================
+const GlowCard = ({ children, className = "", isActive = false }: { children: React.ReactNode; className?: string; isActive?: boolean }) => {
     return (
-        <div
-            className="relative group"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
+        <div className={`relative group ${className}`}>
             <motion.div
-                animate={isFocused ? {
-                    opacity: 0.2,
-                    scale: 1.05,
-                } : {
-                    opacity: isHovered ? 0.1 : 0,
-                    scale: 1,
+                animate={{
+                    opacity: isActive ? 0.4 : 0,
+                    scale: isActive ? 1.05 : 1,
                 }}
-                className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary rounded-xl blur-lg"
-                transition={{ duration: 0.3 }}
+                className="absolute -inset-0.5 bg-gradient-to-r from-primary via-primary/60 to-primary rounded-2xl blur-xl"
+                transition={{ duration: 0.4 }}
             />
-
-            <div className={`
-        relative flex items-center bg-card/95 backdrop-blur-sm rounded-xl border transition-all duration-500
-        ${isFocused
-                    ? 'border-primary/50 shadow-[0_0_30px_hsl(var(--primary)/0.15)]'
-                    : hasValue
-                        ? 'border-primary/30'
-                        : 'border-border/80 hover:border-border/80'
-                }
-      `}>
-                <div className={`
-          absolute left-4 transition-all duration-500
-          ${isFocused ? 'text-primary scale-110' : hasValue ? 'text-primary' : 'text-muted-foreground group-hover:text-muted-foreground/80'}
-        `}>
-                    <Icon name={IconName} className="w-5 h-5" />
-                </div>
-
-                <input
-                    ref={inputRef}
-                    type={type}
-                    placeholder={label}
-                    onChange={(e) => {
-                        setHasValue(!!e.target.value);
-                        props.onChange?.(e);
-                    }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
-                    {...props}
-                />
-
-                {isFocused && (
-                    <motion.div
-                        initial={{ scaleX: 0 }}
-                        animate={{ scaleX: 1 }}
-                        exit={{ scaleX: 0 }}
-                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary rounded-full"
-                        transition={{ duration: 0.4, ease: [0.16, 1, 0.3, 1] }}
-                    />
-                )}
+            <div className="relative bg-gradient-to-br from-card/90 to-card/50 backdrop-blur-xl rounded-2xl border border-white/10 group-hover:border-primary/30 transition-all duration-500">
+                {children}
             </div>
         </div>
     );
 };
 
-// Quantum Textarea
-const QuantumTextarea = ({ icon: IconName, label, ...props }: { icon: string; label: string;[key: string]: any }) => {
-    const [isFocused, setIsFocused] = useState(false);
-    const [hasValue, setHasValue] = useState(false);
-    const [isHovered, setIsHovered] = useState(false);
+// ============================================================================
+// ANIMATED COUNTER
+// ============================================================================
+const AnimatedCounter = ({ value, suffix = "" }: { value: number; suffix?: string }) => {
+    const [count, setCount] = useState(0);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-100px" });
+
+    useEffect(() => {
+        if (isInView) {
+            let start = 0;
+            const duration = 2000;
+            const increment = value / (duration / 16);
+            const timer = setInterval(() => {
+                start += increment;
+                if (start >= value) {
+                    setCount(value);
+                    clearInterval(timer);
+                } else {
+                    setCount(Math.floor(start));
+                }
+            }, 16);
+            return () => clearInterval(timer);
+        }
+    }, [isInView, value]);
 
     return (
-        <div
-            className="relative group"
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-        >
-            <motion.div
-                animate={isFocused ? {
-                    opacity: 0.2,
-                    scale: 1.02,
-                } : {
-                    opacity: isHovered ? 0.1 : 0,
-                    scale: 1,
-                }}
-                className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary rounded-xl blur-lg"
-                transition={{ duration: 0.3 }}
-            />
-
-            <div className={`
-        relative flex bg-card/95 backdrop-blur-sm rounded-xl border transition-all duration-500
-        ${isFocused
-                    ? 'border-primary/50 shadow-[0_0_30px_hsl(var(--primary)/0.15)]'
-                    : hasValue
-                        ? 'border-primary/30'
-                        : 'border-border/80 hover:border-border/80'
-                }
-      `}>
-                <div className={`
-          absolute left-4 top-4 transition-all duration-500
-          ${isFocused ? 'text-primary scale-110' : hasValue ? 'text-primary' : 'text-muted-foreground'}
-        `}>
-                    <Icon name={IconName} className="w-5 h-5" />
-                </div>
-
-                <textarea
-                    placeholder={label}
-                    rows={6}
-                    onChange={(e) => {
-                        setHasValue(!!e.target.value);
-                        props.onChange?.(e);
-                    }}
-                    onFocus={() => setIsFocused(true)}
-                    onBlur={() => setIsFocused(false)}
-                    className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus:outline-none resize-none"
-                    {...props}
-                />
-            </div>
-        </div>
+        <span ref={ref} className="tabular-nums">
+            {count}{suffix}
+        </span>
     );
 };
 
-// Contact Info Card
-const ContactInfoCard = ({ icon, title, info, details, isHovered, onHover }: { icon: string; title: string; info: string; details?: string[]; isHovered: boolean; onHover: (hovered: boolean) => void }) => {
+// ============================================================================
+// PREMIUM TESTIMONIAL CARD
+// ============================================================================
+const PremiumTestimonialCard = ({ testimonial, index, onPlayVideo }: { testimonial: any; index: number; onPlayVideo?: (videoId: string, title: string) => void }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const cardRef = useRef(null);
+    const isInView = useInView(cardRef, { once: true, margin: "-100px" });
+
     return (
         <motion.div
-            onHoverStart={() => onHover(true)}
-            onHoverEnd={() => onHover(false)}
-            whileHover={{ y: -4 }}
-            className="relative p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-primary/10 hover:border-primary/30 transition-all duration-500 group"
+            ref={cardRef}
+            initial={{ opacity: 0, y: 80, rotateX: 10 }}
+            animate={isInView ? { opacity: 1, y: 0, rotateX: 0 } : {}}
+            transition={{ duration: 0.7, delay: index * 0.1, ease: [0.21, 0.45, 0.27, 0.9] }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
-            <motion.div
-                animate={isHovered ? {
-                    scale: 1.1,
-                    rotate: [0, 5, -5, 0],
-                } : { scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-3xl mb-4 text-primary"
-            >
-                <Icon name={icon} className="w-8 h-8" />
-            </motion.div>
+            <TiltCard>
+                <GlowCard isActive={isHovered}>
+                    <div className="relative p-8 md:p-10 overflow-hidden">
+                        <motion.div
+                            animate={{
+                                background: isHovered
+                                    ? "radial-gradient(circle at 0% 0%, rgba(245, 158, 11, 0.15) 0%, rgba(245, 158, 11, 0) 70%)"
+                                    : "radial-gradient(circle at 100% 100%, rgba(245, 158, 11, 0.05) 0%, rgba(245, 158, 11, 0) 70%)",
+                            }}
+                            transition={{ duration: 0.5 }}
+                            className="absolute inset-0 pointer-events-none"
+                        />
 
-            <h3 className="text-lg font-medium text-foreground mb-2">{title}</h3>
-            <p className="text-sm text-muted-foreground mb-3">{info}</p>
+                        <motion.div
+                            animate={{ rotate: isHovered ? 5 : 0, scale: isHovered ? 1.05 : 1 }}
+                            className="absolute top-6 right-6 opacity-10"
+                        >
+                            <svg width="48" height="48" viewBox="0 0 24 24" fill="currentColor" className="text-primary">
+                                <path d="M10 11h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1zM10 21h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1zM19 11h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1zM19 21h-4a1 1 0 0 1-1-1v-4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v4a1 1 0 0 1-1 1z" />
+                            </svg>
+                        </motion.div>
 
-            {details && (
-                <div className="space-y-1">
-                    {details.map((detail, i) => (
-                        <p key={i} className="text-xs text-foreground/70 font-mono">
-                            {detail}
-                        </p>
-                    ))}
-                </div>
-            )}
+                        <div className="flex gap-1.5 mb-6">
+                            {[...Array(5)].map((_, i) => (
+                                <motion.svg
+                                    key={i}
+                                    initial={{ scale: 0, opacity: 0 }}
+                                    animate={{ scale: 1, opacity: 1 }}
+                                    transition={{ delay: index * 0.1 + i * 0.05, type: "spring" }}
+                                    width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-primary"
+                                >
+                                    <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" />
+                                </motion.svg>
+                            ))}
+                        </div>
 
-            {isHovered && (
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-3 right-3"
-                >
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Icon name="ArrowRight" className="w-3 h-3 text-primary" />
+                        <motion.p
+                            animate={{ y: isHovered ? -2 : 0 }}
+                            className="text-foreground/90 text-lg md:text-xl leading-relaxed mb-8 font-light"
+                        >
+                            "{testimonial.text}"
+                        </motion.p>
+
+                        <div className="flex items-center justify-between pt-6 border-t border-white/10">
+                            <div className="flex items-center gap-4">
+                                <motion.div
+                                    animate={{ scale: isHovered ? 1.05 : 1 }}
+                                    className="relative"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/50 rounded-full blur-md opacity-60" />
+                                    <div className="relative w-14 h-14 rounded-full bg-gradient-to-br from-primary/40 to-primary/20 flex items-center justify-center">
+                                        <span className="text-primary font-semibold text-xl">
+                                            {testimonial.avatar || testimonial.name?.charAt(0) || "✓"}
+                                        </span>
+                                    </div>
+                                </motion.div>
+
+                                <div>
+                                    <h4 className="font-semibold text-foreground text-base md:text-lg">
+                                        {testimonial.name}
+                                    </h4>
+                                    <p className="text-sm text-muted-foreground">
+                                        {testimonial.position}, {testimonial.company}
+                                    </p>
+                                </div>
+                            </div>
+
+                            {testimonial.videoId && onPlayVideo && (
+                                <motion.button
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.95 }}
+                                    onClick={() => onPlayVideo(testimonial.videoId, testimonial.name)}
+                                    className="relative group/btn"
+                                >
+                                    <motion.div
+                                        animate={{ scale: isHovered ? 1.2 : 1 }}
+                                        className="absolute inset-0 bg-primary rounded-full blur-md opacity-0 group-hover/btn:opacity-50 transition-opacity"
+                                    />
+                                    <div className="relative w-12 h-12 rounded-full bg-primary flex items-center justify-center shadow-xl">
+                                        <svg width="16" height="16" viewBox="0 0 24 24" fill="white" className="ml-0.5">
+                                            <polygon points="5 3 19 12 5 21 5 3" />
+                                        </svg>
+                                    </div>
+                                </motion.button>
+                            )}
+                        </div>
+
+                        <div className="absolute top-6 left-6 w-8 h-8 border-t-2 border-l-2 border-primary/20" />
+                        <div className="absolute bottom-6 right-6 w-8 h-8 border-b-2 border-r-2 border-primary/20" />
                     </div>
-                </motion.div>
-            )}
+                </GlowCard>
+            </TiltCard>
         </motion.div>
     );
 };
 
-// Success Modal
-const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+// ============================================================================
+// CINEMATIC VIDEO CARD
+// ============================================================================
+const CinematicVideoCard = ({ video, onClick, index }: { video: any; onClick: () => void; index: number }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [imageError, setImageError] = useState(false);
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: "-50px" });
+
+    const thumbnailUrl = imageError ? FALLBACK_IMAGE : getVideoThumbnail(video.videoId);
+
+    return (
+        <motion.div
+            ref={ref}
+            initial={{ opacity: 0, y: 40 }}
+            animate={isInView ? { opacity: 1, y: 0 } : {}}
+            transition={{ duration: 0.6, delay: index * 0.08 }}
+            className="relative group cursor-pointer"
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            onClick={onClick}
+        >
+            <div className="relative aspect-video rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/80">
+                <motion.img
+                    animate={{ scale: isHovered ? 1.1 : 1 }}
+                    transition={{ duration: 0.7, ease: [0.32, 0.72, 0, 1] }}
+                    src={thumbnailUrl}
+                    alt={video.name}
+                    className="w-full h-full object-cover"
+                    onError={() => setImageError(true)}
+                    loading="lazy"
+                />
+
+                <motion.div
+                    animate={{ opacity: isHovered ? 1 : 0 }}
+                    className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent"
+                />
+
+                <motion.div
+                    initial={false}
+                    animate={{ scale: isHovered ? 1 : 0.9, opacity: isHovered ? 1 : 0 }}
+                    className="absolute inset-0 flex items-center justify-center"
+                >
+                    <div className="relative">
+                        <motion.div
+                            animate={{ scale: [1, 1.3, 1] }}
+                            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+                            className="absolute inset-0 bg-white rounded-full blur-xl opacity-50"
+                        />
+                        <div className="relative w-16 h-16 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center border-2 border-white/50 shadow-2xl">
+                            <svg width="24" height="24" viewBox="0 0 24 24" fill="white" className="ml-1">
+                                <polygon points="5 3 19 12 5 21 5 3" />
+                            </svg>
+                        </div>
+                    </div>
+                </motion.div>
+
+                <motion.div
+                    animate={{ y: isHovered ? -5 : 0 }}
+                    className="absolute bottom-3 right-3 px-2.5 py-1 bg-black/70 backdrop-blur-sm rounded-md text-white text-xs font-mono"
+                >
+                    {video.duration}
+                </motion.div>
+            </div>
+
+            <motion.div animate={{ x: isHovered ? 5 : 0 }} className="mt-3">
+                <h4 className="text-sm font-medium text-foreground line-clamp-1 group-hover:text-primary transition-colors">
+                    {video.name}
+                </h4>
+                <p className="text-xs text-muted-foreground mt-0.5 line-clamp-1">
+                    {video.title}
+                </p>
+            </motion.div>
+        </motion.div>
+    );
+};
+
+// ============================================================================
+// FLOATING ORB BACKGROUND
+// ============================================================================
+const FloatingOrbs = () => {
+    const orbs = Array.from({ length: 12 }, (_, i) => ({
+        id: i,
+        size: 100 + Math.random() * 300,
+        x: Math.random() * 100,
+        y: Math.random() * 100,
+        duration: 20 + Math.random() * 20,
+        delay: Math.random() * 10,
+    }));
+
+    return (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+            {orbs.map((orb) => (
+                <motion.div
+                    key={orb.id}
+                    className="absolute rounded-full bg-primary/5 blur-3xl"
+                    style={{
+                        width: orb.size,
+                        height: orb.size,
+                        left: `${orb.x}%`,
+                        top: `${orb.y}%`,
+                    }}
+                    animate={{
+                        x: [0, 50, -30, 20, 0],
+                        y: [0, -30, 40, -20, 0],
+                        scale: [1, 1.2, 0.9, 1.1, 1],
+                    }}
+                    transition={{
+                        duration: orb.duration,
+                        repeat: Infinity,
+                        delay: orb.delay,
+                        ease: "easeInOut",
+                    }}
+                />
+            ))}
+        </div>
+    );
+};
+
+// ============================================================================
+// VIDEO MODAL
+// ============================================================================
+const VideoModal = ({ isOpen, onClose, videoId, title }: { isOpen: boolean; onClose: () => void; videoId: string; title: string }) => {
     useEffect(() => {
-        if (isOpen) {
-            document.body.style.overflow = 'hidden';
-        } else {
-            document.body.style.overflow = 'unset';
-        }
-        return () => {
-            document.body.style.overflow = 'unset';
-        };
+        if (isOpen) document.body.style.overflow = "hidden";
+        else document.body.style.overflow = "unset";
+        return () => { document.body.style.overflow = "unset"; };
     }, [isOpen]);
+
+    if (!isOpen) return null;
 
     return (
         <AnimatePresence>
-            {isOpen && (
-                <motion.div
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    exit={{ opacity: 0 }}
-                    className="fixed inset-0 z-[100] flex items-center justify-center p-4 sm:p-6"
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/95 backdrop-blur-2xl"
+                onClick={onClose}
+            >
+                <motion.button
+                    initial={{ opacity: 0, y: -20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    onClick={onClose}
+                    className="absolute top-6 right-6 z-50 w-12 h-12 rounded-full bg-white/10 hover:bg-white/20 flex items-center justify-center transition-all"
                 >
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        className="absolute inset-0 bg-secondary/95 backdrop-blur-md"
-                        onClick={onClose}
+                    <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                        <path d="M18 6L6 18M6 6L18 18" />
+                    </svg>
+                </motion.button>
+
+                <motion.div
+                    initial={{ scale: 0.9, opacity: 0, y: 20 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.9, opacity: 0, y: 20 }}
+                    transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                    className="relative w-full max-w-5xl aspect-video rounded-2xl overflow-hidden shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <iframe
+                        className="w-full h-full"
+                        src={`https://www.youtube.com/embed/${videoId}?autoplay=1&modestbranding=1&rel=0&showinfo=0&color=white`}
+                        title={title}
+                        frameBorder="0"
+                        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                        allowFullScreen
                     />
-
-                    <motion.div
-                        initial={{ scale: 0.9, y: 20, opacity: 0 }}
-                        animate={{ scale: 1, y: 0, opacity: 1 }}
-                        exit={{ scale: 0.9, y: 20, opacity: 0 }}
-                        transition={{
-                            type: "spring",
-                            stiffness: 400,
-                            damping: 30
-                        }}
-                        className="relative bg-card rounded-2xl sm:rounded-3xl shadow-2xl max-w-lg w-full overflow-hidden"
-                    >
-                        <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-card to-primary/5" />
-
-                        <div className="relative pt-10 sm:pt-12 pb-6 sm:pb-8 px-6 sm:px-8 text-center">
-                            <motion.div
-                                initial={{ scale: 0 }}
-                                animate={{ scale: 1 }}
-                                transition={{
-                                    type: "spring",
-                                    stiffness: 500,
-                                    damping: 30,
-                                    delay: 0.2
-                                }}
-                                className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 sm:mb-6 rounded-full bg-gradient-to-r from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30"
-                            >
-                                <motion.div
-                                    initial={{ pathLength: 0 }}
-                                    animate={{ pathLength: 1 }}
-                                    transition={{ duration: 0.6, delay: 0.4 }}
-                                >
-                                    <Icon name="Check" className="w-8 h-8 text-white" />
-                                </motion.div>
-                            </motion.div>
-
-                            <motion.h3
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.5 }}
-                                className="text-xl sm:text-2xl font-light text-foreground mb-2 sm:mb-3"
-                            >
-                                Message Sent Successfully!
-                            </motion.h3>
-
-                            <motion.p
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.6 }}
-                                className="text-muted-foreground text-xs sm:text-sm leading-relaxed"
-                            >
-                                Thank you for reaching out to Eagle Revolution.
-                                <br />
-                                <span className="font-medium text-primary mt-2 block">
-                                    We'll respond within 4-8 hours.
-                                </span>
-                            </motion.p>
-
-                            <motion.button
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                transition={{ delay: 0.7 }}
-                                onClick={onClose}
-                                className="mt-6 sm:mt-8 px-6 sm:px-8 py-2.5 sm:py-3 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-medium tracking-[0.2em] uppercase rounded-full shadow-lg hover:shadow-xl transition-all duration-500"
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
-                            >
-                                Close
-                            </motion.button>
-                        </div>
-
-                        <div className="absolute top-4 left-4 sm:top-6 sm:left-6 w-8 h-8 sm:w-12 sm:h-12 border-t-2 border-l-2 border-primary/20" />
-                        <div className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 w-8 h-8 sm:w-12 sm:h-12 border-b-2 border-r-2 border-primary/20" />
-                    </motion.div>
                 </motion.div>
-            )}
+            </motion.div>
         </AnimatePresence>
     );
 };
 
-// Main Contact Page Component
-const ContactPage = () => {
-    const sectionRef = useRef(null);
-    const [isClient, setIsClient] = useState(false);
-    const [isSubmitting, setIsSubmitting] = useState(false);
-    const [showSuccess, setShowSuccess] = useState(false);
-    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
-    const [formData, setFormData] = useState({
-        name: '',
-        email: '',
-        phone: '',
-        subject: '',
-        message: ''
-    });
+// ============================================================================
+// SUCCESS MODAL
+// ============================================================================
+const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    if (!isOpen) return null;
 
-    const contactInfo = [
-        {
-            id: 'email',
-            icon: 'Mail',
-            title: 'Email Us',
-            info: 'Get a response within 4-8 hours',
-            details: ['banderson@eaglerevolution.com']
-        },
-        {
-            id: 'phone',
-            icon: 'Phone',
-            title: 'Call Us',
-            info: 'Mon-Fri 9am-6pm CST',
-            details: ['+1 (555) 123-4567']
-        },
-        {
-            id: 'location',
-            icon: 'MapPin',
-            title: 'Visit Us',
-            info: 'Veteran owned & operated',
-            details: ['Austin, Texas', 'United States']
-        }
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+                onClick={onClose}
+            >
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0, y: 40 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.8, opacity: 0, y: 40 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                    className="relative bg-gradient-to-br from-card to-card/95 rounded-2xl max-w-md w-full p-10 text-center border border-white/10 shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring" }}
+                        className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-primary to-primary/80 flex items-center justify-center shadow-2xl"
+                    >
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2.5">
+                            <path d="M20 6L9 17L4 12" strokeLinecap="round" strokeLinejoin="round" />
+                        </svg>
+                    </motion.div>
+
+                    <motion.h3
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-2xl font-medium text-foreground mb-2"
+                    >
+                        Thank You!
+                    </motion.h3>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-muted-foreground text-sm leading-relaxed"
+                    >
+                        Your testimonial has been submitted successfully.
+                        <br />
+                        <span className="text-primary font-medium mt-2 block">We appreciate your feedback!</span>
+                    </motion.p>
+
+                    <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        onClick={onClose}
+                        className="mt-8 px-8 py-3 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        Close
+                    </motion.button>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    );
+};
+
+// ============================================================================
+// ERROR MODAL
+// ============================================================================
+const ErrorModal = ({ isOpen, onClose, message }: { isOpen: boolean; onClose: () => void; message: string }) => {
+    if (!isOpen) return null;
+
+    return (
+        <AnimatePresence>
+            <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 z-[100] flex items-center justify-center p-4 bg-black/80 backdrop-blur-xl"
+                onClick={onClose}
+            >
+                <motion.div
+                    initial={{ scale: 0.8, opacity: 0, y: 40 }}
+                    animate={{ scale: 1, opacity: 1, y: 0 }}
+                    exit={{ scale: 0.8, opacity: 0, y: 40 }}
+                    transition={{ type: "spring", damping: 20, stiffness: 200 }}
+                    className="relative bg-gradient-to-br from-card to-card/95 rounded-2xl max-w-md w-full p-10 text-center border border-red-500/20 shadow-2xl"
+                    onClick={(e) => e.stopPropagation()}
+                >
+                    <motion.div
+                        initial={{ scale: 0 }}
+                        animate={{ scale: 1 }}
+                        transition={{ delay: 0.2, type: "spring" }}
+                        className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-red-500 to-red-500/80 flex items-center justify-center shadow-2xl"
+                    >
+                        <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="white" strokeWidth="2">
+                            <path d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" strokeLinecap="round" />
+                        </svg>
+                    </motion.div>
+
+                    <motion.h3
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.3 }}
+                        className="text-2xl font-medium text-foreground mb-2"
+                    >
+                        Submission Failed
+                    </motion.h3>
+
+                    <motion.p
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
+                        className="text-muted-foreground text-sm leading-relaxed"
+                    >
+                        {message}
+                    </motion.p>
+
+                    <motion.button
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                        onClick={onClose}
+                        className="mt-8 px-8 py-3 bg-primary text-primary-foreground text-sm font-medium rounded-full hover:bg-primary/90 transition-all"
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                    >
+                        Try Again
+                    </motion.button>
+                </motion.div>
+            </motion.div>
+        </AnimatePresence>
+    );
+};
+
+// ============================================================================
+// TESTIMONIAL FORM
+// ============================================================================
+const TestimonialForm = ({ onSubmit, isSubmitting }: { onSubmit: (data: any) => void; isSubmitting: boolean }) => {
+    const [formData, setFormData] = useState({
+        name: "",
+        email: "",
+        company: "",
+        position: "",
+        rating: 5,
+        testimonial: "",
+        allowPublish: true,
+    });
+    const [hoveredRating, setHoveredRating] = useState(0);
+
+    const inputs = [
+        { icon: "User", name: "name", label: "Full Name", type: "text" },
+        { icon: "Mail", name: "email", label: "Email Address", type: "email" },
+        { icon: "Building2", name: "company", label: "Company", type: "text" },
+        { icon: "Briefcase", name: "position", label: "Position", type: "text" },
     ];
 
-    const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value
-        });
+    return (
+        <form onSubmit={(e) => { e.preventDefault(); onSubmit(formData); }} className="space-y-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                {inputs.map((input) => (
+                    <div key={input.name} className="relative group">
+                        <motion.div
+                            whileHover={{ scale: 1.02 }}
+                            className="relative"
+                        >
+                            <div className="absolute left-4 top-1/2 -translate-y-1/2 text-muted-foreground group-focus-within:text-primary transition-colors">
+                                <Icon name={input.icon} className="w-5 h-5" />
+                            </div>
+                            <input
+                                type={input.type}
+                                name={input.name}
+                                value={formData[input.name as keyof typeof formData] as string}
+                                onChange={(e) => setFormData({ ...formData, [input.name]: e.target.value })}
+                                className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all"
+                                placeholder={input.label}
+                                required
+                            />
+                        </motion.div>
+                    </div>
+                ))}
+            </div>
+
+            <div className="space-y-3">
+                <label className="text-xs font-mono tracking-wider uppercase text-muted-foreground">Your Rating</label>
+                <div className="flex gap-2">
+                    {[1, 2, 3, 4, 5].map((star) => (
+                        <motion.button
+                            key={star}
+                            type="button"
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            onClick={() => setFormData({ ...formData, rating: star })}
+                            onMouseEnter={() => setHoveredRating(star)}
+                            onMouseLeave={() => setHoveredRating(0)}
+                            className="focus:outline-none"
+                        >
+                            <svg
+                                width="32"
+                                height="32"
+                                viewBox="0 0 24 24"
+                                fill={(hoveredRating >= star || formData.rating >= star) ? "currentColor" : "none"}
+                                stroke="currentColor"
+                                className={`transition-all duration-200 ${(hoveredRating >= star || formData.rating >= star) ? "text-primary scale-110" : "text-muted-foreground"}`}
+                            >
+                                <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" />
+                            </svg>
+                        </motion.button>
+                    ))}
+                </div>
+            </div>
+
+            <div className="relative group">
+                <div className="absolute left-4 top-4 text-muted-foreground group-focus-within:text-primary transition-colors">
+                    <Icon name="MessageCircle" className="w-5 h-5" />
+                </div>
+                <textarea
+                    name="testimonial"
+                    rows={5}
+                    value={formData.testimonial}
+                    onChange={(e) => setFormData({ ...formData, testimonial: e.target.value })}
+                    className="w-full pl-12 pr-4 py-4 bg-white/5 border border-white/10 rounded-xl text-foreground placeholder:text-muted-foreground focus:outline-none focus:border-primary/50 focus:ring-1 focus:ring-primary/30 transition-all resize-none"
+                    placeholder="Share your experience with us..."
+                    required
+                />
+            </div>
+
+            <div className="flex items-center gap-3">
+                <input
+                    type="checkbox"
+                    id="allowPublish"
+                    checked={formData.allowPublish}
+                    onChange={(e) => setFormData({ ...formData, allowPublish: e.target.checked })}
+                    className="w-4 h-4 rounded border-white/20 bg-white/5 text-primary focus:ring-primary/30"
+                />
+                <label htmlFor="allowPublish" className="text-xs text-muted-foreground">
+                    I agree to have my testimonial published
+                </label>
+            </div>
+
+            <motion.button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full relative py-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground font-medium rounded-xl overflow-hidden disabled:opacity-50 group"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+            >
+                <span className="relative z-10 flex items-center justify-center gap-2">
+                    {isSubmitting ? (
+                        <>
+                            <motion.div
+                                animate={{ rotate: 360 }}
+                                transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+                                className="w-4 h-4 border-2 border-white border-t-transparent rounded-full"
+                            />
+                            Submitting...
+                        </>
+                    ) : (
+                        <>
+                            Share Your Story
+                            <Icon name="Send" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                        </>
+                    )}
+                </span>
+            </motion.button>
+        </form>
+    );
+};
+
+// ============================================================================
+// MAIN PAGE COMPONENT
+// ============================================================================
+const TestimonialsPage = () => {
+    const { testimonials: testimonialsData } = useContent();
+    const [selectedVideo, setSelectedVideo] = useState<string | null>(null);
+    const [selectedVideoTitle, setSelectedVideoTitle] = useState<string | null>(null);
+    const [showVideoModal, setShowVideoModal] = useState(false);
+    const [showSuccess, setShowSuccess] = useState(false);
+    const [showError, setShowError] = useState(false);
+    const [errorMessage, setErrorMessage] = useState("");
+    const [isSubmitting, setIsSubmitting] = useState(false);
+    const heroRef = useRef(null);
+    const { scrollYProgress } = useScroll({ target: heroRef, offset: ["start start", "end start"] });
+    const heroY = useTransform(scrollYProgress, [0, 1], [0, 200]);
+    const heroOpacity = useTransform(scrollYProgress, [0, 0.5], [1, 0]);
+
+    const { section, testimonials, videos, stats } = testimonialsData || {};
+
+    const handlePlayVideo = (videoId: string, title: string) => {
+        setSelectedVideo(videoId);
+        setSelectedVideoTitle(title);
+        setShowVideoModal(true);
     };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-        e.preventDefault();
+    const handleSubmitTestimonial = async (formData: any) => {
         setIsSubmitting(true);
 
-        const emailContent = `
-🦅 EAGLE REVOLUTION CONTACT FORM
-
+        try {
+            // Try direct email submission using mailto as fallback
+            const subject = encodeURIComponent(`Eagle Revolution Testimonial - ${formData.name}`);
+            const body = encodeURIComponent(`
+📋 TESTIMONIAL SUBMISSION
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 CONTACT INFORMATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 Name: ${formData.name}
 Email: ${formData.email}
-Phone: ${formData.phone}
-Subject: ${formData.subject}
+Company: ${formData.company}
+Position: ${formData.position}
+Rating: ${formData.rating}/5 stars
 
-📝 MESSAGE
+📝 TESTIMONIAL:
+${formData.testimonial}
+
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${formData.message}
-
+Allow Publish: ${formData.allowPublish ? 'Yes' : 'No'}
+Submitted: ${new Date().toLocaleString()}
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⏱️ Submitted: ${new Date().toLocaleString()}
-🇺🇸 Veteran Owned & Operated
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-    `;
+      `);
 
-        try {
-            try {
-                const response = await fetch('https://formsubmit.co/ajax/banderson@eaglerevolution.com', {
-                    method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
-                    },
-                    body: JSON.stringify({
-                        _subject: `🦅 Eagle Revolution Contact - ${formData.subject}`,
-                        name: formData.name,
-                        email: formData.email,
-                        phone: formData.phone,
-                        subject: formData.subject,
-                        message: formData.message,
-                        _template: 'table',
-                        _captcha: 'false'
-                    })
-                });
+            // Open email client with pre-filled content
+            window.location.href = `mailto:banderson@eaglerevolution.com?subject=${subject}&body=${body}`;
 
-                if (response.ok) {
-                    setShowSuccess(true);
-                    setFormData({
-                        name: '',
-                        email: '',
-                        phone: '',
-                        subject: '',
-                        message: ''
-                    });
-                    setIsSubmitting(false);
-                    return;
-                }
-            } catch (fetchError) {
-                console.log('FormSubmit failed, using mailto fallback');
-            }
-
-            window.location.href = `mailto:banderson@eaglerevolution.com?subject=${encodeURIComponent(`Contact: ${formData.subject}`)}&body=${encodeURIComponent(emailContent)}`;
+            // Show success message since email client opened
             setShowSuccess(true);
-            setFormData({
-                name: '',
-                email: '',
-                phone: '',
-                subject: '',
-                message: ''
-            });
+
+            // Reset form
+            const form = document.querySelector('form');
+            if (form) form.reset();
 
         } catch (error) {
             console.error('Submission error:', error);
-            alert('Please email us directly at banderson@eaglerevolution.com');
+            setErrorMessage("Unable to open email client. Please email us directly at banderson@eaglerevolution.com");
+            setShowError(true);
         } finally {
             setIsSubmitting(false);
         }
     };
 
     useEffect(() => {
-        setIsClient(true);
+        const ctx = gsap.context(() => {
+            gsap.fromTo(".fade-up", { y: 60, opacity: 0 }, {
+                y: 0,
+                opacity: 1,
+                duration: 1,
+                stagger: 0.2,
+                ease: "power3.out",
+                scrollTrigger: { trigger: ".fade-up-container", start: "top 80%" },
+            });
+        });
+        return () => ctx.revert();
     }, []);
 
-    useEffect(() => {
-        if (!sectionRef.current || !isClient) return;
-
-        const ctx = gsap.context(() => {
-            gsap.fromTo('.contact-reveal',
-                { y: 50, opacity: 0, rotateX: 5 },
-                {
-                    y: 0,
-                    opacity: 1,
-                    rotateX: 0,
-                    duration: 1.2,
-                    stagger: 0.15,
-                    ease: "expo.out",
-                    scrollTrigger: {
-                        trigger: sectionRef.current,
-                        start: "top 85%",
-                        toggleActions: "play none none reverse"
-                    }
-                }
-            );
-        }, sectionRef);
-
-        return () => ctx.revert();
-    }, [isClient]);
-
     return (
-        <section
-            ref={sectionRef}
-            className="relative bg-background py-12 sm:py-14 md:py-16 lg:py-20 overflow-hidden"
-        >
-            {/* Background Elements */}
-            <div className="absolute inset-0 pointer-events-none">
-                <div
-                    className="absolute inset-0 opacity-[0.02]"
-                    style={{
-                        backgroundImage: `
-              linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px),
-              linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)
-            `,
-                        backgroundSize: '60px 60px',
-                    }}
-                />
-            </div>
+        <>
+            <main className="relative min-h-screen bg-background overflow-hidden">
+                <FloatingOrbs />
 
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] sm:w-[1000px] h-[400px] sm:h-[500px] bg-gradient-to-b from-primary/5 to-transparent opacity-60 blur-3xl" />
+                {/* Hero Section */}
+                <section ref={heroRef} className="relative pt-32 pb-20 md:pt-40 md:pb-28 overflow-hidden">
+                    <motion.div style={{ y: heroY, opacity: heroOpacity }} className="absolute inset-0">
+                        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] md:w-[1200px] h-[500px] md:h-[700px] bg-primary/20 blur-[120px] rounded-full" />
+                        <div className="absolute bottom-0 right-0 w-[500px] md:w-[800px] h-[500px] md:h-[800px] bg-primary/10 blur-[100px] rounded-full" />
+                    </motion.div>
 
-            <LiquidParallax speed={0.05} className="z-0">
-                <div className="absolute top-20 right-0 w-2/5 h-3/5">
-                    <img
-                        src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
-                        alt=""
-                        className="w-full h-full object-cover opacity-[0.03]"
-                    />
-                </div>
-            </LiquidParallax>
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative">
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ duration: 0.8, ease: [0.21, 0.45, 0.27, 0.9] }}
+                            className="text-center max-w-4xl mx-auto"
+                        >
+                            <motion.div
+                                initial={{ scale: 0.8, opacity: 0 }}
+                                animate={{ scale: 1, opacity: 1 }}
+                                transition={{ delay: 0.2, type: "spring" }}
+                                className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-primary/10 border border-primary/20 mb-8"
+                            >
+                                <div className="w-2 h-2 rounded-full bg-primary animate-pulse" />
+                                <span className="text-xs font-medium tracking-wider text-primary uppercase">
+                                    {section?.badge || "Testimonials"}
+                                </span>
+                            </motion.div>
 
-            <LiquidParallax speed={0.08} className="z-0">
-                <div className="absolute bottom-0 left-0 w-1/3 h-1/2">
-                    <img
-                        src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
-                        alt=""
-                        className="w-full h-full object-cover opacity-[0.03]"
-                    />
-                </div>
-            </LiquidParallax>
+                            <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
+                                What Our
+                                <span className="bg-gradient-to-r from-primary to-primary/60 bg-clip-text text-transparent"> Customers </span>
+                                Say
+                            </h1>
 
-            <div className="absolute inset-0 pointer-events-none">
-                {isClient && [...Array(20)].map((_, i) => (
-                    <motion.div
-                        key={i}
-                        className="absolute w-0.5 h-0.5 bg-primary/20 rounded-full"
-                        style={{
-                            left: `${Math.random() * 100}%`,
-                            top: `${Math.random() * 100}%`,
-                        }}
-                        animate={{
-                            y: [0, -40, 0, 40, 0],
-                            opacity: [0, 0.2, 0],
-                        }}
-                        transition={{
-                            duration: 8 + Math.random() * 6,
-                            repeat: Infinity,
-                            delay: Math.random() * 4,
-                            ease: "easeInOut"
-                        }}
-                    />
-                ))}
-            </div>
+                            <p className="text-lg md:text-xl text-muted-foreground max-w-2xl mx-auto font-light">
+                                {section?.description || "Real stories from real people who've experienced the Eagle Revolution difference"}
+                            </p>
 
-            <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-30">
-                {/* Header */}
-                <div className="max-w-3xl mx-auto text-center mb-12 sm:mb-16 md:mb-20 contact-reveal">
-                    <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
-                        <div className="w-8 sm:w-12 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
-                        <span className="text-[10px] sm:text-xs font-mono tracking-[0.2em] sm:tracking-[0.3em] uppercase text-primary/80">
-                            Contact Us
-                        </span>
-                        <div className="w-8 sm:w-12 h-[2px] bg-gradient-to-r from-primary via-primary to-transparent" />
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: 0.4 }}
+                                className="flex items-center justify-center gap-6 mt-10"
+                            >
+                                <div className="flex items-center gap-3 px-5 py-2.5 bg-white/5 rounded-full border border-white/10">
+                                    <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" className="text-primary">
+                                        <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" />
+                                    </svg>
+                                    <span className="text-sm font-medium">{stats?.averageRating || "5.0"} out of 5</span>
+                                </div>
+                                <div className="w-px h-8 bg-white/20" />
+                                <div className="text-sm text-muted-foreground">
+                                    Based on <span className="text-primary font-semibold">{stats?.totalReviews || 0}+</span> verified reviews
+                                </div>
+                            </motion.div>
+                        </motion.div>
                     </div>
+                </section>
 
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-foreground mb-4 sm:mb-6 leading-tight">
-                        Let's Start a <span className="text-primary font-bold">Conversation</span>
-                    </h1>
-
-                    <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-light max-w-2xl mx-auto px-4">
-                        Whether you have a question about our services, need a quote, or want to discuss a project,
-                        our team is ready to help. Reach out and we'll get back to you within 4-8 hours.
-                    </p>
-                </div>
-
-                {/* Contact Info Cards */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                    {/* Email Card */}
-                    <motion.div
-                        whileHover={{ y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative group"
-                    >
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-
-                        <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
-                            </div>
-
-                            <div className="relative p-7">
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
-                                        <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                                        </svg>
-                                    </div>
-                                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                </div>
-
-                                <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
-                                    Email Us
-                                </h3>
-
-                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    Send us a message and we'll respond within 4-8 hours
-                                </p>
-
-                                <div className="space-y-2 pt-3 border-t border-primary/10">
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">banderson@eaglerevolution.com</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">24/7 Support Available</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-3 right-3">
-                                    <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
-
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Phone Card */}
-                    <motion.div
-                        whileHover={{ y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative group"
-                    >
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-
-                        <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
-                            </div>
-
-                            <div className="relative p-7">
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
-                                        <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                    </div>
-                                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                </div>
-
-                                <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
-                                    Call Us
-                                </h3>
-
-                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    Speak directly with our team during business hours
-                                </p>
-
-                                <div className="space-y-2 pt-3 border-t border-primary/10">
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">+1 (555) 123-4567</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">Mon-Fri: 9am - 6pm CST</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-3 right-3">
-                                    <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
-
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Location Card */}
-                    <motion.div
-                        whileHover={{ y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative group"
-                    >
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-
-                        <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
-                            </div>
-
-                            <div className="relative p-7">
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
-                                        <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                </div>
-
-                                <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
-                                    Visit Us
-                                </h3>
-
-                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    Veteran-owned and operated from the heart of Texas
-                                </p>
-
-                                <div className="space-y-2 pt-3 border-t border-primary/10">
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">Austin, Texas</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">United States</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">Virtual meetings available</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-3 right-3">
-                                    <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
-
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                            </div>
-                        </div>
-                    </motion.div>
-                </div>
-
-                <style jsx>{`
-  @keyframes shimmer {
-    0% {
-      transform: translateX(-100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
-  }
-  .animate-\\[shimmer_2s_infinite\\] {
-    animation: shimmer 2s infinite;
-  }
-`}</style>
-
-                {/* Contact Form */}
-                <motion.div
-                    initial={{ opacity: 0, y: 50 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
-                    className="relative max-w-4xl mx-auto"
-                >
-                    <div className="relative bg-card/90 backdrop-blur-xl rounded-2xl sm:rounded-3xl border border-primary/10 shadow-2xl overflow-hidden">
-                        <svg className="absolute inset-0 w-full h-full pointer-events-none">
-                            <motion.rect
-                                x="2"
-                                y="2"
-                                width="calc(100% - 4px)"
-                                height="calc(100% - 4px)"
-                                fill="none"
-                                stroke="url(#formGradient)"
-                                strokeWidth="1.2"
-                                strokeDasharray="8 8"
-                                initial={{ pathLength: 0, opacity: 0 }}
-                                whileInView={{ pathLength: 1, opacity: 0.6 }}
-                                viewport={{ once: true }}
-                                transition={{ duration: 1.5, delay: 0.5 }}
-                            />
-                            <defs>
-                                <linearGradient id="formGradient" x1="0%" y1="0%" x2="100%" y2="100%">
-                                    <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.8" />
-                                    <stop offset="100%" stopColor="hsl(var(--primary)/0.8)" stopOpacity="0.8" />
-                                </linearGradient>
-                            </defs>
-                        </svg>
-
-                        <div className="relative p-5 sm:p-8 md:p-10 lg:p-12">
-                            <form onSubmit={handleSubmit} className="space-y-6 sm:space-y-8">
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                    <HolographicInput
-                                        icon="User"
-                                        label="Full name"
-                                        name="name"
-                                        value={formData.name}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                    <HolographicInput
-                                        icon="Mail"
-                                        type="email"
-                                        label="Email address"
-                                        name="email"
-                                        value={formData.email}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-
-                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
-                                    <HolographicInput
-                                        icon="Phone"
-                                        type="tel"
-                                        label="Phone number"
-                                        name="phone"
-                                        value={formData.phone}
-                                        onChange={handleInputChange}
-                                    />
-                                    <HolographicInput
-                                        icon="FileText"
-                                        label="Subject"
-                                        name="subject"
-                                        value={formData.subject}
-                                        onChange={handleInputChange}
-                                        required
-                                    />
-                                </div>
-
-                                <QuantumTextarea
-                                    icon="MessageCircle"
-                                    label="How can we help you?"
-                                    name="message"
-                                    value={formData.message}
-                                    onChange={handleInputChange}
-                                    required
-                                />
-
-                                <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 sm:pt-6 border-t border-primary/10">
-                                    <div className="flex items-center gap-3">
-                                        <div className="flex -space-x-2">
-                                            {[1, 2, 3, 4].map((i) => (
-                                                <motion.div
-                                                    key={i}
-                                                    whileHover={{ y: -3, scale: 1.1 }}
-                                                    className="w-6 h-6 sm:w-8 sm:h-8 rounded-full bg-gradient-to-br from-primary/10 to-primary/20 border-2 border-card flex items-center justify-center text-primary text-[8px] sm:text-xs font-medium shadow-lg"
-                                                >
-                                                    {String.fromCharCode(64 + i)}
-                                                </motion.div>
-                                            ))}
+                {/* Stats Grid */}
+                <section className="py-16">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
+                            {[
+                                { value: stats?.totalReviews || 0, label: "Total Reviews", icon: "MessageSquare", suffix: "+" },
+                                { value: stats?.averageRating || 5.0, label: "Average Rating", icon: "Star", suffix: "" },
+                                { value: stats?.subscribers || 0, label: "Happy Customers", icon: "Users", suffix: "+" },
+                                { value: stats?.totalVideos || 0, label: "Video Stories", icon: "Video", suffix: "+" },
+                            ].map((stat, i) => (
+                                <motion.div
+                                    key={i}
+                                    initial={{ opacity: 0, y: 30 }}
+                                    whileInView={{ opacity: 1, y: 0 }}
+                                    transition={{ delay: i * 0.1, duration: 0.5 }}
+                                    viewport={{ once: true }}
+                                    className="relative group"
+                                >
+                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/20 to-primary/5 rounded-2xl blur-xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                    <div className="relative text-center p-6 rounded-2xl bg-white/5 border border-white/10 backdrop-blur-sm group-hover:border-primary/30 transition-all">
+                                        <Icon name={stat.icon} className="w-8 h-8 text-primary mx-auto mb-3" />
+                                        <div className="text-3xl md:text-4xl font-bold text-primary mb-1">
+                                            <AnimatedCounter value={stat.value} suffix={stat.suffix} />
                                         </div>
-                                        <span className="text-[10px] sm:text-xs text-muted-foreground">
-                                            <span className="font-semibold text-foreground">24/7</span> support available
-                                        </span>
+                                        <div className="text-xs text-muted-foreground tracking-wide uppercase">{stat.label}</div>
                                     </div>
+                                </motion.div>
+                            ))}
+                        </div>
+                    </div>
+                </section>
 
-                                    <motion.button
-                                        type="submit"
-                                        disabled={isSubmitting}
-                                        className="relative px-6 sm:px-10 py-2.5 sm:py-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs sm:text-sm font-medium rounded-full shadow-2xl overflow-hidden group disabled:opacity-50 disabled:cursor-not-allowed"
-                                        whileHover={{ scale: isSubmitting ? 1 : 1.02 }}
-                                        whileTap={{ scale: isSubmitting ? 1 : 0.98 }}
-                                    >
-                                        <span className="relative z-10 flex items-center gap-1 sm:gap-2">
-                                            {isSubmitting ? (
-                                                <>
-                                                    <motion.div
-                                                        animate={{ rotate: 360 }}
-                                                        transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-                                                        className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full"
-                                                    />
-                                                    <span className="hidden xs:inline">Sending...</span>
-                                                </>
-                                            ) : (
-                                                <>
-                                                    <span className="hidden xs:inline">Send Message</span>
-                                                    <span className="xs:hidden">Send</span>
-                                                    <Icon name="Send" className="w-4 h-4" />
-                                                </>
-                                            )}
-                                        </span>
+                {/* Testimonials Grid */}
+                <section className="py-20">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div
+                            initial={{ opacity: 0 }}
+                            whileInView={{ opacity: 1 }}
+                            viewport={{ once: true }}
+                            className="grid grid-cols-1 md:grid-cols-2 gap-8"
+                        >
+                            {testimonials?.slice(0, 4).map((testimonial: any, idx: number) => (
+                                <PremiumTestimonialCard
+                                    key={testimonial.id || idx}
+                                    testimonial={testimonial}
+                                    index={idx}
+                                    onPlayVideo={handlePlayVideo}
+                                />
+                            ))}
+                        </motion.div>
+                    </div>
+                </section>
+
+                {/* Video Section */}
+                {videos && videos.length > 0 && (
+                    <section className="py-20 bg-gradient-to-b from-transparent via-white/5 to-transparent">
+                        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                            <motion.div
+                                initial={{ opacity: 0, y: 30 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                className="text-center mb-12"
+                            >
+                                <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-primary/10 border border-primary/20 mb-4">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                    <span className="text-xs font-medium tracking-wider text-primary uppercase">In Their Own Words</span>
+                                </div>
+                                <h2 className="text-3xl md:text-4xl font-bold mb-4">Watch Customer Stories</h2>
+                                <p className="text-muted-foreground max-w-2xl mx-auto">
+                                    Hear directly from our customers about their experience
+                                </p>
+                            </motion.div>
+
+                            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-5">
+                                {videos.map((video: any, idx: number) => (
+                                    <CinematicVideoCard
+                                        key={video.id || idx}
+                                        video={video}
+                                        index={idx}
+                                        onClick={() => handlePlayVideo(video.videoId, video.title)}
+                                    />
+                                ))}
+                            </div>
+
+                            <motion.div
+                                initial={{ opacity: 0 }}
+                                whileInView={{ opacity: 1 }}
+                                viewport={{ once: true }}
+                                className="text-center mt-10"
+                            >
+                                <a
+                                    href="https://g.page/r/eaglerevolution"
+                                    target="_blank"
+                                    rel="noopener noreferrer"
+                                    className="inline-flex items-center gap-2 text-sm text-primary hover:gap-3 transition-all group"
+                                >
+                                    <Icon name="Google" className="w-5 h-5" />
+                                    Read all {stats?.totalReviews || 0}+ reviews on Google
+                                    <Icon name="ArrowRight" className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                </a>
+                            </motion.div>
+                        </div>
+                    </section>
+                )}
+
+                {/* Share Your Story Section */}
+                <section className="py-20">
+                    <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <motion.div
+                            initial={{ opacity: 0, y: 40 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            className="relative"
+                        >
+                            <div className="absolute inset-0 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 rounded-3xl blur-3xl" />
+                            <div className="relative bg-gradient-to-br from-card/80 to-card/40 backdrop-blur-xl rounded-3xl border border-white/10 p-8 md:p-12 shadow-2xl">
+                                <div className="text-center mb-8">
+                                    <div className="w-12 h-1 bg-primary mx-auto mb-6 rounded-full" />
+                                    <h2 className="text-3xl md:text-4xl font-bold mb-3">Share Your Story</h2>
+                                    <p className="text-muted-foreground">
+                                        Have you worked with us? We'd love to hear about your experience
+                                    </p>
+                                    <p className="text-xs text-primary/60 mt-2">
+                                        Clicking submit will open your email client
+                                    </p>
+                                </div>
+
+                                <TestimonialForm onSubmit={handleSubmitTestimonial} isSubmitting={isSubmitting} />
+                            </div>
+                        </motion.div>
+                    </div>
+                </section>
+
+                {/* Footer */}
+                <footer className="py-12 border-t border-white/10 mt-12">
+                    <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+                        <div className="flex flex-wrap items-center justify-between gap-4">
+                            <div className="flex items-center gap-3">
+                                <div className="flex -space-x-2">
+                                    {testimonials?.slice(0, 5).map((t: any, i: number) => (
                                         <motion.div
-                                            className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary"
-                                            initial={{ x: '-100%' }}
-                                            whileHover={{ x: 0 }}
-                                            transition={{ duration: 0.4 }}
-                                        />
-                                    </motion.button>
+                                            key={i}
+                                            initial={{ scale: 0 }}
+                                            whileInView={{ scale: 1 }}
+                                            transition={{ delay: i * 0.05 }}
+                                            className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/30 to-primary/10 border-2 border-background flex items-center justify-center text-primary text-xs font-medium"
+                                        >
+                                            {t.avatar || t.name?.charAt(0) || "✓"}
+                                        </motion.div>
+                                    ))}
                                 </div>
-                            </form>
+                                <div className="text-sm text-muted-foreground">
+                                    <span className="font-semibold text-foreground">{stats?.subscribers || 0}+</span> satisfied customers
+                                </div>
+                            </div>
 
-                            <div className="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-6 mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-primary/10">
-                                <div className="text-[10px] sm:text-xs font-mono text-primary flex items-center gap-1 sm:gap-2">
-                                    <span className="animate-pulse">●</span>
-                                    <span>Veteran owned & operated</span>
+                            <div className="flex items-center gap-3 text-sm">
+                                <div className="flex items-center gap-2">
+                                    <div className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+                                    <span className="text-muted-foreground">Veteran Owned</span>
                                 </div>
-                                <div className="hidden xs:block w-px h-4 sm:h-6 bg-border" />
-                                <div className="text-[10px] sm:text-xs text-muted-foreground">
-                                    <span className="font-semibold text-foreground">100%</span> confidential
-                                </div>
-                                <div className="hidden xs:block w-px h-4 sm:h-6 bg-border" />
-                                <div className="text-[10px] sm:text-xs text-muted-foreground">
-                                    Response within <span className="text-primary font-semibold">4-8 hours</span>
+                                <div className="w-px h-4 bg-white/20" />
+                                <div className="flex items-center gap-1">
+                                    {[...Array(5)].map((_, i) => (
+                                        <svg key={i} width="14" height="14" viewBox="0 0 24 24" fill="currentColor" className="text-primary">
+                                            <path d="M12 2L15.09 8.26L22 9.27L17 14.14L18.18 21.02L12 17.77L5.82 21.02L7 14.14L2 9.27L8.91 8.26L12 2z" />
+                                        </svg>
+                                    ))}
+                                    <span className="font-medium ml-1">5.0</span>
                                 </div>
                             </div>
                         </div>
                     </div>
-                </motion.div>
-            </div>
+                </footer>
+            </main>
 
-            {/* Wave Decoration */}
-            <div className="absolute bottom-0 left-0 w-full overflow-hidden pointer-events-none">
-                <svg
-                    viewBox="0 0 1440 100"
-                    className="relative block w-full h-16 sm:h-20 md:h-24"
-                    preserveAspectRatio="none"
-                >
-                    <path
-                        fill="url(#contactWave)"
-                        d="M0,48L60,52.3C120,57,240,65,360,65.3C480,66,600,58,720,52C840,46,960,42,1080,46C1200,50,1320,58,1380,62L1440,66L1440,100L1380,100C1320,100,1200,100,1080,100C960,100,840,100,720,100C600,100,480,100,360,100C240,100,120,100,60,100L0,100Z"
-                    />
-                    <defs>
-                        <linearGradient id="contactWave" x1="0%" y1="0%" x2="100%" y2="0%">
-                            <stop offset="0%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
-                            <stop offset="50%" stopColor="hsl(var(--primary))" stopOpacity="0.08" />
-                            <stop offset="100%" stopColor="hsl(var(--primary))" stopOpacity="0.05" />
-                        </linearGradient>
-                    </defs>
-                </svg>
-            </div>
+            <VideoModal
+                isOpen={showVideoModal}
+                onClose={() => setShowVideoModal(false)}
+                videoId={selectedVideo || ""}
+                title={selectedVideoTitle || ""}
+            />
 
             <SuccessModal isOpen={showSuccess} onClose={() => setShowSuccess(false)} />
-        </section>
+
+            <ErrorModal
+                isOpen={showError}
+                onClose={() => setShowError(false)}
+                message={errorMessage}
+            />
+        </>
     );
 };
 
-export default ContactPage;
+export default TestimonialsPage;
