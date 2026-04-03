@@ -166,7 +166,7 @@ export default function AboutSection() {
                 transition: {
                     delay: custom * 0.15,
                     duration: 0.7,
-                    ease: [0.25, 0.1, 0.25, 1],
+                    ease: "easeOut" as const,
                 },
             }),
         }),
@@ -294,30 +294,56 @@ export default function AboutSection() {
                         custom={1}
                         className="space-y-4"
                     >
-                        <motion.div variants={variants} custom={2} className="inline-flex items-center gap-2 bg-primary/5 px-4 py-2 rounded-full border border-primary/10">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.2, duration: 0.6 }}
+                            className="inline-flex items-center gap-2 bg-primary/5 px-4 py-2 rounded-full border border-primary/10"
+                        >
                             <span className="text-primary text-lg">⚡</span>
                             <span className="text-primary uppercase tracking-[0.2em] text-xs sm:text-sm font-bold">{badge}</span>
                         </motion.div>
 
                         <div className="space-y-4">
-                            <motion.h2 variants={variants} custom={3} className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight">
+                            <motion.h2
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.3, duration: 0.6 }}
+                                className="text-5xl sm:text-6xl md:text-6xl lg:text-7xl font-black leading-[1.1] tracking-tight"
+                            >
                                 <span className="block text-foreground">{headline.prefix}</span>
                                 <span className="block text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">{headline.highlight}</span>
                                 <span className="block text-foreground">{headline.suffix}</span>
                             </motion.h2>
 
-                            <motion.div variants={variants} custom={4} className="w-24 h-1.5 bg-gradient-to-r from-primary to-primary/60 rounded-full" />
+                            <motion.div
+                                initial={{ scaleX: 0 }}
+                                whileInView={{ scaleX: 1 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.4, duration: 0.6 }}
+                                className="w-24 h-1.5 bg-gradient-to-r from-primary to-primary/60 rounded-full origin-left"
+                            />
                         </div>
 
                         <motion.p
-                            variants={variants}
-                            custom={5}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.5, duration: 0.6 }}
                             className="text-muted-foreground text-lg md:text-xl leading-relaxed"
                             dangerouslySetInnerHTML={{ __html: description }}
                         />
 
                         {coreValues && (
-                            <motion.div variants={variants} custom={5.5} className="flex flex-wrap gap-2 pt-2">
+                            <motion.div
+                                initial={{ opacity: 0, y: 20 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: 0.55, duration: 0.6 }}
+                                className="flex flex-wrap gap-2 pt-2"
+                            >
                                 {coreValues.map((value: string) => (
                                     <span
                                         key={value}
@@ -329,7 +355,13 @@ export default function AboutSection() {
                             </motion.div>
                         )}
 
-                        <motion.div variants={variants} custom={6} className="pt-2 w-full">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.6, duration: 0.6 }}
+                            className="pt-2 w-full"
+                        >
                             <div className="flex flex-row flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 w-full">
                                 {buttons.map((button: any, idx: number) =>
                                     button.primary ? (
@@ -379,7 +411,13 @@ export default function AboutSection() {
                             </div>
                         </motion.div>
 
-                        <motion.div variants={variants} custom={7} className="grid grid-cols-3 gap-4 pt-8">
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: 0.7, duration: 0.6 }}
+                            className="grid grid-cols-3 gap-4 pt-8"
+                        >
                             {stats.map((stat: any) => (
                                 <StatCard key={stat.label} {...stat} />
                             ))}
