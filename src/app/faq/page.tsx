@@ -43,12 +43,16 @@ const AccordionItem = ({
     const isInView = useInView(itemRef, { once: true, margin: "-30px" });
 
     const highlightText = (text: string, query?: string) => {
-        if (!query) return text;
-        const parts = text.split(new RegExp(`(${query})`, 'gi'));
-        return parts.map((part, i) =>
-            part.toLowerCase() === query.toLowerCase() ?
-                <mark key={i} className="bg-primary/20 text-primary rounded px-0.5">{part}</mark> : part
-        );
+        if (!query || !text) return text;
+        try {
+            const parts = text.split(new RegExp(`(${query.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')})`, 'gi'));
+            return parts.map((part, i) =>
+                part.toLowerCase() === query.toLowerCase() ?
+                    <mark key={i} className="bg-primary/20 text-primary rounded px-0.5">{part}</mark> : part
+            );
+        } catch (error) {
+            return text;
+        }
     };
 
     return (
@@ -86,7 +90,7 @@ const AccordionItem = ({
                                 <span className="text-sm font-mono text-primary/40">
                                     {String(index + 1).padStart(2, '0')}
                                 </span>
-                                {item.category && item.category !== 'all' && (
+                                {item.category && item.category !== 'all' && item.category !== 'allquestion' && (
                                     <span className="text-xs px-2 py-0.5 rounded-full bg-primary/10 text-primary">
                                         {item.category}
                                     </span>
@@ -161,7 +165,7 @@ const AccordionItem = ({
                                         {searchHighlight ? highlightText(item.answer, searchHighlight) : item.answer}
                                     </p>
 
-                                    {item.metadata && (
+                                    {item.metadata && item.metadata.length > 0 && (
                                         <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
                                             {item.metadata.map((meta: any, i: number) => (
                                                 <motion.div
@@ -179,7 +183,7 @@ const AccordionItem = ({
                                         </div>
                                     )}
 
-                                    {item.links && (
+                                    {item.links && item.links.length > 0 && (
                                         <motion.div
                                             initial={{ opacity: 0, y: 10 }}
                                             animate={{ opacity: 1, y: 0 }}
@@ -258,12 +262,20 @@ const CategoryFilter = ({
     activeCategory: string;
     onCategoryChange: (id: string) => void
 }) => {
+    // Filter out any duplicate 'all' or 'allquestion' categories
+    const uniqueCategories = useMemo(() => {
+        const seen = new Set();
+        return categories.filter(cat => {
+            const id = cat.id;
+            if (seen.has(id) || id === 'allquestion') return false;
+            seen.add(id);
+            return true;
+        });
+    }, [categories]);
+
     return (
         <div className="flex flex-wrap items-center gap-2 md:gap-3">
-            {categories.map((category) => {
-                // Skip if category is already "all" (prevent duplicate)
-                if (category.id === 'allquestion') return null;
-
+            {uniqueCategories.map((category) => {
                 return (
                     <motion.button
                         key={category.id}
@@ -310,7 +322,17 @@ const SearchBar = ({
     searchQuery: string;
 }) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [localQuery, setLocalQuery] = useState(searchQuery);
     const inputRef = useRef<HTMLInputElement>(null);
+    
+    // Debounce search to prevent excessive filtering
+    useEffect(() => {
+        const timer = setTimeout(() => {
+            onSearch(localQuery);
+        }, 300);
+        
+        return () => clearTimeout(timer);
+    }, [localQuery, onSearch]);
 
     return (
         <motion.div
@@ -334,18 +356,19 @@ const SearchBar = ({
                     ref={inputRef}
                     type="text"
                     placeholder="Search questions..."
-                    defaultValue={searchQuery}
-                    onChange={(e) => onSearch(e.target.value)}
+                    value={localQuery}
+                    onChange={(e) => setLocalQuery(e.target.value)}
                     onFocus={() => setIsFocused(true)}
                     onBlur={() => setIsFocused(false)}
                     className="w-full pl-11 pr-4 py-3 md:py-3.5 bg-transparent rounded-full text-sm md:text-base text-card-foreground placeholder:text-muted-foreground focus:outline-none"
                 />
 
-                {searchQuery && (
+                {localQuery && (
                     <button
                         onClick={() => {
+                            setLocalQuery('');
                             onSearch('');
-                            if (inputRef.current) inputRef.current.value = '';
+                            if (inputRef.current) inputRef.current.focus();
                         }}
                         className="absolute right-3 text-xs text-muted-foreground hover:text-primary transition-colors"
                     >
@@ -356,8 +379,16 @@ const SearchBar = ({
         </motion.div>
     );
 };
+
 const AwardCTABanner = () => {
-    const { cta } = useContent().whyChooseUs;
+    const { whyChooseUs } = useContent();
+    
+    // Add null check for whyChooseUs
+    if (!whyChooseUs || !whyChooseUs.cta) {
+        return null;
+    }
+    
+    const { cta } = whyChooseUs;
 
     return (
         <motion.div
@@ -420,39 +451,43 @@ const AwardCTABanner = () => {
                             {cta.description}
                         </p>
 
-                        <div className="flex items-center gap-6 mt-6">
-                            {cta.trustBadges.map((badge: string, i: number) => (
-                                <div key={i} className="flex items-center gap-2">
-                                    <div className="w-1.5 h-1.5 bg-primary rounded-full" />
-                                    <span className="text-xs text-muted-foreground">{badge}</span>
-                                </div>
-                            ))}
-                        </div>
+                        {cta.trustBadges && cta.trustBadges.length > 0 && (
+                            <div className="flex items-center gap-6 mt-6">
+                                {cta.trustBadges.map((badge: string, i: number) => (
+                                    <div key={i} className="flex items-center gap-2">
+                                        <div className="w-1.5 h-1.5 bg-primary rounded-full" />
+                                        <span className="text-xs text-muted-foreground">{badge}</span>
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
 
-                    <div className="flex flex-col sm:flex-row gap-4">
-                        {cta.buttons.map((button: any, idx: number) => (
-                            <motion.a
-                                key={idx}
-                                href={button.href}
-                                whileHover={{ scale: 1.03 }}
-                                whileTap={{ scale: 0.98 }}
-                                className="relative px-8 py-4 bg-white text-primary border-2 border-primary font-bold rounded-full shadow-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 overflow-hidden flex items-center justify-center gap-2"
-                            >
-                                <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
-                                    {button.text}
-                                    <motion.svg
-                                        className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
-                                        fill="none"
-                                        stroke="currentColor"
-                                        viewBox="0 0 24 24"
-                                    >
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </motion.svg>
-                                </span>
-                            </motion.a>
-                        ))}
-                    </div>
+                    {cta.buttons && cta.buttons.length > 0 && (
+                        <div className="flex flex-col sm:flex-row gap-4">
+                            {cta.buttons.map((button: any, idx: number) => (
+                                <motion.a
+                                    key={idx}
+                                    href={button.href}
+                                    whileHover={{ scale: 1.03 }}
+                                    whileTap={{ scale: 0.98 }}
+                                    className="relative px-8 py-4 bg-white text-primary border-2 border-primary font-bold rounded-full shadow-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 overflow-hidden flex items-center justify-center gap-2 group"
+                                >
+                                    <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
+                                        {button.text}
+                                        <motion.svg
+                                            className="w-4 h-4 transition-transform duration-300 group-hover:translate-x-1"
+                                            fill="none"
+                                            stroke="currentColor"
+                                            viewBox="0 0 24 24"
+                                        >
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                        </motion.svg>
+                                    </span>
+                                </motion.a>
+                            ))}
+                        </div>
+                    )}
                 </div>
             </div>
         </motion.div>
@@ -466,34 +501,66 @@ export default function FAQPage() {
     const [openItems, setOpenItems] = useState<number[]>([0]);
     const [activeCategory, setActiveCategory] = useState('all');
     const [searchQuery, setSearchQuery] = useState('');
+    const [isMounted, setIsMounted] = useState(false);
 
-    const { section, categories, items } = faq;
+    // Handle mounting to prevent hydration issues
+    useEffect(() => {
+        setIsMounted(true);
+    }, []);
 
-    // Get categories with counts - don't add extra "All" if it already exists
+    // Add null check for faq
+    if (!faq) {
+        return (
+            <section className="relative bg-background py-20 md:py-24 lg:py-28 overflow-hidden">
+                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
+                    <div className="text-center py-20">
+                        <p className="text-muted-foreground">Loading FAQ content...</p>
+                    </div>
+                </div>
+            </section>
+        );
+    }
+
+    const { section, categories = [], items = [] } = faq;
+
+    // Get categories with counts - fix duplicate all issue
     const categoriesWithCounts = useMemo(() => {
-        // Check if 'all' category already exists in the data
-        const hasAllCategory = categories.some((cat: any) => cat.id === 'all');
-
-        const catsWithCounts = categories.map((cat: any) => ({
+        if (!categories.length) return [{ id: 'all', label: 'All Questions', icon: 'Grid' }];
+        
+        // Filter out invalid categories and create a Set to track unique IDs
+        const validCategories = categories.filter((cat: any) => cat && cat.id);
+        const uniqueIds = new Set();
+        const uniqueCategories = validCategories.filter((cat: any) => {
+            if (uniqueIds.has(cat.id)) return false;
+            uniqueIds.add(cat.id);
+            return true;
+        });
+        
+        const catsWithCounts = uniqueCategories.map((cat: any) => ({
             ...cat,
-            count: items.filter((item: any) => item.category === cat.id).length
+            count: items.filter((item: any) => item && item.category === cat.id).length
         }));
-
-        // Only add 'All' if it doesn't already exist
+        
+        // Check if 'all' already exists
+        const hasAllCategory = catsWithCounts.some((cat: any) => cat.id === 'all');
+        
         if (!hasAllCategory) {
-            return [{ id: 'all', label: 'All', icon: 'Grid' }, ...catsWithCounts];
+            return [{ id: 'all', label: 'All Questions', icon: 'Grid' }, ...catsWithCounts];
         }
-
+        
         return catsWithCounts;
     }, [categories, items]);
 
-    // Filter items
+    // Filter items with null checks
     const filteredItems = useMemo(() => {
+        if (!items.length) return [];
+        
         return items.filter((item: any) => {
+            if (!item) return false;
             const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
             const matchesSearch = searchQuery === '' ||
-                item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                item.answer.toLowerCase().includes(searchQuery.toLowerCase());
+                (item.question && item.question.toLowerCase().includes(searchQuery.toLowerCase())) ||
+                (item.answer && item.answer.toLowerCase().includes(searchQuery.toLowerCase()));
             return matchesCategory && matchesSearch;
         });
     }, [items, activeCategory, searchQuery]);
@@ -513,35 +580,46 @@ export default function FAQPage() {
 
     // Handle hash navigation
     useEffect(() => {
+        if (!isMounted) return;
+        
         const hash = window.location.hash.slice(1);
-        if (hash) {
-            const index = items.findIndex((item: any) => item.id === hash);
+        if (hash && items.length) {
+            const index = items.findIndex((item: any) => item && item.id === hash);
             if (index !== -1) {
                 setOpenItems([index]);
                 setTimeout(() => {
-                    document.getElementById(`faq-${hash}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    const element = document.getElementById(`faq-${hash}`);
+                    if (element) {
+                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }
                 }, 100);
             }
         }
-    }, [items]);
+    }, [items, isMounted]);
+
+    if (!isMounted) {
+        return null;
+    }
 
     return (
         <section
             ref={sectionRef}
-            className="relative bg-background py-20 md:py-24 lg:py-28 overflow-hidden"
+            className="relative bg-background py-20 md:py-24 lg:py-28 overflow-hidden min-h-screen"
         >
             <SubtleBackground />
 
             <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
                 <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16">
-                    <span className="text-xs font-medium tracking-[0.2em] uppercase text-primary mb-3 block">
-                        {section.badge}
-                    </span>
+                    {section?.badge && (
+                        <span className="text-xs font-medium tracking-[0.2em] uppercase text-primary mb-3 block">
+                            {section.badge}
+                        </span>
+                    )}
                     <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
-                        {section.headline}
+                        {section?.headline || "Frequently Asked Questions"}
                     </h2>
                     <p className="text-muted-foreground text-base md:text-lg">
-                        {section.description}
+                        {section?.description || "Find answers to common questions about our services"}
                     </p>
                     <div className="w-16 h-0.5 bg-gradient-to-r from-primary to-primary/60 mx-auto mt-6 rounded-full" />
                 </div>
@@ -558,7 +636,7 @@ export default function FAQPage() {
                 <div className="space-y-3 md:space-y-4 mb-12 md:mb-16">
                     {filteredItems.length > 0 ? (
                         filteredItems.map((item: any, index: number) => (
-                            <div key={item.id} id={`faq-${item.id}`}>
+                            <div key={item.id || index} id={`faq-${item.id || index}`}>
                                 <AccordionItem
                                     item={item}
                                     index={index}

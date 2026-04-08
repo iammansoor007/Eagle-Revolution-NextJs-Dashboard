@@ -440,6 +440,83 @@ const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 };
 
+// SMS Consent Checkbox Component
+const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => {
+  const [isHovered, setIsHovered] = useState(false);
+  const [isFocused, setIsFocused] = useState(false);
+
+  return (
+    <motion.div
+      className="relative mt-4"
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ delay: 0.3 }}
+      onMouseEnter={() => setIsHovered(true)}
+      onMouseLeave={() => setIsHovered(false)}
+    >
+      <div className={`
+        relative flex items-start gap-3 p-4 rounded-xl transition-all duration-500
+        ${isFocused ? 'bg-primary/5 border border-primary/30' : 'bg-muted/30 border border-border/50 hover:border-primary/20'}
+      `}>
+        <div className="relative">
+          <input
+            type="checkbox"
+            id="smsConsent"
+            checked={checked}
+            onChange={onChange}
+            onFocus={() => setIsFocused(true)}
+            onBlur={() => setIsFocused(false)}
+            className="absolute opacity-0 w-5 h-5 cursor-pointer"
+          />
+          <motion.div
+            animate={checked ? {
+              backgroundColor: "hsl(var(--primary))",
+              borderColor: "hsl(var(--primary))"
+            } : {
+              backgroundColor: "transparent",
+              borderColor: "hsl(var(--border))"
+            }}
+            whileHover={{ scale: 1.05 }}
+            whileTap={{ scale: 0.95 }}
+            className={`
+              w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-300
+              ${isHovered && !checked ? 'border-primary/50' : ''}
+            `}
+          >
+            {checked && (
+              <motion.div
+                initial={{ scale: 0 }}
+                animate={{ scale: 1 }}
+                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+              >
+                <Icon name="Check" className="w-3 h-3 text-white" />
+              </motion.div>
+            )}
+          </motion.div>
+        </div>
+
+        <label
+          htmlFor="smsConsent"
+          className="flex-1 text-[11px] sm:text-xs text-muted-foreground leading-relaxed cursor-pointer"
+        >
+          I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see{' '}
+          <a href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</a>
+          {' '}and{' '}
+          <a href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</a>.
+        </label>
+      </div>
+
+      {isFocused && (
+        <motion.div
+          initial={{ scaleX: 0 }}
+          animate={{ scaleX: 1 }}
+          className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary rounded-full"
+        />
+      )}
+    </motion.div>
+  );
+};
+
 const GetQuote = () => {
   const { quote } = useContent();
   const sectionRef = useRef(null);
@@ -448,6 +525,7 @@ const GetQuote = () => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedServices, setSelectedServices] = useState<number[]>([]);
+  const [smsConsent, setSmsConsent] = useState(false);
   const [formData, setFormData] = useState({
     name: '',
     email: '',
@@ -477,6 +555,13 @@ const GetQuote = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    
+    // Validate SMS consent
+    if (!smsConsent) {
+      alert("Please agree to receive SMS communications to continue.");
+      return;
+    }
+    
     setIsSubmitting(true);
 
     const serviceNames = selectedServices
@@ -497,6 +582,7 @@ Company: ${formData.company}
 Project Type: ${projectTypes.find((t: any) => t.value === formData.projectType)?.label || 'Not specified'}
 Timeline: ${timelines.find((t: any) => t.value === formData.timeline)?.label || 'Not specified'}
 Selected Services: ${serviceNames || 'None selected'}
+SMS Consent: Yes
 
 📝 MESSAGE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -526,6 +612,7 @@ ${formData.message}
             timeline: timelines.find((t: any) => t.value === formData.timeline)?.label,
             services: serviceNames,
             message: formData.message,
+            sms_consent: 'Yes',
             _template: 'table',
             _captcha: 'false'
           })
@@ -535,6 +622,7 @@ ${formData.message}
           setShowSuccess(true);
           setFormStep(1);
           setSelectedServices([]);
+          setSmsConsent(false);
           setFormData({
             name: '',
             email: '',
@@ -555,6 +643,7 @@ ${formData.message}
       setShowSuccess(true);
       setFormStep(1);
       setSelectedServices([]);
+      setSmsConsent(false);
       setFormData({
         name: '',
         email: '',
@@ -601,9 +690,6 @@ ${formData.message}
 
     return () => ctx.revert();
   }, [isClient]);
-
-
-  // if (!isClient) return null;
 
   return (
     <section
@@ -761,6 +847,7 @@ ${formData.message}
                           name="phone"
                           value={formData.phone}
                           onChange={handleInputChange}
+                          required
                         />
                         <HolographicInput
                           icon="Building2"
@@ -770,6 +857,12 @@ ${formData.message}
                           onChange={handleInputChange}
                         />
                       </div>
+
+                      {/* SMS Consent Checkbox */}
+                      <SMSConsentCheckbox 
+                        checked={smsConsent} 
+                        onChange={(e) => setSmsConsent(e.target.checked)}
+                      />
                     </motion.div>
                   )}
 
@@ -1011,4 +1104,4 @@ ${formData.message}
   );
 };
 
-export default GetQuote;  
+export default GetQuote;

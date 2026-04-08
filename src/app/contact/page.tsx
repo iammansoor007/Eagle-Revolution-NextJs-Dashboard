@@ -163,49 +163,78 @@ const QuantumTextarea = ({ icon: IconName, label, ...props }: { icon: string; la
     );
 };
 
-// Contact Info Card
-const ContactInfoCard = ({ icon, title, info, details, isHovered, onHover }: { icon: string; title: string; info: string; details?: string[]; isHovered: boolean; onHover: (hovered: boolean) => void }) => {
+// SMS Consent Checkbox Component
+const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => {
+    const [isHovered, setIsHovered] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+
     return (
         <motion.div
-            onHoverStart={() => onHover(true)}
-            onHoverEnd={() => onHover(false)}
-            whileHover={{ y: -4 }}
-            className="relative p-6 rounded-2xl bg-card/80 backdrop-blur-sm border border-primary/10 hover:border-primary/30 transition-all duration-500 group"
+            className="relative mt-4"
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.3 }}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
         >
-            <motion.div
-                animate={isHovered ? {
-                    scale: 1.1,
-                    rotate: [0, 5, -5, 0],
-                } : { scale: 1 }}
-                transition={{ duration: 0.5 }}
-                className="text-3xl mb-4 text-primary"
-            >
-                <Icon name={icon} className="w-8 h-8" />
-            </motion.div>
-
-            <h3 className="text-lg font-medium text-foreground mb-2">{title}</h3>
-            <p className="text-sm text-muted-foreground mb-3">{info}</p>
-
-            {details && (
-                <div className="space-y-1">
-                    {details.map((detail, i) => (
-                        <p key={i} className="text-xs text-foreground/70 font-mono">
-                            {detail}
-                        </p>
-                    ))}
+            <div className={`
+                relative flex items-start gap-3 p-4 rounded-xl transition-all duration-500
+                ${isFocused ? 'bg-primary/5 border border-primary/30' : 'bg-muted/30 border border-border/50 hover:border-primary/20'}
+            `}>
+                <div className="relative">
+                    <input
+                        type="checkbox"
+                        id="smsConsent"
+                        checked={checked}
+                        onChange={onChange}
+                        onFocus={() => setIsFocused(true)}
+                        onBlur={() => setIsFocused(false)}
+                        className="absolute opacity-0 w-5 h-5 cursor-pointer"
+                    />
+                    <motion.div
+                        animate={checked ? {
+                            backgroundColor: "hsl(var(--primary))",
+                            borderColor: "hsl(var(--primary))"
+                        } : {
+                            backgroundColor: "transparent",
+                            borderColor: "hsl(var(--border))"
+                        }}
+                        whileHover={{ scale: 1.05 }}
+                        whileTap={{ scale: 0.95 }}
+                        className={`
+                            w-5 h-5 rounded-md border-2 flex items-center justify-center transition-all duration-300
+                            ${isHovered && !checked ? 'border-primary/50' : ''}
+                        `}
+                    >
+                        {checked && (
+                            <motion.div
+                                initial={{ scale: 0 }}
+                                animate={{ scale: 1 }}
+                                transition={{ type: "spring", stiffness: 500, damping: 30 }}
+                            >
+                                <Icon name="Check" className="w-3 h-3 text-white" />
+                            </motion.div>
+                        )}
+                    </motion.div>
                 </div>
-            )}
 
-            {isHovered && (
-                <motion.div
-                    initial={{ scale: 0 }}
-                    animate={{ scale: 1 }}
-                    className="absolute top-3 right-3"
+                <label
+                    htmlFor="smsConsent"
+                    className="flex-1 text-[11px] sm:text-xs text-muted-foreground leading-relaxed cursor-pointer"
                 >
-                    <div className="w-5 h-5 rounded-full bg-primary/20 flex items-center justify-center">
-                        <Icon name="ArrowRight" className="w-3 h-3 text-primary" />
-                    </div>
-                </motion.div>
+                    I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see{' '}
+                    <a href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</a>
+                    {' '}and{' '}
+                    <a href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</a>.
+                </label>
+            </div>
+
+            {isFocused && (
+                <motion.div
+                    initial={{ scaleX: 0 }}
+                    animate={{ scaleX: 1 }}
+                    className="absolute -bottom-0.5 left-0 right-0 h-0.5 bg-gradient-to-r from-primary to-primary rounded-full"
+                />
             )}
         </motion.div>
     );
@@ -325,7 +354,7 @@ const ContactPage = () => {
     const [isClient, setIsClient] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
-    const [hoveredCard, setHoveredCard] = useState<string | null>(null);
+    const [smsConsent, setSmsConsent] = useState(false);
     const [formData, setFormData] = useState({
         name: '',
         email: '',
@@ -333,30 +362,6 @@ const ContactPage = () => {
         subject: '',
         message: ''
     });
-
-    const contactInfo = [
-        {
-            id: 'email',
-            icon: 'Mail',
-            title: 'Email Us',
-            info: 'Get a response within 4-8 hours',
-            details: ['banderson@eaglerevolution.com']
-        },
-        {
-            id: 'phone',
-            icon: 'Phone',
-            title: 'Call Us',
-            info: 'Mon-Fri 9am-6pm CST',
-            details: ['+1 (555) 123-4567']
-        },
-        {
-            id: 'location',
-            icon: 'MapPin',
-            title: 'Visit Us',
-            info: 'Veteran owned & operated',
-            details: ['Austin, Texas', 'United States']
-        }
-    ];
 
     const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({
@@ -367,6 +372,13 @@ const ContactPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
+        
+        // Validate SMS consent
+        if (!smsConsent) {
+            alert("Please agree to receive SMS communications to continue.");
+            return;
+        }
+        
         setIsSubmitting(true);
 
         const emailContent = `
@@ -380,6 +392,7 @@ Name: ${formData.name}
 Email: ${formData.email}
 Phone: ${formData.phone}
 Subject: ${formData.subject}
+SMS Consent: Yes
 
 📝 MESSAGE
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
@@ -406,6 +419,7 @@ ${formData.message}
                         phone: formData.phone,
                         subject: formData.subject,
                         message: formData.message,
+                        sms_consent: 'Yes',
                         _template: 'table',
                         _captcha: 'false'
                     })
@@ -420,6 +434,7 @@ ${formData.message}
                         subject: '',
                         message: ''
                     });
+                    setSmsConsent(false);
                     setIsSubmitting(false);
                     return;
                 }
@@ -436,6 +451,7 @@ ${formData.message}
                 subject: '',
                 message: ''
             });
+            setSmsConsent(false);
 
         } catch (error) {
             console.error('Submission error:', error);
@@ -814,6 +830,7 @@ ${formData.message}
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleInputChange}
+                                        required
                                     />
                                     <HolographicInput
                                         icon="FileText"
@@ -824,6 +841,12 @@ ${formData.message}
                                         required
                                     />
                                 </div>
+
+                                {/* SMS Consent Checkbox */}
+                                <SMSConsentCheckbox 
+                                    checked={smsConsent} 
+                                    onChange={(e) => setSmsConsent(e.target.checked)}
+                                />
 
                                 <QuantumTextarea
                                     icon="MessageCircle"
