@@ -31,7 +31,7 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
       {hasLoaded && (
         <div className="relative z-10 flex flex-col min-h-screen">
           <Navbar />
-          <main className="flex-grow pt-24">
+          <main className="flex-grow sm:pt-22 pt-24">
             <PageTransition>{children}</PageTransition>
           </main>
           <Footer />

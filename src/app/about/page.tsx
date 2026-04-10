@@ -135,7 +135,7 @@ const StatCounter = ({ value, label, suffix = "", delay = 0, icon: Icon, descrip
   return (
     <div
       ref={ref}
-      className="group relative bg-card rounded-xl sm:rounded-2xl p-4 sm:p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 text-center sm:text-left"
+      className="group relative bg-card rounded-xl sm:rounded-2xl p-3 sm:p-6 md:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 hover:-translate-y-2 text-center sm:text-left"
       style={{ transitionDelay: `${delay}s` }}
     >
       <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent rounded-xl sm:rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
@@ -229,7 +229,7 @@ const StatsSection = () => {
           </p>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
+        <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
           {stats.map((stat, index) => (
             <StatCounter
               key={index}
@@ -273,7 +273,7 @@ const Hero = () => {
   const textY = useTransform(scrollY, [0, 500], [0, -50]);
 
   return (
-    <section className="relative min-h-screen w-full bg-background overflow-hidden flex items-center justify-center py-8 sm:py-12">
+    <section className="relative min-h-[85vh] sm:min-h-screen w-full bg-background overflow-hidden flex items-center justify-center py-16 sm:py-12">
       {/* --- Background --- */}
       <div className="absolute inset-0 z-0">
         <motion.div style={{ y: y1 }} className="absolute inset-0">
@@ -305,7 +305,7 @@ const Hero = () => {
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
-            <h1 className="text-4xl xs:text-5xl sm:text-6xl md:text-7xl lg:text-[80px] xl:text-[100px] font-black leading-[1.1] sm:leading-[1.1] md:leading-[0.95] lg:leading-[0.85] tracking-tighter text-primary mb-4 sm:mb-6">
+            <h1 className="text-3xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-[80px] xl:text-[100px] font-black leading-[1.05] sm:leading-[1.1] md:leading-[0.95] lg:leading-[0.85] tracking-tighter text-primary mb-4 sm:mb-6">
               SOARING <br />
               <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/70 to-foreground/90">
                 BEYOND
@@ -318,12 +318,12 @@ const Hero = () => {
               Born in O'Fallon, Missouri. Built on military precision. Driven by integrity.
             </p>
 
-            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4 justify-center lg:justify-start items-center">
+            <div className="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start items-center">
               <motion.a
                 href="/contact"
                 whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
                 whileTap={{ scale: 0.98 }}
-                className="w-full sm:w-auto px-6 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 bg-primary text-primary-foreground font-bold text-sm sm:text-base md:text-lg rounded-xl flex items-center justify-center gap-2 sm:gap-3 group transition-all hover:text-white"
+                className="px-5 sm:px-8 md:px-10 py-3 sm:py-4 md:py-5 bg-primary text-primary-foreground font-bold text-xs sm:text-base md:text-lg rounded-xl flex items-center justify-center gap-2 sm:gap-3 group transition-all hover:text-white"
               >
                 Contact Now
                 <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
@@ -573,9 +573,9 @@ const FounderStory = () => {
 
           <div className="space-y-6 sm:space-y-8 md:space-y-10 founder-reveal">
             <div>
-              <h3 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground mb-3 sm:mb-4 text-center lg:text-left">
+              <h3 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground mb-3 sm:mb-4 text-left">
                 Brandon Anderson
-                <span className="block text-xs sm:text-sm font-mono text-primary mt-1 sm:mt-2 tracking-[0.2em] uppercase">
+                <span className="block text-xs sm:text-sm font-mono text-primary mt-1 sm:mt-2 tracking-[0.15em] sm:tracking-[0.2em] uppercase">
                   Founder • U.S. Army Veteran • Globally Licensed Combat Sports Official
                 </span>
               </h3>
@@ -610,7 +610,7 @@ const FounderStory = () => {
                 </footer>
               </blockquote>
 
-              <div className="flex flex-wrap items-center justify-center lg:justify-start gap-3 sm:gap-4 mt-8 sm:mt-10 pt-4 border-t border-border">
+              <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-4 mt-8 sm:mt-10 pt-4 border-t border-border">
                 <motion.a
                   href="https://www.linkedin.com/company/eagle-revolution/people/"
                   target="_blank"
@@ -871,9 +871,10 @@ const RecognitionMarquee = () => {
 const ServiceCard = ({ service, index, inView }: { service: any; index: number; inView: boolean }) => {
   return (
     <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.23, 1, 0.32, 1] }}
+      initial={{ opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-20px", amount: 0.05 }}
+      transition={{ duration: 0.6, delay: Math.min(index * 0.08, 0.3), ease: [0.23, 1, 0.32, 1] }}
       className="group"
     >
       <div className="relative rounded-xl sm:rounded-2xl overflow-hidden bg-card border border-border/50 hover:border-primary/30 transition-all duration-500 hover:shadow-2xl">
@@ -928,7 +929,7 @@ const ServiceCard = ({ service, index, inView }: { service: any; index: number; 
 // ==================== SERVICES SECTION ====================
 const ServicesSection = () => {
   const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-100px", amount: 0.1 });
+  const inView = useInView(ref, { once: true, margin: "-30px", amount: 0.05 });
 
   const services = [
     {
@@ -1103,8 +1104,8 @@ const AwardCTABanner = () => {
               </span>
             </motion.div>
 
-            <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-2 sm:mb-3 md:mb-4 leading-tight">
-              Ready to Start Your <br />
+            <h3 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-2 sm:mb-3 md:mb-4 leading-tight">
+              Ready to Start Your{' '}
               <span className="text-primary">Revolution?</span>
             </h3>
 
@@ -1128,17 +1129,17 @@ const AwardCTABanner = () => {
             </div>
           </div>
 
-          <div className="flex flex-col sm:flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
+          <div className="flex flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
             <motion.a
               href="/contact"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              className="relative px-4 sm:px-5 md:px-6 lg:px-8 py-2.5 sm:py-3 md:py-4 bg-primary text-primary-foreground font-bold rounded-full shadow-lg hover:shadow-xl hover:text-white transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2 group"
+              className="relative flex-1 sm:flex-none px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-primary text-primary-foreground font-bold rounded-full shadow-lg hover:shadow-xl hover:text-white transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2 group"
             >
-              <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs md:text-sm lg:text-base whitespace-nowrap">
-                Get Preapproved in Seconds
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                Get Preapproved
                 <motion.svg
-                  className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4 transition-transform duration-300 group-hover:translate-x-1"
+                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 transition-transform duration-300 group-hover:translate-x-1"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
@@ -1152,9 +1153,9 @@ const AwardCTABanner = () => {
               href="/contact"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
-              className="relative px-4 sm:px-5 md:px-6 lg:px-8 py-2.5 sm:py-3 md:py-4 bg-background text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2"
+              className="relative flex-1 sm:flex-none px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-background text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2"
             >
-              <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-[10px] sm:text-xs md:text-sm lg:text-base whitespace-nowrap">
+              <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
                 Contact Us
               </span>
             </motion.a>
