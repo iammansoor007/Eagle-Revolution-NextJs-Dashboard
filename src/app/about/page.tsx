@@ -10,6 +10,13 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import owner from "@/assets/ownerupdatedimage.jpeg";
+import roofingImg from '@/assets/portfolio1.png';
+import windowsImg from '@/assets/portfolio2.jpg';
+import decksImg from '@/assets/portfolio3.jpg';
+import commercialImg from '@/assets/portfolio4.jpg';
+import sidingImg from '@/assets/portfolio5.jpg';
+import servicesData from '../../data/servicesData.json';
+
 import {
   MousePointer2,
   Globe,
@@ -39,6 +46,21 @@ import {
 import React from 'react';
 
 gsap.registerPlugin(ScrollTrigger);
+
+const iconMap = {
+  Home: LucideHome, Layout: LucideLayers, TreePine: LucideStar, Building2: LucideBuilding, Building: LucideBuilding, Droplets: LucideDroplet,
+  Shield: LucideShield, Trophy: Award, Users: Users, ThumbsUp: Heart, FileText: LucideLayers, ClipboardCheck: CheckCircle,
+  Truck: LucideLayers, Hammer: LucideStar, CheckCircle: CheckCircle, Award: Award, Clock: Clock
+};
+
+const imageMap: Record<string, any> = {
+  'Residential Roofing': roofingImg,
+  'Windows & Doors': windowsImg,
+  'Custom Decks': decksImg,
+  'Commercial Roofing': commercialImg,
+  'Siding, Soffit & Fascia': sidingImg,
+  'Gutters & Protection': sidingImg,
+};
 
 // ==================== CUSTOM SVG ICONS ====================
 const CustomIcons = {
@@ -894,24 +916,25 @@ const RecognitionMarquee = () => {
 };
 
 // ==================== SERVICE CARD (Your Preferred Style) ====================
-const ServiceCard = ({ service, index, inView }: { service: any; index: number; inView: boolean }) => {
+const ServiceCard = ({ service, index }: { service: any; index: number }) => {
+  const SIcon = iconMap[service.icon as keyof typeof iconMap] || LucideHome;
   const [isHovered, setIsHovered] = useState(false);
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
+      whileInView={{ opacity: 1, y: 0 }}
+      viewport={{ once: true, margin: "-50px" }}
       transition={{ duration: 0.6, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       className="group"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/services/${service.slug || '#'}`} className="block h-full">
+      <Link href={`/services/${service.slug}`} className="block h-full">
         <div className="flex flex-col h-full">
-          {/* Image Container */}
-          <div className="relative aspect-[4/5] rounded-[2rem] sm:rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-lg transition-all duration-700 group-hover:shadow-2xl">
+          <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-lg transition-all duration-700 group-hover:shadow-2xl">
             <Image
-              src={service.image}
+              src={imageMap[service.title] || roofingImg}
               alt={service.title}
               fill
               className="object-cover transition-transform duration-1000 group-hover:scale-105"
@@ -919,47 +942,32 @@ const ServiceCard = ({ service, index, inView }: { service: any; index: number; 
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
 
-            {/* Gradient Overlay */}
             <div className="absolute inset-0 bg-gradient-to-t from-black/40 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
-            {/* Subtle Border Glow on Hover */}
-            <div className="absolute inset-0 rounded-[2rem] sm:rounded-[2.5rem] border-2 border-transparent group-hover:border-primary/20 transition-all duration-500 pointer-events-none" />
+            <div className="absolute inset-0 rounded-[2.5rem] border-2 border-transparent group-hover:border-primary/20 transition-all duration-500 pointer-events-none" />
 
-            {/* Floating Badge */}
-            <div className="absolute top-4 left-4 sm:top-6 sm:left-6 z-10">
-              <div className="px-3 sm:px-5 py-1.5 sm:py-2.5 bg-white/95 backdrop-blur-md rounded-xl border border-white/30 shadow-lg">
-                <span className="text-[8px] sm:text-[10px] font-black uppercase tracking-[0.2em] text-primary">
-                  {service.tag || 'PREMIUM'}
+            <div className="absolute top-6 left-6 z-10">
+              <div className="px-5 py-2.5 bg-white/95 backdrop-blur-md rounded-xl border border-white/30 shadow-lg">
+                <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
+                  {service.tag}
                 </span>
               </div>
             </div>
 
-            {/* Hover Arrow Button */}
             <motion.div
-              className="absolute bottom-4 right-4 sm:bottom-6 sm:right-6 z-10"
+              className="absolute bottom-6 right-6 z-10"
               initial={{ opacity: 0, scale: 0.8 }}
               animate={isHovered ? { opacity: 1, scale: 1 } : { opacity: 0, scale: 0.8 }}
               transition={{ duration: 0.3 }}
             >
-              <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
-                <ArrowUpRight className="w-5 h-5 sm:w-6 sm:h-6" />
+              <div className="w-12 h-12 rounded-xl bg-primary text-white flex items-center justify-center shadow-lg hover:shadow-xl transition-shadow">
+                <ArrowUpRight className="w-6 h-6" />
               </div>
             </motion.div>
-
-            {/* Service Icon on Image */}
-            <div className="absolute bottom-4 left-4 sm:bottom-6 sm:left-6 z-10">
-              <div className="w-8 h-8 sm:w-10 sm:h-10 rounded-full bg-white/50 backdrop-blur-sm flex items-center justify-center">
-                <div className="text-primary text-base sm:text-lg">
-                  {service.icon}
-                </div>
-              </div>
-            </div>
           </div>
 
-          {/* Content */}
-          <div className="flex-1 mt-4 sm:mt-6 px-3 sm:px-4 flex flex-col items-center text-center">
-            {/* Index Number */}
-            <div className="flex items-center gap-3 mb-3 sm:mb-4 opacity-40">
+          <div className="flex-1 mt-6 px-4 flex flex-col items-center text-center">
+            <div className="flex items-center gap-3 mb-4 opacity-40">
               <span className="w-6 h-[1px] bg-foreground" />
               <span className="text-[10px] font-bold uppercase tracking-widest leading-none">
                 {String(index + 1).padStart(2, '0')}
@@ -967,17 +975,14 @@ const ServiceCard = ({ service, index, inView }: { service: any; index: number; 
               <span className="w-6 h-[1px] bg-foreground" />
             </div>
 
-            {/* Title */}
             <h3 className="text-xl sm:text-2xl lg:text-3xl font-heading font-black text-foreground mb-2 tracking-tighter leading-tight group-hover:text-primary transition-colors duration-300">
               {service.title}
             </h3>
 
-            {/* Description/Tagline */}
             <p className="text-muted-foreground text-xs sm:text-sm font-medium uppercase tracking-[0.1em] opacity-60 group-hover:opacity-80 transition-opacity">
-              {service.tagline || service.desc?.slice(0, 40) + '...'}
+              {service.tagline}
             </p>
 
-            {/* Learn More Link */}
             <div className="mt-4 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
               <span className="inline-flex items-center gap-1 text-xs font-semibold text-primary">
                 Learn More
@@ -991,132 +996,48 @@ const ServiceCard = ({ service, index, inView }: { service: any; index: number; 
   );
 };
 
-// ==================== SERVICES SECTION (With Your Preferred Card Style) ====================
+// ==================== SERVICES SECTION ====================
 const ServicesSection = () => {
-  const ref = useRef(null);
-  const inView = useInView(ref, { once: true, margin: "-50px", amount: 0.1 });
-
-  const services = [
-    {
-      title: "Residential Roofing",
-      icon: <CustomIcons.Home />,
-      desc: "Premium roofing solutions that combine durability with architectural elegance. Protecting your home with excellence.",
-      tagline: "Premium Protection",
-      tag: "POPULAR",
-      slug: "residential-roofing",
-      image: "https://images.unsplash.com/photo-1513694203232-719a280e022f?q=80&w=2069"
-    },
-    {
-      title: "Commercial Roofing",
-      icon: <CustomIcons.Building />,
-      desc: "Engineered for performance and longevity. We deliver commercial roofing systems that stand the test of time.",
-      tagline: "Commercial Grade",
-      tag: "EXPERT",
-      slug: "commercial-roofing",
-      image: "https://images.unsplash.com/photo-1541888946425-d81bb19480c5?q=80&w=2070"
-    },
-    {
-      title: "Windows & Doors",
-      icon: <CustomIcons.Window />,
-      desc: "Transform your home with energy-efficient windows and doors that elevate aesthetics and functionality.",
-      tagline: "Energy Efficient",
-      tag: "BESTSELLER",
-      slug: "windows-doors",
-      image: "https://images.unsplash.com/photo-1503387762-592dea58ef23?q=80&w=2000"
-    },
-    {
-      title: "Decks & Outdoor Living",
-      icon: <CustomIcons.Star />,
-      desc: "Create stunning outdoor spaces that extend your living area. Perfect for entertaining and relaxation.",
-      tagline: "Custom Design",
-      tag: "FEATURED",
-      slug: "decks",
-      image: "https://images.unsplash.com/photo-1590059132718-500fd97553ef?q=80&w=2000"
-    },
-    {
-      title: "Siding, Soffit & Fascia",
-      icon: <CustomIcons.Layers />,
-      desc: "Enhance curb appeal with premium siding solutions that offer beauty, durability, and energy efficiency.",
-      tagline: "Curb Appeal",
-      tag: "TRENDING",
-      slug: "siding",
-      image: "https://images.unsplash.com/photo-1621333649344-914954386222?q=80&w=2070"
-    },
-    {
-      title: "Gutter Systems",
-      icon: <CustomIcons.Droplet />,
-      desc: "Protect your investment with seamless gutter systems designed for optimal water management and aesthetics.",
-      tagline: "Water Protection",
-      tag: "ESSENTIAL",
-      slug: "gutters",
-      image: "https://images.unsplash.com/photo-1560518883-ce09059eeffa?q=80&w=2073"
-    }
-  ];
+  const servicesList = (servicesData?.services || []).map(service => ({
+    ...service,
+    image: imageMap[service.title] || roofingImg
+  }));
 
   return (
-    <section ref={ref} className="relative py-12 sm:py-16 md:py-20 lg:py-24 bg-background">
-      {/* Background Grid */}
-      <div className="absolute inset-0 pointer-events-none">
-        <div className="absolute top-0 left-0 w-full h-full">
-          <svg className="absolute inset-0 w-full h-full" xmlns="http://www.w3.org/2000/svg">
-            <defs>
-              <pattern id="light-grid-services" width="40" height="40" patternUnits="userSpaceOnUse">
-                <path d="M 40 0 L 0 0 0 40" fill="none" stroke="currentColor" strokeWidth="0.3" className="text-border/10" />
-              </pattern>
-            </defs>
-            <rect width="100%" height="100%" fill="url(#light-grid-services)" />
-          </svg>
-        </div>
-      </div>
-
-      <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <section className="py-16 md:py-24 px-6 lg:px-12 bg-transparent relative z-30">
+      <div className="w-full max-w-7xl mx-auto">
         {/* Section Header */}
-        <div className="max-w-4xl mx-auto text-center mb-12 sm:mb-16 lg:mb-20">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6 }}
-            className="inline-flex items-center gap-3 mb-6"
-          >
-            <div className="w-6 sm:w-8 h-px bg-primary" />
-            <span className="text-[10px] sm:text-xs font-medium tracking-[0.3em] text-primary uppercase">
-              Our Services
-            </span>
-            <div className="w-6 sm:w-8 h-px bg-primary" />
-          </motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 30 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="text-center mb-16"
+        >
+          <span className="inline-block text-primary text-xs font-black uppercase tracking-[0.5em] mb-4">
+            Eagle Revolution
+          </span>
+          <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground">
+            World Class <span className="text-primary">Capabilities</span>
+          </h2>
+          <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6" />
+          <p className="max-w-3xl mx-auto text-muted-foreground text-lg md:text-xl leading-relaxed">
+            Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area.
+          </p>
+        </motion.div>
 
-          <motion.h2
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.1 }}
-            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground mb-4 sm:mb-6"
-          >
-            Comprehensive Exterior
-            <br />
-            <span className="text-primary">Solutions</span>
-          </motion.h2>
-
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={inView ? { opacity: 1, y: 0 } : {}}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="text-muted-foreground text-sm sm:text-base lg:text-lg max-w-2xl mx-auto"
-          >
-            From roof to foundation, we deliver excellence across every aspect of your home's exterior
-          </motion.p>
-        </div>
-
-        {/* Services Grid - Your Preferred Style */}
+        {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 relative z-30">
-          {services.map((service, index) => (
-            <ServiceCard key={index} service={service} index={index} inView={inView} />
+          {servicesList.map((service, index) => (
+            <ServiceCard key={index} service={service} index={index} />
           ))}
         </div>
 
         {/* View All Button */}
         <motion.div
           initial={{ opacity: 0, y: 30 }}
-          animate={inView ? { opacity: 1, y: 0 } : {}}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
           transition={{ duration: 0.6, delay: 0.5 }}
           className="text-center mt-12 sm:mt-16"
         >

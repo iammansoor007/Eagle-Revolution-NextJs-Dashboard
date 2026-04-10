@@ -4,6 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
+import sharedServicesData from "../data/servicesData.json";
 import logo from "../assets/eaglelogo.png";
 
 import Image from "next/image";
@@ -21,7 +22,8 @@ const Navbar = () => {
   const megaMenuRef = useRef<HTMLDivElement>(null);
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  const { services, companyLinks } = navbar;
+  const { companyLinks } = navbar;
+  const services = sharedServicesData.services;
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);
@@ -87,8 +89,9 @@ const Navbar = () => {
 
             <div className="hidden lg:flex items-center space-x-2">
               <div className="relative">
-                <motion.button
-                  ref={servicesButtonRef}
+                <Link
+                  href="/services"
+                  ref={servicesButtonRef as any}
                   onMouseEnter={handleServicesMouseEnter}
                   onMouseLeave={handleServicesMouseLeave}
                   className={`flex items-center space-x-2 px-5 py-2.5 transition-all duration-300 font-bold rounded-xl relative group ${scrolled ? "text-black hover:text-primary" : "text-black hover:text-primary"
@@ -100,7 +103,7 @@ const Navbar = () => {
                     <Icon name="ChevronDown" className="h-4 w-4 ml-1" />
                   </motion.span>
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-4/5 transition-all duration-500" />
-                </motion.button>
+                </Link>
 
                 <AnimatePresence>
                   {activeMegaMenu === "services" && (
@@ -119,8 +122,8 @@ const Navbar = () => {
                           const isThisHovered = hoveredService === service.title;
                           return (
                             <Link
-                              key={service.title}
-                              href="#services"
+                              key={service.slug}
+                              href={`/services/${service.slug}`}
                               onMouseEnter={() => setHoveredService(service.title)}
                               onMouseLeave={() => setHoveredService(null)}
                               onClick={handleLinkClick}
@@ -236,8 +239,8 @@ const Navbar = () => {
                   <div className="grid gap-3">
                     {services.map((service: any) => (
                       <Link
-                        key={service.title}
-                        href="#services"
+                        key={service.slug}
+                        href={`/services/${service.slug}`}
                         onClick={handleLinkClick}
                         className="flex items-center space-x-4 p-3 rounded-xl border border-border active:bg-primary/5"
                       >

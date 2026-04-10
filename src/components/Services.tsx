@@ -1,4 +1,5 @@
 import { useRef, useEffect, useState } from "react";
+import Link from 'next/link';
 import {
   motion,
   useScroll,
@@ -12,6 +13,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
 import serviceDetail from "@/assets/fairservice.png";
+import sharedServicesData from "../data/servicesData.json";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -61,6 +63,7 @@ const CompactServiceCard = ({ service }: { service: any }) => {
       onMouseLeave={() => setIsHovered(false)}
       className="relative bg-card rounded-xl border border-border hover:border-primary transition-all duration-500 overflow-hidden shadow-md hover:shadow-xl hover:shadow-primary/20 p-6"
     >
+      <Link href={`/services/${service.slug || '#'}`} className="absolute inset-0 z-20" />
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-primary/5 via-card to-card pointer-events-none"
         animate={{
@@ -155,6 +158,7 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
       }}
       className="relative h-[420px] bg-card rounded-2xl border border-border hover:border-primary transition-all duration-700 overflow-hidden shadow-lg hover:shadow-2xl hover:shadow-primary/20 group"
     >
+      <Link href={`/services/${service.slug || '#'}`} className="absolute inset-0 z-20" />
       <motion.div
         className="absolute inset-0 bg-gradient-to-br from-primary/5 via-card to-card pointer-events-none"
         animate={{ opacity: isHovered ? 1 : 0.3 }}
@@ -300,8 +304,13 @@ const Services = () => {
   const imageScale = useTransform(smoothProgress, [0, 0.1], [1.15, 1]);
   const overlayOpacity = useTransform(smoothProgress, [0, 0.08], [0.5, 0.1]);
 
-  const { badge, headline, description, stats, services, cta } = servicesData;
-  const featuredService = services[0];
+  const { badge, headline, description, stats, cta } = servicesData;
+  
+  const servicesList = sharedServicesData.services.map((s: any, idx: number) => ({
+    ...s,
+    number: String(idx + 1).padStart(2, '0')
+  }));
+  const featuredService = servicesList[0];
 
   useEffect(() => {
     setIsClient(true);
@@ -448,8 +457,8 @@ const Services = () => {
             </span>
           </div>
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-            {services.slice(1).map((service: any, index: number) => (
-              <ServiceCard key={service.number} service={service} index={index} />
+            {servicesList.slice(1).map((service: any, index: number) => (
+              <ServiceCard key={index} service={service} index={index} />
             ))}
           </div>
         </div>

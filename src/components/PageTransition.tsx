@@ -22,10 +22,10 @@ export default function PageTransition({ children }: { children: React.ReactNode
     <AnimatePresence mode="wait" onExitComplete={() => window.scrollTo(0, 0)}>
       <motion.div key={pathname} className="relative">
         <motion.div
-           initial={{ opacity: 0 }}
-           animate={{ opacity: 1 }}
-           exit={{ opacity: 0 }}
-           transition={{ duration: 0.3 }}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
           {children}
         </motion.div>
@@ -48,7 +48,7 @@ export default function PageTransition({ children }: { children: React.ReactNode
                 </span>
               </div>
             </motion.div>
-            
+
             {/* Bottom Shutter */}
             <motion.div
               className="fixed bottom-0 left-0 w-full h-full bg-secondary z-[998] pointer-events-none"
