@@ -75,35 +75,82 @@ const Counter = ({ value, suffix = "", duration = 2, start = false }) => {
 
 // --- StatCard Component ---
 const StatCard = ({ stat, index }) => {
-  const IconComponent = stat.icon;
   const cardRef = useRef(null);
   const inView = useInView(cardRef, { once: true, margin: "50px" });
+  const x = useMotionValue(0);
+  const y = useMotionValue(0);
+  const rotateX = useTransform(y, [-0.5, 0.5], [10, -10]);
+  const rotateY = useTransform(x, [-0.5, 0.5], [-10, 10]);
+
+  const handleMouseMove = (e) => {
+    if (!cardRef.current) return;
+    const rect = cardRef.current.getBoundingClientRect();
+    const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
+    const mouseY = (e.clientY - rect.top) / rect.height - 0.5;
+    x.set(mouseX);
+    y.set(mouseY);
+  };
+
+  const handleMouseLeave = () => {
+    x.set(0);
+    y.set(0);
+  };
 
   return (
     <motion.div
       ref={cardRef}
-      initial={{ opacity: 0, y: 20 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 20 }}
-      transition={{ duration: 0.6, delay: index * 0.1 }}
-      className="group relative"
+      initial={{ opacity: 0, y: 40 }}
+      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
+      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
+      style={{ rotateX, rotateY, transformPerspective: 1000 }}
+      className="relative group lg:px-2"
     >
-      <div className="bg-white border border-border/60 rounded-[2rem] p-8 shadow-sm hover:shadow-xl hover:border-primary/20 transition-all duration-500 text-center lg:text-left h-full">
-        <div className="w-12 h-12 rounded-xl bg-primary/5 text-primary flex items-center justify-center mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500 mx-auto lg:mx-0 shadow-inner">
-          <IconComponent className="w-6 h-6" />
-        </div>
-        <div className="space-y-1">
-          <h3 className="text-4xl xs:text-5xl font-black text-foreground tracking-tighter">
-            <Counter
-              value={parseInt(stat.value.replace(/[^0-9]/g, ''))}
-              suffix={stat.value.includes('%') ? '%' : (stat.value.includes('+') ? '+' : '')}
-              start={inView}
-            />
-          </h3>
-          <p className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-muted-foreground group-hover:text-primary transition-colors">
-            {stat.label}
-          </p>
+      <div className="relative h-full bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl p-3 sm:p-8 overflow-hidden transition-all duration-500 group-hover:bg-white/[0.06] group-hover:border-primary/30 group-hover:shadow-[0_20px_50px_rgba(36,48,210,0.15)]">
+        <div className="absolute -inset-24 bg-primary/5 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
+
+        <div className="relative z-10">
+          <div className="flex items-center justify-between mb-4 sm:mb-6">
+            {/* Icon Container with !important to force styles */}
+            <div className="icon-container w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 group-hover:!bg-primary group-hover:!border-primary transition-all duration-300">
+              <stat.icon className="icon w-5 h-5 sm:w-6 sm:h-6 !text-primary group-hover:!text-white transition-all duration-300" />
+            </div>
+            <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary transition-colors">
+              Impact
+            </div>
+          </div>
+
+          <div className="space-y-0.5 sm:space-y-1">
+            <h3 className="text-2xl xs:text-4xl sm:text-5xl font-black text-foreground tracking-tight">
+              <Counter
+                value={parseInt(stat.value.replace(/[^0-9]/g, ''))}
+                suffix={stat.value.includes('%') ? '%' : (stat.value.includes('+') ? '+' : '')}
+                start={inView}
+              />
+            </h3>
+            <p className="text-[10px] sm:text-sm font-semibold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors duration-300">
+              {stat.label}
+            </p>
+          </div>
+
+          <div className="mt-4 sm:mt-8 flex items-center gap-2 sm:gap-4">
+            <div className="h-[1.5px] sm:h-[2px] w-6 sm:w-8 bg-primary/20 group-hover:w-full group-hover:bg-primary transition-all duration-500 rounded-full" />
+            <div className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-all duration-500" />
+          </div>
         </div>
       </div>
+
+      {/* Add this style tag to force the hover effect */}
+      <style jsx>{`
+        .icon-container:hover {
+          background-color: hsl(var(--primary)) !important;
+          border-color: hsl(var(--primary)) !important;
+        }
+        .icon-container:hover .icon {
+          color: white !important;
+        }
+      `}</style>
     </motion.div>
   );
 };

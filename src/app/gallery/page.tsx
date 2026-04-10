@@ -237,8 +237,8 @@ const MinimalFilter = ({ categories, activeCategory, onSelect }: { categories: s
                     whileHover={{ y: -2 }}
                     whileTap={{ scale: 0.95 }}
                     className={`relative px-3 sm:px-4 py-1.5 sm:py-2 text-xs sm:text-sm font-medium transition-all duration-300 ${activeCategory === category
-                            ? "text-primary"
-                            : "text-muted-foreground hover:text-foreground"
+                        ? "text-primary"
+                        : "text-muted-foreground hover:text-foreground"
                         }`}
                 >
                     {category}
@@ -258,89 +258,75 @@ const MinimalFilter = ({ categories, activeCategory, onSelect }: { categories: s
 // ============================================================================
 // DENSE MASONRY CARD - NO EMPTY SPACES
 // ============================================================================
+const getSizeClasses = (size: string) => {
+    switch (size) {
+        case 'large': return 'lg:col-span-2 lg:row-span-2';
+        case 'wide': return 'lg:col-span-2';
+        case 'tall': return 'lg:row-span-2';
+        default: return '';
+    }
+};
+
 const MasonryCard = ({ project, index, onClick }: { project: any; index: number; onClick: () => void }) => {
     const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
 
-    const getSizeClasses = (size: string) => {
-        switch (size) {
-            case 'large': return 'lg:col-span-2 lg:row-span-2';
-            case 'wide': return 'lg:col-span-2';
-            case 'tall': return 'lg:row-span-2';
-            default: return '';
-        }
-    };
-
     return (
         <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
+            initial={{ opacity: 0, scale: 0.98 }}
             whileInView={{ opacity: 1, scale: 1 }}
             viewport={{ once: true, margin: "-20px" }}
-            transition={{ duration: 0.4, delay: index * 0.03 }}
-            className={`group cursor-pointer ${getSizeClasses(project.size)}`}
+            transition={{ duration: 0.4, delay: Math.min(index * 0.05, 0.3) }}
+            className={`group cursor-pointer relative overflow-hidden h-[300px] sm:h-[350px] lg:h-auto ${getSizeClasses(project.size)}`}
             onClick={onClick}
             onMouseEnter={() => setIsHovered(true)}
             onMouseLeave={() => setIsHovered(false)}
         >
-            <div className="relative h-full bg-card/60 backdrop-blur-sm overflow-hidden border border-border hover:border-primary/40 transition-all duration-500 shadow-sm hover:shadow-xl hover:shadow-primary/10">
-                <div className="relative w-full h-full">
-                    {!imageLoaded && (
-                        <div className="absolute inset-0 bg-muted animate-pulse" />
-                    )}
+            <div className="relative w-full h-full bg-card/60">
+                {!imageLoaded && (
+                    <div className="absolute inset-0 bg-muted animate-pulse" />
+                )}
 
-                    <Image
-                        src={project.image}
-                        alt={project.title}
-                        fill
-                        className={`object-cover group-hover:scale-105 transition-transform duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'
-                            }`}
-                        onLoad={() => setImageLoaded(true)}
-                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
-                        priority={index < 6}
-                    />
+                <Image
+                    src={project.image}
+                    alt={project.title}
+                    fill
+                    className={`object-cover group-hover:scale-105 transition-transform duration-700 ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                    onLoad={() => setImageLoaded(true)}
+                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+                    priority={index < 4}
+                />
 
-                    {/* Brand Color Gradient Overlay */}
+                {/* Always-visible dark gradient at bottom */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-black/10 to-transparent" />
+
+                {/* Hover brand overlay */}
+                <motion.div
+                    animate={{ opacity: isHovered ? 1 : 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="absolute inset-0 bg-gradient-to-t from-primary/90 via-primary/50 to-transparent"
+                />
+
+                {/* Category tag — top left */}
+                <div className="absolute top-3 left-3 z-10">
+                    <span className="px-2.5 py-1 bg-black/50 backdrop-blur-md text-white text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider">
+                        {project.category}
+                    </span>
+                </div>
+
+                {/* Title always visible at bottom */}
+                <div className="absolute inset-x-0 bottom-0 p-3 sm:p-4 z-10">
+                    <h3 className="text-white text-sm sm:text-base font-semibold leading-tight">{project.title}</h3>
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: isHovered ? 1 : 0 }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute inset-0 bg-gradient-to-t from-primary/95 via-primary/60 to-transparent"
-                    />
-
-                    {/* Category Tag */}
-                    <div className="absolute top-3 left-3 z-10">
-                        <span className="px-2.5 py-1 bg-black/60 backdrop-blur-md text-white text-[9px] sm:text-[10px] font-semibold uppercase tracking-wider border border-white/20 shadow-lg">
-                            {project.category}
-                        </span>
-                    </div>
-
-                    {/* Content Overlay */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{
-                            opacity: isHovered ? 1 : 0,
-                            y: isHovered ? 0 : 10
-                        }}
-                        transition={{ duration: 0.3 }}
-                        className="absolute inset-x-0 bottom-0 p-4 sm:p-5 z-10"
+                        animate={{ opacity: isHovered ? 1 : 0, y: isHovered ? 0 : 6 }}
+                        transition={{ duration: 0.25 }}
                     >
-                        <div className="text-white/70 text-[10px] sm:text-xs mb-1.5 flex items-center gap-1.5">
+                        <p className="text-white/80 text-xs mt-0.5">{project.subtitle}</p>
+                        <div className="text-white/60 text-[10px] mt-1 flex items-center gap-1.5">
                             <span>{project.location}</span>
                             <span className="w-1 h-1 bg-white/40 rounded-full" />
                             <span>{project.year}</span>
                         </div>
-                        <h3 className="text-white text-lg sm:text-xl font-semibold mb-0.5 tracking-tight">{project.title}</h3>
-                        <p className="text-white/80 text-xs sm:text-sm mb-3">{project.subtitle}</p>
-
-                        <motion.button
-                            whileHover={{ x: 3 }}
-                            className="inline-flex items-center gap-1.5 text-white text-xs sm:text-sm font-medium group/btn"
-                        >
-                            View Details
-                            <svg className="w-3.5 h-3.5 group-hover/btn:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                            </svg>
-                        </motion.button>
                     </motion.div>
                 </div>
             </div>
@@ -510,9 +496,9 @@ export default function GalleryPage() {
         <main className="relative min-h-screen bg-background">
             <CleanHero />
 
-            {/* Sticky Filter */}
-            <section className="sticky top-0 z-30 py-3 px-3 bg-background/80 backdrop-blur-xl border-b border-border">
-                <div className="max-w-[1800px] mx-auto">
+            {/* Sticky Filter — offset by navbar height (sticky top-0 on navbar) */}
+            <section className="sticky top-[57px] sm:top-[65px] z-30 py-3 px-3 bg-background/90 backdrop-blur-xl border-b border-border">
+                <div className="max-w-7xl mx-auto">
                     <MinimalFilter
                         categories={CATEGORIES}
                         activeCategory={activeCategory}
@@ -521,38 +507,30 @@ export default function GalleryPage() {
                 </div>
             </section>
 
-            {/* Dense Masonry Gallery - No Gaps */}
-            <section className="px-2 sm:px-3 lg:px-4 py-4 sm:py-6">
-                <div className="max-w-[1800px] mx-auto">
-                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 auto-rows-[200px] sm:auto-rows-[220px] lg:auto-rows-[180px] xl:auto-rows-[200px] gap-2 sm:gap-3">
-                        <AnimatePresence mode="popLayout">
-                            {filteredProjects.map((project, i) => (
-                                <MasonryCard
-                                    key={project.id}
-                                    project={project}
-                                    index={i}
-                                    onClick={() => setSelectedProject(project)}
-                                />
-                            ))}
-                        </AnimatePresence>
-                    </div>
-
-                    {filteredProjects.length === 0 && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="text-center py-32"
-                        >
-                            <p className="text-muted-foreground text-base">No projects found.</p>
-                            <button
-                                onClick={() => setActiveCategory("All")}
-                                className="mt-3 text-primary text-sm font-medium hover:underline"
-                            >
-                                View all projects
-                            </button>
-                        </motion.div>
-                    )}
+            {/* Editorial Gallery Grid — grid-flow-dense + gap-0 */}
+            <section className="px-0">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[220px] grid-flow-dense gap-0">
+                    {filteredProjects.map((project, i) => (
+                        <MasonryCard
+                            key={project.id}
+                            project={project}
+                            index={i}
+                            onClick={() => setSelectedProject(project)}
+                        />
+                    ))}
                 </div>
+
+                {filteredProjects.length === 0 && (
+                    <div className="text-center py-32">
+                        <p className="text-muted-foreground text-base">No projects found.</p>
+                        <button
+                            onClick={() => setActiveCategory("All")}
+                            className="mt-3 text-primary text-sm font-medium hover:underline"
+                        >
+                            View all projects
+                        </button>
+                    </div>
+                )}
             </section>
 
             <EditorialModal
@@ -560,6 +538,6 @@ export default function GalleryPage() {
                 isOpen={!!selectedProject}
                 onClose={() => setSelectedProject(null)}
             />
-        </main>
+        </main >
     );
 }

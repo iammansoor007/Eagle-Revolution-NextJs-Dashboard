@@ -372,13 +372,13 @@ const ContactPage = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Validate SMS consent
         if (!smsConsent) {
             alert("Please agree to receive SMS communications to continue.");
             return;
         }
-        
+
         setIsSubmitting(true);
 
         const emailContent = `
@@ -669,7 +669,7 @@ ${formData.message}
                                 <div className="space-y-2 pt-3 border-t border-primary/10">
                                     <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">+1 (555) 123-4567</span>
+                                        <span className="text-foreground/80 font-mono text-xs">+1 (636) 449-9714</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
@@ -727,7 +727,7 @@ ${formData.message}
                                 <div className="space-y-2 pt-3 border-t border-primary/10">
                                     <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">Austin, Texas</span>
+                                        <span className="text-foreground/80 font-mono text-xs">O’Fallon, Missouri 63366</span>
                                     </div>
                                     <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
                                         <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
@@ -843,8 +843,8 @@ ${formData.message}
                                 </div>
 
                                 {/* SMS Consent Checkbox */}
-                                <SMSConsentCheckbox 
-                                    checked={smsConsent} 
+                                <SMSConsentCheckbox
+                                    checked={smsConsent}
                                     onChange={(e) => setSmsConsent(e.target.checked)}
                                 />
 

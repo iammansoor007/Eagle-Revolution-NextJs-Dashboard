@@ -222,7 +222,7 @@ const StatsSection = () => {
       description: "Proudly serving our community"
     },
     {
-      value: 5,
+      value: 10,
       label: "Year Workmanship Guarantee",
       suffix: "YR",
       delay: 0.4,
@@ -379,7 +379,7 @@ const Hero = () => {
                 <div className="space-y-4">
                   {[
                     { label: 'Veteran Owned', val: 'USA', icon: <ShieldCheck className="text-primary w-5 h-5" /> },
-                    { label: 'Quality Guarantee', val: '5 YEAR', icon: <Zap className="text-primary w-5 h-5" /> },
+                    { label: 'Quality Guarantee', val: 'Lifetime', icon: <Zap className="text-primary w-5 h-5" /> },
                     { label: 'Support', val: '24/7', icon: <Globe className="text-primary w-5 h-5" /> },
                   ].map((stat, i) => (
                     <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-background/40 border border-border/40">
@@ -776,8 +776,7 @@ const MissionSection = () => {
             </div>
 
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 sm:mb-8 px-2 sm:px-0">
-              To revolutionize the exterior remodeling industry by delivering
-              exceptional value and prioritizing customers over profit.
+              To revolutionize the remodeling industry by putting people first—restoring trust through transparency, exceptional craftsmanship, and an unwavering commitment to doing what’s right.
             </p>
 
             <div className="flex gap-4 sm:gap-6 justify-center lg:justify-start">
@@ -1182,12 +1181,12 @@ const ValuesGrid = () => {
 
   const values = [
     {
-      title: 'Extreme Ownership',
-      description: 'By embracing this mindset, we ensure that we always act in the best interests of our clients, driving continuous improvement and achieving excellence in every project we undertake. We are not perfect by any means, but we are perfect at fixing any mistake along the way.',
-      icon: LucideShield,
+      title: 'Customer First',
+      description: 'Our customers always come first here at Eagle Revolution. We ensure that our customers can have complete confidence in the quality of our work, knowing that we will always act in their best interests and stand behind our products and services with unwavering dedication.',
+      icon: BadgeCheck,
       number: '01',
-      stat: '100%',
-      statLabel: 'Accountability',
+      stat: '500+',
+      statLabel: 'Happy Clients',
     },
     {
       title: 'Integrity',
@@ -1198,20 +1197,20 @@ const ValuesGrid = () => {
       statLabel: 'Hidden Fees',
     },
     {
-      title: 'Humility',
-      description: 'Humility is about putting the needs of the customer above our own and being open to feedback, learning, and improvement. By embracing humility, we stay grounded, continually refining our skills and enhancing the customer experience.',
-      icon: Heart,
+      title: 'Extreme Ownership',
+      description: 'By embracing this mindset, we ensure that we always act in the best interests of our clients, driving continuous improvement and achieving excellence in every project we undertake. We are not perfect by any means, but we are perfect at fixing any mistake along the way.',
+      icon: LucideShield,
       number: '03',
-      stat: '24/7',
-      statLabel: 'Client Focus',
+      stat: '100%',
+      statLabel: 'Accountability',
     },
     {
-      title: 'Customer First',
-      description: 'Our customers always come first here at Eagle Revolution. We ensure that our customers can have complete confidence in the quality of our work, knowing that we will always act in their best interests and stand behind our products and services with unwavering dedication.',
-      icon: BadgeCheck,
+      title: 'Gratitude',
+      description: 'By expressing gratitude, we build lasting relationships and create a positive impact, ensuring every interaction is rooted in kindness and acknowledgment. We believe that a thankful mindset inspires excellence in service and craftsmanship, making every project a shared celebration.',
+      icon: Sparkles,
       number: '04',
-      stat: '500+',
-      statLabel: 'Happy Clients',
+      stat: '100%',
+      statLabel: 'Grateful',
     },
     {
       title: 'Growth',
@@ -1222,12 +1221,12 @@ const ValuesGrid = () => {
       statLabel: 'Continuous',
     },
     {
-      title: 'Gratitude',
-      description: 'By expressing gratitude, we build lasting relationships and create a positive impact, ensuring every interaction is rooted in kindness and acknowledgment. We believe that a thankful mindset inspires excellence in service and craftsmanship, making every project a shared celebration.',
-      icon: Sparkles,
+      title: 'Humility',
+      description: 'Humility is about putting the needs of the customer above our own and being open to feedback, learning, and improvement. By embracing humility, we stay grounded, continually refining our skills and enhancing the customer experience.',
+      icon: Heart,
       number: '06',
-      stat: '100%',
-      statLabel: 'Grateful',
+      stat: '24/7',
+      statLabel: 'Client Focus',
     },
   ];
 

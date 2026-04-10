@@ -112,8 +112,9 @@ const StatCard = ({ stat, index }) => {
 
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
-            <div className="w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 group-hover:bg-primary group-hover:text-white transition-all duration-300">
-              <stat.icon className="w-5 h-5 sm:w-6 sm:h-6" />
+            {/* Icon Container with !important to force styles */}
+            <div className="icon-container w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 group-hover:!bg-primary group-hover:!border-primary transition-all duration-300">
+              <stat.icon className="icon w-5 h-5 sm:w-6 sm:h-6 !text-primary group-hover:!text-white transition-all duration-300" />
             </div>
             <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary transition-colors">
               Impact
@@ -139,6 +140,17 @@ const StatCard = ({ stat, index }) => {
           </div>
         </div>
       </div>
+
+      {/* Add this style tag to force the hover effect */}
+      <style jsx>{`
+        .icon-container:hover {
+          background-color: hsl(var(--primary)) !important;
+          border-color: hsl(var(--primary)) !important;
+        }
+        .icon-container:hover .icon {
+          color: white !important;
+        }
+      `}</style>
     </motion.div>
   );
 };
@@ -700,7 +712,7 @@ export default function ServiceDetailPage({ params }) {
               className="order-2 lg:order-1 text-center lg:text-left flex flex-col items-center lg:items-start"
             >
               {/* Badge Container - This controls the alignment */}
-              <div className="flex justify-center lg:justify-start w-full mb-6 sm:mb-8">
+              <div className="flex justify-center lg:justify-start w-full mb-2">
                 <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-primary/10">
                   <IconComponent className="w-3 h-3 sm:w-4 sm:h-4" />
                   <span className="text-[10px] xs:text-xs font-bold uppercase tracking-wider">{service.tag}</span>
@@ -820,7 +832,7 @@ export default function ServiceDetailPage({ params }) {
                 <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 rounded-xl sm:rounded-2xl transition-opacity duration-500" />
 
                 <div className="relative z-10">
-                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                  <div className="w-12 h-12 sm:w-14 sm:h-14 bg-primary/10 rounded-lg sm:rounded-xl flex items-center justify-center mb-4 sm:mb-6 transition-all duration-300">
                     <benefit.icon className="w-6 h-6 sm:w-7 sm:h-7 text-primary group-hover:text-white transition-colors" />
                   </div>
 

@@ -503,31 +503,16 @@ export default function FAQPage() {
     const [searchQuery, setSearchQuery] = useState('');
     const [isMounted, setIsMounted] = useState(false);
 
-    // Handle mounting to prevent hydration issues
     useEffect(() => {
         setIsMounted(true);
     }, []);
 
-    // Add null check for faq
-    if (!faq) {
-        return (
-            <section className="relative bg-background py-20 md:py-24 lg:py-28 overflow-hidden">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                    <div className="text-center py-20">
-                        <p className="text-muted-foreground">Loading FAQ content...</p>
-                    </div>
-                </div>
-            </section>
-        );
-    }
-
-    const { section, categories = [], items = [] } = faq;
+    const { section, categories = [], items = [] } = faq || {};
 
     // Get categories with counts - fix duplicate all issue
     const categoriesWithCounts = useMemo(() => {
-        if (!categories.length) return [{ id: 'all', label: 'All Questions', icon: 'Grid' }];
+        if (!categories || !categories.length) return [{ id: 'all', label: 'All Questions', icon: 'Grid' }];
         
-        // Filter out invalid categories and create a Set to track unique IDs
         const validCategories = categories.filter((cat: any) => cat && cat.id);
         const uniqueIds = new Set();
         const uniqueCategories = validCategories.filter((cat: any) => {
@@ -538,23 +523,19 @@ export default function FAQPage() {
         
         const catsWithCounts = uniqueCategories.map((cat: any) => ({
             ...cat,
-            count: items.filter((item: any) => item && item.category === cat.id).length
+            count: (items || []).filter((item: any) => item && item.category === cat.id).length
         }));
         
-        // Check if 'all' already exists
         const hasAllCategory = catsWithCounts.some((cat: any) => cat.id === 'all');
-        
         if (!hasAllCategory) {
             return [{ id: 'all', label: 'All Questions', icon: 'Grid' }, ...catsWithCounts];
         }
-        
         return catsWithCounts;
     }, [categories, items]);
 
     // Filter items with null checks
     const filteredItems = useMemo(() => {
-        if (!items.length) return [];
-        
+        if (!items || !items.length) return [];
         return items.filter((item: any) => {
             if (!item) return false;
             const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
@@ -578,36 +559,21 @@ export default function FAQPage() {
         setOpenItems([]);
     };
 
-    // Handle hash navigation
+    // Handle hash navigation — only runs client-side after mount
     useEffect(() => {
-        if (!isMounted) return;
-        
+        if (!isMounted || !items || !items.length) return;
         const hash = window.location.hash.slice(1);
-        if (hash && items.length) {
+        if (hash) {
             const index = items.findIndex((item: any) => item && item.id === hash);
             if (index !== -1) {
                 setOpenItems([index]);
                 setTimeout(() => {
                     const element = document.getElementById(`faq-${hash}`);
-                    if (element) {
-                        element.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    }
+                    if (element) element.scrollIntoView({ behavior: 'smooth', block: 'center' });
                 }, 100);
             }
         }
     }, [items, isMounted]);
-
-    if (!isMounted) {
-        return (
-            <section className="relative bg-background py-20 md:py-24 lg:py-28 overflow-hidden min-h-screen">
-                <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8">
-                    <div className="text-center py-20">
-                        <p className="text-muted-foreground">Loading...</p>
-                    </div>
-                </div>
-            </section>
-        );
-    }
 
     return (
         <section

@@ -867,63 +867,53 @@
       "main": [
         {
           "label": "Residential Roofing",
-          "href": "/roofing",
+          "href": "/services/residential-roofing",
           "icon": "Home"
         },
         {
           "label": "Windows & Doors",
-          "href": "/windows-doors",
+          "href": "/services/windows-doors",
           "icon": "Layout"
         },
         {
           "label": "Custom Decks",
-          "href": "/decks",
+          "href": "/services/custom-decks",
           "icon": "TreePine"
         },
         {
           "label": "Siding, Soffit & Fascia",
-          "href": "/siding",
+          "href": "/services/siding-soffit-fascia",
           "icon": "Building2"
         },
         {
           "label": "Commercial Roofing",
-          "href": "/commercial-roofing",
+          "href": "/services/commercial-roofing",
           "icon": "Building"
         },
         {
           "label": "Gutters & Protection",
-          "href": "/gutters",
+          "href": "/services/gutters-protection",
           "icon": "Droplets"
-        },
-        {
-          "label": "Free Estimates",
-          "href": "/estimate",
-          "icon": "ClipboardCheck"
-        },
-        {
-          "label": "Financing Options",
-          "href": "/financing",
-          "icon": "CreditCard"
         }
       ],
       "materials": {
-        "title": "Certifications",
+        "title": "Company",
         "items": [
           {
-            "label": "ProVia Certified Installer",
-            "href": "/provia"
+            "label": "About Us",
+            "href": "/about"
           },
           {
-            "label": "IKO Certified Pro",
-            "href": "/iko"
+            "label": "Gallery",
+            "href": "/gallery"
           },
           {
-            "label": "CertainTeed Certified",
-            "href": "/certainteed"
+            "label": "Reviews",
+            "href": "/reviews"
           },
           {
-            "label": " Wolf Home Products Certified",
-            "href": "/wolf"
+            "label": "FAQ",
+            "href": "/faq"
           }
         ]
       }
@@ -985,14 +975,14 @@
         "icon": "Star"
       },
       {
-        "label": "Warranty",
-        "href": "/warranty",
-        "icon": "Shield"
+        "label": "FAQ",
+        "href": "/faq",
+        "icon": "MessageSquare"
       },
       {
-        "label": "Financing",
-        "href": "/financing",
-        "icon": "CreditCard"
+        "label": "Contact",
+        "href": "/contact",
+        "icon": "Phone"
       }
     ],
     "social": [
@@ -1028,14 +1018,6 @@
         {
           "label": "Terms of Service",
           "href": "/terms"
-        },
-        {
-          "label": "Licenses",
-          "href": "/licenses"
-        },
-        {
-          "label": "Sitemap",
-          "href": "/sitemap"
         }
       ],
       "tagline": "VETERAN OWNED • INTEGRITY • CRAFTSMANSHIP"
