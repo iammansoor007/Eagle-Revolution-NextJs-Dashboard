@@ -5,7 +5,7 @@ import Navbar from "./Navbar";
 import Footer from "./Footer";
 import PageTransition from "./PageTransition";
 import LoadingScreen from "./LoadingScreen";
-import { AnimatePresence, motion } from "framer-motion";
+import { AnimatePresence, motion, easeOut } from "framer-motion"; // Add easeOut import
 import { useEffect, useState } from "react";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
@@ -18,7 +18,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
   const isSplashPhase = !hasLoaded;
 
-  // Stagger variants to reduce "Mount Pressure" (mounting everything at once)
   const containerVariants = {
     hidden: { opacity: 0 },
     visible: {
@@ -30,12 +29,16 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     }
   };
 
+  // FIXED: Use imported easeOut function
   const itemVariants = {
     hidden: { opacity: 0, y: 10 },
     visible: { 
       opacity: 1, 
       y: 0,
-      transition: { duration: 0.5, ease: "easeOut" }
+      transition: { 
+        duration: 0.5, 
+        ease: easeOut // ✅ Use the imported easing function
+      }
     }
   };
 

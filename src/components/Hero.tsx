@@ -13,7 +13,7 @@ gsap.registerPlugin(ScrollTrigger);
 const Hero = () => {
   const { hero } = useContent();
   const sectionRef = useRef<HTMLElement>(null);
-  
+
   // Use MotionValues to avoid React re-renders on every mouse move
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
@@ -68,18 +68,18 @@ const Hero = () => {
         <div className="absolute inset-0 bg-gradient-to-b from-slate-900/20 via-transparent to-transparent" />
 
         <motion.div
-           className="absolute top-[10%] right-[10%] w-[50rem] h-[50rem] bg-primary/10 rounded-full blur-[90px]"
-           animate={{
-             scale: [1, 1.05, 1],
-             opacity: [0.1, 0.15, 0.1],
-           }}
-           transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-           style={{ 
-             x: parallaxX, 
-             y: parallaxY,
-             willChange: "transform, opacity" 
-           }}
-         />
+          className="absolute top-[10%] right-[10%] w-[50rem] h-[50rem] bg-primary/10 rounded-full blur-[90px]"
+          animate={{
+            scale: [1, 1.05, 1],
+            opacity: [0.1, 0.15, 0.1],
+          }}
+          transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+          style={{
+            x: parallaxX,
+            y: parallaxY,
+            willChange: "transform, opacity"
+          }}
+        />
       </div>
 
       <div className="absolute inset-0 opacity-[0.03] pointer-events-none z-0">
@@ -93,9 +93,11 @@ const Hero = () => {
         </svg>
       </div>
 
-      <div className="relative z-10 min-h-screen flex items-center py-28 sm:py-24">
+      <div className="relative z-10 min-h-screen flex items-center py-8 sm:py-12 lg:py-16">
         <div className="container mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-start lg:items-center">
+          <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-12 lg:gap-16 items-center">
+
+            {/* Left Column - Text Content */}
             <div className="text-center lg:text-left">
               <motion.div
                 className="inline-flex items-center gap-2 bg-white/10 backdrop-blur-sm rounded-full px-4 py-1.5 mb-6 mx-auto lg:mx-0"
@@ -132,8 +134,6 @@ const Hero = () => {
               >
                 {description}
               </motion.p>
-
-
 
               <motion.div
                 className="mb-10 w-full"
@@ -191,6 +191,52 @@ const Hero = () => {
                 ))}
               </motion.div>
             </div>
+
+            {/* Right Column - Ultra Minimal Financing */}
+            <motion.div
+              initial={{ opacity: 0, x: 30 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="flex justify-center lg:justify-end      lg:-mt-24 "
+            >
+              <motion.a
+                href="https://www.greensky.com/prequal/gs/prequalify-for-loan?merchant=81115616&channel=External-Button-Prequal"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="relative group"
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+              >
+                {/* Darker background for better contrast */}
+                <div className="relative bg-slate-800/80 backdrop-blur-md border border-white/20 rounded-2xl px-8 py-12 shadow-2xl transition-all duration-300 group-hover:border-primary/50 group-hover:bg-slate-800/90">
+
+                  {/* Subtle glow on hover */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                  {/* Simple Icon + Text */}
+                  <div className="flex flex-col items-center gap-4 relative z-10">
+                    <div className="w-16 h-16 rounded-2xl bg-primary/20 flex items-center justify-center group-hover:bg-primary/30 group-hover:scale-110 transition-all duration-300">
+                      <svg className="w-8 h-8 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 10h18M7 15h1m4 0h1m-7 4h12a3 3 0 003-3V8a3 3 0 00-3-3H6a3 3 0 00-3 3v8a3 3 0 003 3z" />
+                      </svg>
+                    </div>
+
+                    <div className="text-center">
+                      <h4 className="text-white font-bold text-xl mb-1">Financing Available</h4>
+                      <p className="text-white/70 text-sm">Quick prequalification • Soft credit check</p>
+                    </div>
+
+                    <span className="text-white font-semibold flex items-center gap-2 group-hover:gap-3 transition-all mt-2">
+                      Check Your Options
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2.5} d="M9 5l7 7-7 7" />
+                      </svg>
+                    </span>
+                  </div>
+                </div>
+              </motion.a>
+            </motion.div>
+
           </div>
         </div>
       </div>

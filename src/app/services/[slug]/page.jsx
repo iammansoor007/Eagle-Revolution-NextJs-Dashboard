@@ -16,7 +16,7 @@ import {
   CheckCircle, ArrowRight, Phone, Clock, Shield, Award,
   ChevronRight, Star, ThumbsUp, Truck,
   ChevronDown, ArrowUpRight, Users, Trophy,
-  FileText, ClipboardCheck, Hammer, Minus, Plus
+  FileText, ClipboardCheck, Hammer, Minus, Plus, Sparkles, Zap, Palette, Sun, Snowflake
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 
@@ -32,13 +32,14 @@ import sidingImg from '@/assets/portfolio5.jpg';
 const iconMap = {
   Home, Layout, TreePine, Building2, Building, Droplets,
   Shield, Trophy, Users, ThumbsUp, FileText, ClipboardCheck,
-  Truck, Hammer, CheckCircle, Award, Clock
+  Truck, Hammer, CheckCircle, Award, Clock, Sparkles, Zap, Palette, Sun, Snowflake
 };
 
 const imageMap = {
   'Residential Roofing': roofingImg,
   'Windows & Doors': windowsImg,
   'Custom Decks': decksImg,
+  'PVC Decking': decksImg,
   'Commercial Roofing': commercialImg,
   'Siding, Soffit & Fascia': sidingImg,
   'Gutters & Protection': sidingImg,
@@ -112,7 +113,6 @@ const StatCard = ({ stat, index }) => {
 
         <div className="relative z-10">
           <div className="flex items-center justify-between mb-4 sm:mb-6">
-            {/* Icon Container with !important to force styles */}
             <div className="icon-container w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 group-hover:!bg-primary group-hover:!border-primary transition-all duration-300">
               <stat.icon className="icon w-5 h-5 sm:w-6 sm:h-6 !text-primary group-hover:!text-white transition-all duration-300" />
             </div>
@@ -141,7 +141,6 @@ const StatCard = ({ stat, index }) => {
         </div>
       </div>
 
-      {/* Add this style tag to force the hover effect */}
       <style jsx>{`
         .icon-container:hover {
           background-color: hsl(var(--primary)) !important;
@@ -370,7 +369,6 @@ const FAQItem = ({ faq, index, isOpen, onToggle }) => {
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className="relative group"
     >
-      {/* Dynamic Background Effect - Desktop Only */}
       <div className="hidden sm:block absolute inset-0 pointer-events-none overflow-hidden rounded-xl sm:rounded-2xl">
         <svg className="w-full h-full">
           <motion.rect
@@ -460,7 +458,6 @@ const FAQItem = ({ faq, index, isOpen, onToggle }) => {
           )}
         </AnimatePresence>
 
-        {/* Decorative Corners - Desktop Only */}
         <div className="hidden sm:block">
           <motion.div
             className="absolute top-2 left-2 sm:top-4 sm:left-4 w-4 h-4 sm:w-6 sm:h-6 border-t-2 border-l-2"
@@ -582,6 +579,36 @@ const AwardCTABanner = () => {
   );
 };
 
+// --- Material Comparison Card (For Deck Pages) ---
+const MaterialComparisonCard = ({ type, features, isRecommended }) => {
+  return (
+    <motion.div
+      whileHover={{ y: -8 }}
+      className={`relative rounded-2xl overflow-hidden border-2 transition-all duration-300 ${isRecommended
+        ? 'border-primary shadow-xl shadow-primary/20'
+        : 'border-border hover:border-primary/30'
+        }`}
+    >
+      {isRecommended && (
+        <div className="absolute top-0 right-0 bg-primary text-white text-xs font-bold px-4 py-1.5 rounded-bl-xl">
+          RECOMMENDED
+        </div>
+      )}
+      <div className="p-6 sm:p-8 bg-card">
+        <h4 className="text-2xl font-bold text-foreground mb-4">{type}</h4>
+        <ul className="space-y-3">
+          {features.map((feature, idx) => (
+            <li key={idx} className="flex items-start gap-3">
+              <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
+              <span className="text-muted-foreground">{feature}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+    </motion.div>
+  );
+};
+
 // --- Main Component ---
 export default function ServiceDetailPage({ params }) {
   const { slug } = use(params);
@@ -634,6 +661,9 @@ export default function ServiceDetailPage({ params }) {
     ...s,
     icon: iconMap[s.icon] || Shield
   }));
+
+  // Check if current page is a deck-related page
+  const isDeckPage = service.slug === 'custom-decks' || service.slug === 'pvc-decking';
 
   return (
     <main className="bg-background text-foreground font-body overflow-x-hidden">
@@ -711,7 +741,6 @@ export default function ServiceDetailPage({ params }) {
               transition={{ duration: 0.6 }}
               className="order-2 lg:order-1 text-center lg:text-left flex flex-col items-center lg:items-start"
             >
-              {/* Badge Container - This controls the alignment */}
               <div className="flex justify-center lg:justify-start w-full mb-2">
                 <div className="inline-flex items-center gap-2 bg-primary/5 text-primary px-3 py-1.5 sm:px-4 sm:py-2 rounded-full border border-primary/10">
                   <IconComponent className="w-3 h-3 sm:w-4 sm:h-4" />
@@ -794,7 +823,7 @@ export default function ServiceDetailPage({ params }) {
       </section>
 
       {/* Benefits Section - The Eagle Edge */}
-      <section className="py-12 xs:py-16 sm:py-20 md:py-28 bg-muted/30 border-y border-border">
+      <section className="py-6 xs:py-8 sm:py-10 md:py-12 bg-muted/30 border-y border-border">
         <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
           <motion.div
             initial={{ opacity: 0, y: 20 }}
@@ -851,6 +880,360 @@ export default function ServiceDetailPage({ params }) {
           </div>
         </div>
       </section>
+
+      {/* ============================================ */}
+      {/* PREMIUM DECK SHOWCASE - Conditional Section */}
+      {/* Only shows for custom-decks and pvc-decking */}
+      {/* ============================================ */}
+      {/* ============================================ */}
+      {/* PREMIUM DECK SHOWCASE - Enhanced Version */}
+      {/* ============================================ */}
+      {isDeckPage && (
+        <section className="relative py-20 xs:py-24 sm:py-28 md:py-32 bg-background border-b border-border overflow-hidden">
+
+          {/* Animated Background Elements */}
+          <div className="absolute inset-0 pointer-events-none">
+            <motion.div
+              className="absolute top-20 left-10 w-72 h-72 bg-primary/5 rounded-full blur-[100px]"
+              animate={{
+                x: [0, 40, -20, 0],
+                y: [0, -30, 20, 0],
+                scale: [1, 1.2, 0.9, 1],
+              }}
+              transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
+            />
+            <motion.div
+              className="absolute bottom-20 right-10 w-96 h-96 bg-primary/3 rounded-full blur-[120px]"
+              animate={{
+                x: [0, -30, 40, 0],
+                y: [0, 20, -30, 0],
+                scale: [1, 0.9, 1.1, 1],
+              }}
+              transition={{ duration: 18, repeat: Infinity, ease: "easeInOut", delay: 2 }}
+            />
+            <div className="absolute inset-0 opacity-[0.02] bg-[radial-gradient(hsl(var(--primary))_1px,transparent_1px)] [background-size:40px_40px]" />
+          </div>
+
+          <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12 relative z-10">
+
+            {/* Enhanced Section Header */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+              className="text-center max-w-4xl mx-auto mb-16 sm:mb-20"
+            >
+              {/* Premium Badge with Animation */}
+              <motion.div
+                initial={{ scale: 0 }}
+                whileInView={{ scale: 1 }}
+                viewport={{ once: true }}
+                transition={{ type: "spring", stiffness: 200, damping: 20 }}
+                className="inline-flex items-center gap-2 bg-gradient-to-r from-primary/20 via-primary/10 to-primary/20 text-primary px-5 py-2.5 rounded-full border border-primary/30 mb-8 backdrop-blur-sm"
+              >
+                <Sparkles className="w-4 h-4" />
+                <span className="text-xs font-bold uppercase tracking-[0.2em]">Premium Material Showcase</span>
+                <Sparkles className="w-4 h-4" />
+              </motion.div>
+
+              <h2 className="text-4xl xs:text-5xl sm:text-6xl lg:text-7xl font-heading font-bold text-foreground mb-6 leading-[1.1]">
+                {service.slug === 'pvc-decking'
+                  ? 'PVC vs Composite:'
+                  : 'Composite & PVC:'}
+                <br />
+                <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary via-primary/90 to-primary">
+                  Built Different
+                </span>
+              </h2>
+
+              <div className="flex items-center justify-center gap-3 mb-6">
+                <div className="w-12 h-[2px] bg-gradient-to-r from-transparent to-primary/50" />
+                <Star className="w-4 h-4 text-primary fill-primary" />
+                <div className="w-12 h-[2px] bg-gradient-to-l from-transparent to-primary/50" />
+              </div>
+
+              <p className="text-muted-foreground text-lg sm:text-xl max-w-3xl mx-auto leading-relaxed">
+                {service.slug === 'pvc-decking'
+                  ? 'Pure polymer engineering delivers unmatched moisture resistance and lighter, cooler surfaces that composite simply cannot match.'
+                  : 'Two premium paths to your dream outdoor space. Discover why our deck installations are the gold standard.'}
+              </p>
+            </motion.div>
+
+            {/* Hero Feature Image - Full Width */}
+            <motion.div
+              initial={{ opacity: 0, scale: 0.95 }}
+              whileInView={{ opacity: 1, scale: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.1 }}
+              className="relative h-[300px] sm:h-[400px] md:h-[500px] rounded-3xl sm:rounded-[3rem] overflow-hidden shadow-2xl shadow-primary/10 mb-16 group"
+            >
+              <Image
+                src={decksImg}
+                alt="Premium deck showcase"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-1000"
+                priority
+              />
+              <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
+
+              {/* Overlay Content */}
+              <div className="absolute inset-0 flex flex-col justify-end p-8 sm:p-12">
+                <motion.div
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: 0.3 }}
+                  className="max-w-2xl"
+                >
+                  <span className="inline-block bg-primary text-white text-sm font-bold px-4 py-2 rounded-full mb-4">
+                    Award-Winning Craftsmanship
+                  </span>
+                  <h3 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-4">
+                    Transform Your Outdoor Living
+                  </h3>
+                  <p className="text-white/80 text-lg mb-6">
+                    Every deck we build is a masterpiece of engineering and design, backed by industry-leading warranties.
+                  </p>
+                </motion.div>
+              </div>
+
+              {/* Decorative Corner Accents */}
+              <div className="absolute top-6 left-6 w-12 h-12 border-t-2 border-l-2 border-white/20 rounded-tl-2xl" />
+              <div className="absolute top-6 right-6 w-12 h-12 border-t-2 border-r-2 border-white/20 rounded-tr-2xl" />
+              <div className="absolute bottom-6 left-6 w-12 h-12 border-b-2 border-l-2 border-white/20 rounded-bl-2xl" />
+              <div className="absolute bottom-6 right-6 w-12 h-12 border-b-2 border-r-2 border-white/20 rounded-br-2xl" />
+            </motion.div>
+
+            {/* Material Comparison - Enhanced */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.2 }}
+              className="mb-20"
+            >
+              <div className="text-center mb-12">
+                <span className="text-primary text-sm font-bold uppercase tracking-[0.3em]">Compare & Choose</span>
+                <h3 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mt-3 mb-4">
+                  Find Your Perfect Material
+                </h3>
+                <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
+                  Side-by-side comparison of our premium decking solutions
+                </p>
+              </div>
+
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-8 lg:gap-10">
+                {/* Composite Card - Enhanced */}
+                <motion.div
+                  whileHover={{ y: -10 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-500 ${service.slug === 'custom-decks'
+                    ? 'border-primary shadow-2xl shadow-primary/20 bg-gradient-to-b from-primary/5 to-transparent'
+                    : 'border-border hover:border-primary/30 bg-card'
+                    }`}
+                >
+                  {service.slug === 'custom-decks' && (
+                    <div className="absolute top-0 right-0 z-20">
+                      <div className="bg-primary text-white text-xs font-bold px-6 py-2 rounded-bl-2xl shadow-lg">
+                        ⭐ RECOMMENDED
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-8 sm:p-10">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                        <TreePine className="w-7 h-7 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="text-2xl font-bold text-foreground">Capped Composite</h4>
+                        <p className="text-sm text-muted-foreground">Wood fiber + polymer blend</p>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-4 mb-8">
+                      {[
+                        { feature: "Natural wood look and feel", highlight: true },
+                        { feature: "25+ year fade and stain warranty" },
+                        { feature: "Realistic wood grain patterns" },
+                        { feature: "Lower cost than premium PVC" },
+                        { feature: "Excellent for full sun exposure" },
+                        { feature: "Scratch and stain resistant capstock" }
+                      ].map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${item.highlight ? 'bg-primary/20' : 'bg-primary/10'
+                            }`}>
+                            <CheckCircle className={`w-3.5 h-3.5 ${item.highlight ? 'text-primary' : 'text-primary/70'}`} />
+                          </div>
+                          <span className={`${item.highlight ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                            {item.feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="pt-6 border-t border-border">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Starting at</span>
+                        <span className="text-2xl font-bold text-foreground">Competitive Pricing</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+
+                {/* PVC Card - Enhanced */}
+                <motion.div
+                  whileHover={{ y: -10 }}
+                  transition={{ type: "spring", stiffness: 300, damping: 20 }}
+                  className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-500 ${service.slug === 'pvc-decking'
+                    ? 'border-primary shadow-2xl shadow-primary/20 bg-gradient-to-b from-primary/5 to-transparent'
+                    : 'border-border hover:border-primary/30 bg-card'
+                    }`}
+                >
+                  {service.slug === 'pvc-decking' && (
+                    <div className="absolute top-0 right-0 z-20">
+                      <div className="bg-primary text-white text-xs font-bold px-6 py-2 rounded-bl-2xl shadow-lg">
+                        ⭐ RECOMMENDED
+                      </div>
+                    </div>
+                  )}
+
+                  <div className="p-8 sm:p-10">
+                    <div className="flex items-center gap-4 mb-6">
+                      <div className="w-14 h-14 rounded-2xl bg-primary/10 flex items-center justify-center">
+                        <Droplets className="w-7 h-7 text-primary" />
+                      </div>
+                      <div>
+                        <h4 className="text-2xl font-bold text-foreground">Cellular PVC</h4>
+                        <p className="text-sm text-muted-foreground">100% pure polymer</p>
+                      </div>
+                    </div>
+
+                    <ul className="space-y-4 mb-8">
+                      {[
+                        { feature: "Zero organic material - never rots", highlight: true },
+                        { feature: "Lifetime rot and insect warranty", highlight: true },
+                        { feature: "Lighter, cooler surface in direct sun" },
+                        { feature: "Ideal for pools and shaded areas" },
+                        { feature: "Superior moisture resistance" },
+                        { feature: "Never absorbs water or swells" }
+                      ].map((item, idx) => (
+                        <li key={idx} className="flex items-start gap-3">
+                          <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${item.highlight ? 'bg-primary/20' : 'bg-primary/10'
+                            }`}>
+                            <CheckCircle className={`w-3.5 h-3.5 ${item.highlight ? 'text-primary' : 'text-primary/70'}`} />
+                          </div>
+                          <span className={`${item.highlight ? 'text-foreground font-medium' : 'text-muted-foreground'}`}>
+                            {item.feature}
+                          </span>
+                        </li>
+                      ))}
+                    </ul>
+
+                    <div className="pt-6 border-t border-border">
+                      <div className="flex items-center justify-between">
+                        <span className="text-sm text-muted-foreground">Premium Investment</span>
+                        <span className="text-2xl font-bold text-foreground">Worth Every Penny</span>
+                      </div>
+                    </div>
+                  </div>
+                </motion.div>
+              </div>
+            </motion.div>
+
+            {/* Feature Grid - Enhanced */}
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.6, delay: 0.3 }}
+              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20"
+            >
+              {[
+                {
+                  icon: Zap,
+                  title: "Cool-Touch Technology",
+                  description: "Advanced heat-mitigating capstock keeps surfaces cooler than traditional composites",
+                  color: "from-amber-500/20 to-orange-500/10"
+                },
+                {
+                  icon: Palette,
+                  title: "Premium Color Range",
+                  description: "Multi-tonal streaking and authentic wood grain patterns that never fade",
+                  color: "from-blue-500/20 to-purple-500/10"
+                },
+                {
+                  icon: Shield,
+                  title: "Lifetime Protection",
+                  description: "Industry-leading warranties backed by our military-grade installation",
+                  color: "from-green-500/20 to-emerald-500/10"
+                }
+              ].map((item, idx) => (
+                <motion.div
+                  key={idx}
+                  whileHover={{ scale: 1.02 }}
+                  className={`relative p-6 rounded-2xl bg-gradient-to-br ${item.color} border border-primary/10 backdrop-blur-sm overflow-hidden group`}
+                >
+                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                  <div className="relative z-10">
+                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                      <item.icon className="w-7 h-7 text-primary" />
+                    </div>
+                    <h4 className="text-xl font-bold text-foreground mb-3">{item.title}</h4>
+                    <p className="text-muted-foreground leading-relaxed">{item.description}</p>
+                  </div>
+                </motion.div>
+              ))}
+            </motion.div>
+
+            {/* Image Gallery Strip */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              whileInView={{ opacity: 1 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: 0.4 }}
+              className="mb-16"
+            >
+              <div className="flex items-center gap-3 mb-8">
+                <div className="w-8 h-[2px] bg-primary/40" />
+                <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary/60">Project Gallery</span>
+                <div className="flex-1 h-[1px] bg-gradient-to-r from-primary/20 to-transparent" />
+              </div>
+
+              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                {[1, 2, 3, 4].map((item, idx) => (
+                  <motion.div
+                    key={idx}
+                    initial={{ opacity: 0, scale: 0.9 }}
+                    whileInView={{ opacity: 1, scale: 1 }}
+                    viewport={{ once: true }}
+                    transition={{ delay: idx * 0.1 }}
+                    whileHover={{ scale: 1.05, zIndex: 10 }}
+                    className="relative aspect-square rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
+                  >
+                    <Image
+                      src={decksImg}
+                      alt={`Deck project ${idx + 1}`}
+                      fill
+                      className="object-cover group-hover:scale-110 transition-transform duration-500"
+                    />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <span className="text-white text-xs font-medium bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
+                        View Project
+                      </span>
+                    </div>
+                  </motion.div>
+                ))}
+              </div>
+            </motion.div>
+
+
+
+          </div>
+        </section>
+      )}
 
       {/* Process Section */}
       <section className="relative py-16 xs:py-20 sm:py-24 md:py-32 bg-background overflow-hidden">
