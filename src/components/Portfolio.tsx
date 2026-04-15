@@ -1,4 +1,6 @@
-import { useRef, useEffect, useState, useCallback, useMemo } from "react";
+"use client";
+
+import { useRef, useEffect, useState, useMemo } from "react";
 import Image from "next/image";
 import {
   motion,
@@ -13,21 +15,41 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useContent } from "../hooks/useContent";
 import { useRouter } from "next/navigation";
 
-
+// Rename window import to avoid conflict with global window object
 import commercialroof from "../assets/COMMERCIAL ROOFS-20260414T184732Z-3-001/COMMERCIAL ROOFS/croof1.jpg";
 import decks from "../assets/DECKS-20260414T184734Z-3-001/DECKS/deck12.jpg";
 import deck2 from "../assets/DECKS-20260414T184734Z-3-001/DECKS/deck11.jpg";
 import door from "../assets/DOORS-20260414T184740Z-3-001/DOORS/DOOR1.jpg";
 import residental1 from "../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof4 - Copy (2).png";
 import residental2 from "../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof9.jpg";
-
 import siding from "../assets/SIDING-20260415T110420Z-3-001/SIDING/siding5.jpg";
-import window from "../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows10.jpg";
-
+import windowsImg from "../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows10.jpg";
 import pvc from "../assets/pvcdecks.jpg";
-import window2 from "../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows2.jpg";
+import windows2Img from "../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows2.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
+
+// Type definitions
+interface Project {
+  number: string;
+  title: string;
+  category: string;
+  location: string;
+  year: string;
+  desc: string;
+  architect?: string;
+  image: string;
+  accent?: string;
+}
+
+interface Section {
+  badge?: string;
+  headline?: string;
+}
+
+interface Button {
+  text?: string;
+}
 
 const imageMap: Record<string, any> = {
   home1: commercialroof,
@@ -37,14 +59,14 @@ const imageMap: Record<string, any> = {
   home5: residental1,
   home6: residental2,
   home7: siding,
-  home8: window,
+  home8: windowsImg,
   home9: pvc,
-  home10: window2,
+  home10: windows2Img,
 };
 
-const MarqueeItem = ({ project }: { project: any }) => {
+const MarqueeItem = ({ project }: { project: Project }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const itemRef = useRef(null);
+  const itemRef = useRef<HTMLDivElement>(null);
 
   const x = useMotionValue(0);
   const y = useMotionValue(0);
@@ -55,9 +77,9 @@ const MarqueeItem = ({ project }: { project: any }) => {
   const rotateX = useTransform(springY, [-0.4, 0.4], [3, -3]);
   const rotateY = useTransform(springX, [-0.4, 0.4], [-3, 3]);
 
-  const handleMouseMove = (e: React.MouseEvent) => {
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
     if (!itemRef.current || !isHovered) return;
-    const rect = (itemRef.current as HTMLElement).getBoundingClientRect();
+    const rect = itemRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
     const mouseY = e.clientY - rect.top;
     const xPct = (mouseX / rect.width - 0.5) * 0.4;
@@ -205,13 +227,13 @@ const InfiniteMarquee = ({
   direction = "left",
   speed = 45,
 }: {
-  projects: any[];
+  projects: Project[];
   direction?: string;
   speed?: number;
 }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const marqueeRef = useRef(null);
-  const animationRef = useRef<any>(null);
+  const marqueeRef = useRef<HTMLDivElement>(null);
+  const animationRef = useRef<gsap.core.Tween | null>(null);
 
   const infiniteProjects = useMemo(() => {
     return [...projects, ...projects, ...projects, ...projects, ...projects];
@@ -221,7 +243,7 @@ const InfiniteMarquee = ({
     if (!marqueeRef.current) return;
 
     const marquee = marqueeRef.current;
-    const itemWidth = window.innerWidth < 640 ? 216 : window.innerWidth < 768 ? 256 : 296;
+    const itemWidth = globalThis.window?.innerWidth < 640 ? 216 : globalThis.window?.innerWidth < 768 ? 256 : 296;
     const totalWidth = itemWidth * projects.length;
     const distance = direction === "left" ? -totalWidth : totalWidth;
 
@@ -343,10 +365,10 @@ const PremiumLightbox = ({
 
 const Portfolio = () => {
   const { portfolio: portfolioData } = useContent();
-  const sectionRef = useRef(null);
+  const sectionRef = useRef<HTMLElement>(null);
   const [lightbox, setLightbox] = useState<any>(null);
   const [isClient, setIsClient] = useState(false);
-   const router = useRouter();
+  const router = useRouter();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -361,17 +383,22 @@ const Portfolio = () => {
 
   const headerParallax = useTransform(smoothProgress, [0, 1], [0, -30]);
 
-  const { section, projects, button } = portfolioData;
+  // Safely extract data with proper defaults
+  const section: Section = portfolioData?.section || {};
+  const projects: Project[] = portfolioData?.projects || [];
+  const button: Button = portfolioData?.button || {};
 
   useEffect(() => {
     setIsClient(true);
   }, []);
 
-
-  // if (!isClient) return null;
-
   const row1 = projects.slice(0, 3);
   const row2 = projects.slice(2, 5);
+
+  // Don't render marquee if no projects
+  if (row1.length === 0 && row2.length === 0) {
+    return null;
+  }
 
   return (
     <section
@@ -399,52 +426,52 @@ const Portfolio = () => {
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-2 sm:mb-3 md:mb-4">
             <div className="w-8 sm:w-10 md:w-12 h-0.5 bg-gradient-to-r from-primary to-primary/60" />
             <span className="text-[10px] sm:text-xs font-medium tracking-[0.2em] sm:tracking-[0.25em] uppercase text-primary">
-              {section.badge}
+              {section.badge || "Our Work"}
             </span>
             <div className="w-8 sm:w-10 md:w-12 h-0.5 bg-gradient-to-l from-primary to-primary/60" />
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-bold text-foreground leading-[1.1] tracking-tight px-2">
             {typeof section.headline === 'string'
               ? section.headline.replace(/<[^>]*>/g, '')
-              : section.headline}
+              : section.headline || "Featured Projects"}
           </h2>
         </motion.div>
 
-        {/* MARQUEE SECTION - RESTORED */}
+        {/* MARQUEE SECTION */}
         <div className="space-y-1 sm:space-y-2 md:space-y-0">
           <InfiniteMarquee projects={row1} direction="left" speed={45} />
           <InfiniteMarquee projects={row2} direction="right" speed={40} />
         </div>
 
-    <motion.div
-  initial={{ opacity: 0, y: 20 }}
-  whileInView={{ opacity: 1, y: 0 }}
-  viewport={{ once: true }}
-  transition={{ duration: 0.6 }}
-  className="flex justify-center mt-8 sm:mt-10 md:mt-12"
->
-  <button
-    onClick={() => router.push("/gallery")}
-    className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-primary to-primary/80 text-white text-xs sm:text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-1 sm:gap-2 hover:scale-105 hover:from-primary/90 hover:to-primary/70"
-  >
-    {button.text}
-    <svg
-      width="14"
-      height="14"
-      className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-    >
-      <path
-        d="M5 12h14M12 5l7 7-7 7"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  </button>
-</motion.div>
+        <motion.div
+          initial={{ opacity: 0, y: 20 }}
+          whileInView={{ opacity: 1, y: 0 }}
+          viewport={{ once: true }}
+          transition={{ duration: 0.6 }}
+          className="flex justify-center mt-8 sm:mt-10 md:mt-12"
+        >
+          <button
+            onClick={() => router.push("/gallery")}
+            className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-primary to-primary/80 text-white text-xs sm:text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-1 sm:gap-2 hover:scale-105 hover:from-primary/90 hover:to-primary/70"
+          >
+            {button.text || "View All Projects"}
+            <svg
+              width="14"
+              height="14"
+              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+            >
+              <path
+                d="M5 12h14M12 5l7 7-7 7"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+              />
+            </svg>
+          </button>
+        </motion.div>
       </div>
 
       <AnimatePresence>
