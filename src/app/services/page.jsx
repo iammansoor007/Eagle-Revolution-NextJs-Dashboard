@@ -22,12 +22,13 @@ import {
 import servicesData from '../../data/servicesData.json';
 
 import breakcrumb from '@/assets/Breadcrumb-Image.jpeg';
-import roofingImg from '@/assets/portfolio1.png';
-import windowsImg from '@/assets/portfolio2.jpg';
-import decksImg from '@/assets/portfolio3.jpg';
-import commercialImg from '@/assets/portfolio4.jpg';
-import sidingImg from '@/assets/portfolio5.jpg';
-import heroBg from '@/assets/bgfair.jpg';
+import roofingImg from '../../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof1.jpg';
+import windowsImg from '../../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/window5.jpg';
+import decksImg from '../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck3.jpg';
+import commercialImg from '../../assets/COMMERCIAL ROOFS-20260414T184732Z-3-001/COMMERCIAL ROOFS/croof2.jpg';
+import sidingImg from '../../assets/SIDING-20260415T110420Z-3-001/SIDING/siding5.jpg';
+import gutter from '../../assets/gutterinstallation.jpg';
+import pvcdecks from '../../assets/pvcdecks.jpg';
 
 const iconMap = {
   Home, Layout, TreePine, Building2, Building, Droplets,
@@ -41,7 +42,9 @@ const imageMap = {
   'Custom Decks': decksImg,
   'Commercial Roofing': commercialImg,
   'Siding, Soffit & Fascia': sidingImg,
-  'Gutters & Protection': sidingImg,
+  'Gutters & Protection': gutter,
+  'PVC Decking': pvcdecks
+
 };
 
 // --- Counter Component ---

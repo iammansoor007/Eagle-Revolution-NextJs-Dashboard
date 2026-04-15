@@ -11,30 +11,35 @@ import {
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { useContent } from "../hooks/useContent";
-import portfolio1 from "@/assets/portfolio1.png";
-import portfolio2 from "@/assets/portfolio2.jpg";
-import portfolio3 from "@/assets/portfolio3.jpg";
-import portfolio4 from "@/assets/portfolio4.jpg";
-import portfolio5 from "@/assets/portfolio5.jpg";
-import portfolio6 from "@/assets/portfolio7.jpg";
-import portfolio7 from "@/assets/portfolio1.png";
-import portfolio8 from "@/assets/portfolio2.jpg";
-import portfolio9 from "@/assets/portfolio3.jpg";
-import portfolio10 from "@/assets/portfolio4.jpg";
+import { useRouter } from "next/navigation";
+
+
+import commercialroof from "../assets/COMMERCIAL ROOFS-20260414T184732Z-3-001/COMMERCIAL ROOFS/croof1.jpg";
+import decks from "../assets/DECKS-20260414T184734Z-3-001/DECKS/deck12.jpg";
+import deck2 from "../assets/DECKS-20260414T184734Z-3-001/DECKS/deck11.jpg";
+import door from "../assets/DOORS-20260414T184740Z-3-001/DOORS/DOOR1.jpg";
+import residental1 from "../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof4 - Copy (2).png";
+import residental2 from "../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof9.jpg";
+
+import siding from "../assets/SIDING-20260415T110420Z-3-001/SIDING/siding5.jpg";
+import window from "../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows10.jpg";
+
+import pvc from "../assets/pvcdecks.jpg";
+import window2 from "../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows2.jpg";
 
 gsap.registerPlugin(ScrollTrigger);
 
 const imageMap: Record<string, any> = {
-  home1: portfolio1,
-  home2: portfolio2,
-  home3: portfolio3,
-  home4: portfolio4,
-  home5: portfolio5,
-  home6: portfolio6,
-  home7: portfolio7,
-  home8: portfolio8,
-  home9: portfolio9,
-  home10: portfolio10,
+  home1: commercialroof,
+  home2: decks,
+  home3: deck2,
+  home4: door,
+  home5: residental1,
+  home6: residental2,
+  home7: siding,
+  home8: window,
+  home9: pvc,
+  home10: window2,
 };
 
 const MarqueeItem = ({ project }: { project: any }) => {
@@ -341,6 +346,7 @@ const Portfolio = () => {
   const sectionRef = useRef(null);
   const [lightbox, setLightbox] = useState<any>(null);
   const [isClient, setIsClient] = useState(false);
+   const router = useRouter();
 
   const { scrollYProgress } = useScroll({
     target: sectionRef,
@@ -410,35 +416,35 @@ const Portfolio = () => {
           <InfiniteMarquee projects={row2} direction="right" speed={40} />
         </div>
 
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.6 }}
-          className="flex justify-center mt-8 sm:mt-10 md:mt-12"
-        >
-          <button
-            onClick={() => setLightbox(portfolio1)}
-            className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-primary to-primary/80 text-white text-xs sm:text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-1 sm:gap-2 hover:scale-105 hover:from-primary/90 hover:to-primary/70"
-          >
-            {button.text}
-            <svg
-              width="14"
-              height="14"
-              className="w-3.5 h-3.5 sm:w-4 sm:h-4"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-            >
-              <path
-                d="M5 12h14M12 5l7 7-7 7"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              />
-            </svg>
-          </button>
-        </motion.div>
+    <motion.div
+  initial={{ opacity: 0, y: 20 }}
+  whileInView={{ opacity: 1, y: 0 }}
+  viewport={{ once: true }}
+  transition={{ duration: 0.6 }}
+  className="flex justify-center mt-8 sm:mt-10 md:mt-12"
+>
+  <button
+    onClick={() => router.push("/gallery")}
+    className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-primary to-primary/80 text-white text-xs sm:text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-1 sm:gap-2 hover:scale-105 hover:from-primary/90 hover:to-primary/70"
+  >
+    {button.text}
+    <svg
+      width="14"
+      height="14"
+      className="w-3.5 h-3.5 sm:w-4 sm:h-4"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+    >
+      <path
+        d="M5 12h14M12 5l7 7-7 7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  </button>
+</motion.div>
       </div>
 
       <AnimatePresence>

@@ -4,176 +4,212 @@ import { useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 
+// Import images directly - NOT wrapped in objects
+import commercialroof from "../../assets/COMMERCIAL ROOFS-20260414T184732Z-3-001/COMMERCIAL ROOFS/croof2.jpg";
+import decks from "../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck12.jpg";
+import deck3 from "../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck5.jpg";
+import deck2 from "../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck11.jpg";
+import door from "../../assets/DOORS-20260414T184740Z-3-001/DOORS/DOOR1.jpg";
+import residental1 from "../../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof4 - Copy (2).png";
+import residental2 from "../../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof9.jpg";
+import siding from "../../assets/SIDING-20260415T110420Z-3-001/SIDING/siding5.jpg";
+import windowImg from "../../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows10.jpg";
+import gutter from '../../assets/gutterinstallation.jpg';
+import pvc from "../../assets/pvcdecks.jpg";
+import window2 from "../../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows2.jpg";
+
 // ============================================================================
-// ROOFING PROJECT DATA
+// PROJECT DATA - Mapped to your services
 // ============================================================================
-const CATEGORIES = ["All", "Residential", "Commercial", "Storm", "Premium", "Metal"];
+const CATEGORIES = [
+    "All",
+    "Custom Decks",
+    "PVC Decking",
+    "Windows & Doors",
+    "Residential Roofing",
+    "Commercial Roofing",
+    "Siding, Soffit & Fascia",
+    "Gutters & Protection"
+];
 
 const PROJECTS = [
+    // Custom Decks Projects
     {
         id: 1,
-        title: "Presidential TL",
-        subtitle: "Luxury Estate",
-        category: "Premium",
-        location: "Highland Park, TX",
+        title: "Lakeside Composite Deck",
+        subtitle: "Premium Outdoor Living",
+        category: "Custom Decks",
+        location: "Lake Ozark, MO",
         year: "2024",
-        description: "GAF Presidential TL shingles with copper flashing and premium ventilation system. This luxury estate features architectural excellence and superior weather protection.",
-        image: "/images/portfolio/portfolio1.png",
+        description: "Expansive composite deck with built-in lighting, custom pergola, and glass railings overlooking the lake. Features hidden fasteners and premium weather-resistant materials.",
+        image: decks, // Pass directly, not wrapped in object
         featured: true,
         size: "large",
-        specs: { sqft: "4,200", duration: "6 days", warranty: "50 Year" },
+        specs: { sqft: "850", duration: "12 days", warranty: "25 Year" },
     },
     {
         id: 2,
-        title: "Meridian Complex",
-        subtitle: "Commercial TPO",
-        category: "Commercial",
-        location: "Plano, TX",
-        year: "2024",
-        description: "80mil TPO membrane with tapered insulation and 20-year warranty. Energy-efficient white membrane reduces cooling costs.",
-        image: "/images/portfolio/portfolio2.jpg",
+        title: "Multi-Level Entertainment Deck",
+        subtitle: "Architectural Masterpiece",
+        category: "Custom Decks",
+        location: "Chesterfield, MO",
+        year: "2023",
+        description: "Three-tier deck system with integrated hot tub platform, outdoor kitchen area, and custom cable railing system for unobstructed views.",
+        image: deck2, // Pass directly
         featured: true,
         size: "wide",
-        specs: { sqft: "28,000", duration: "18 days", warranty: "20 Year" },
+        specs: { sqft: "1,200", duration: "18 days", warranty: "25 Year" },
     },
     {
         id: 3,
-        title: "Storm Restoration",
-        subtitle: "Insurance Claim",
-        category: "Storm",
-        location: "Frisco, TX",
+        title: "Cedar Deck with Pergola",
+        subtitle: "Natural Wood Beauty",
+        category: "Custom Decks",
+        location: "Wildwood, MO",
         year: "2024",
-        description: "Complete replacement due to hail damage with insurance coordination.",
-        image: "/images/portfolio/portfolio3.jpg",
-        featured: false,
-        size: "tall",
-        specs: { sqft: "3,100", duration: "3 days", warranty: "Lifetime" },
-    },
-    {
-        id: 4,
-        title: "Standing Seam",
-        subtitle: "Metal Roofing",
-        category: "Metal",
-        location: "Prosper, TX",
-        year: "2023",
-        description: "24-gauge standing seam with hidden fasteners and snow guards.",
-        image: "/images/portfolio/portfolio4.jpg",
+        description: "Premium cedar deck with custom-built pergola, built-in bench seating, and ambient LED lighting throughout for evening entertaining.",
+        image: deck3, // Pass directly
         featured: false,
         size: "normal",
-        specs: { sqft: "3,800", duration: "7 days", warranty: "40 Year" },
+        specs: { sqft: "450", duration: "8 days", warranty: "Lifetime" },
     },
+
+    // PVC Decking Projects
     {
-        id: 5,
-        title: "Windsor Hills",
-        subtitle: "Architectural Shingles",
-        category: "Residential",
-        location: "McKinney, TX",
+        id: 4,
+        title: "Poolside PVC Paradise",
+        subtitle: "Waterproof Performance",
+        category: "PVC Decking",
+        location: "Town & Country, MO",
         year: "2024",
-        description: "GAF Timberline HDZ with ridge vent and premium underlayment.",
-        image: "/images/portfolio/portfolio5.jpg",
+        description: "100% polymer PVC decking surrounding an infinity pool. Features cool-touch technology and superior slip resistance for wet conditions.",
+        image: pvc, // Pass directly
         featured: true,
         size: "tall",
-        specs: { sqft: "2,800", duration: "4 days", warranty: "Lifetime" },
+        specs: { sqft: "620", duration: "10 days", warranty: "Lifetime" },
     },
+
+    // Windows & Doors Projects
     {
         id: 6,
-        title: "Distribution Hub",
-        subtitle: "Industrial TPO",
-        category: "Commercial",
-        location: "Garland, TX",
-        year: "2023",
-        description: "Large-scale TPO with custom drainage and HVAC integration.",
-        image: "/images/portfolio/portfolio7.jpg",
-        featured: false,
+        title: "Whole-Home Window Transformation",
+        subtitle: "Energy Efficiency Upgrade",
+        category: "Windows & Doors",
+        location: "Clayton, MO",
+        year: "2024",
+        description: "Complete window replacement with Energy Star rated vinyl windows featuring Low-E glass and argon gas fills. 35% energy savings achieved.",
+        image: windowImg, // Pass directly
+        featured: true,
         size: "wide",
-        specs: { sqft: "45,000", duration: "22 days", warranty: "25 Year" },
+        specs: { sqft: "N/A", duration: "5 days", warranty: "Lifetime" },
     },
     {
         id: 7,
-        title: "Synthetic Slate",
-        subtitle: "DaVinci Collection",
-        category: "Premium",
-        location: "Southlake, TX",
+        title: "Custom Entry Door System",
+        subtitle: "Security & Curb Appeal",
+        category: "Windows & Doors",
+        location: "Ladue, MO",
         year: "2024",
-        description: "DaVinci synthetic slate with authentic appearance and durability.",
-        image: "/images/portfolio/portfolio1.png",
+        description: "Premium fiberglass entry door with multi-point locking system, decorative glass inserts, and custom sidelights for maximum curb appeal.",
+        image: door, // Pass directly
         featured: true,
-        size: "large",
-        specs: { sqft: "5,100", duration: "8 days", warranty: "50 Year" },
+        size: "tall",
+        specs: { sqft: "N/A", duration: "2 days", warranty: "Lifetime" },
     },
     {
         id: 8,
-        title: "Emergency Response",
-        subtitle: "Storm Repair",
-        category: "Storm",
-        location: "Allen, TX",
-        year: "2024",
-        description: "24-hour emergency tarping and permanent wind damage repair.",
-        image: "/images/portfolio/portfolio2.jpg",
+        title: "Patio Door Installation",
+        subtitle: "Indoor-Outdoor Flow",
+        category: "Windows & Doors",
+        location: "Creve Coeur, MO",
+        year: "2023",
+        description: "Premium sliding patio door with UV protection glass and smooth-glide track system. Dramatically improves natural light and access.",
+        image: window2, // Pass directly
         featured: false,
         size: "normal",
-        specs: { sqft: "2,400", duration: "2 days", warranty: "Lifetime" },
+        specs: { sqft: "N/A", duration: "1 day", warranty: "20 Year" },
     },
+
+    // Residential Roofing Projects
     {
         id: 9,
-        title: "Copper Accents",
-        subtitle: "Custom Metalwork",
-        category: "Residential",
-        location: "University Park, TX",
-        year: "2023",
-        description: "Custom copper flashing and decorative bay window roofs.",
-        image: "/images/portfolio/portfolio3.jpg",
-        featured: false,
-        size: "tall",
-        specs: { sqft: "3,300", duration: "6 days", warranty: "Lifetime" },
+        title: "Presidential TL Estate",
+        subtitle: "Luxury Asphalt Roofing",
+        category: "Residential Roofing",
+        location: "Frontenac, MO",
+        year: "2024",
+        description: "GAF Presidential TL shingles with copper flashing, premium ridge ventilation, and full ice & water shield underlayment. 50-year warranty.",
+        image: residental1, // Pass directly
+        featured: true,
+        size: "large",
+        specs: { sqft: "4,200", duration: "4 days", warranty: "50 Year" },
     },
     {
         id: 10,
-        title: "Lakefront Estate",
-        subtitle: "Premium Installation",
-        category: "Premium",
-        location: "Austin, TX",
+        title: "Storm Damage Restoration",
+        subtitle: "Insurance Claim Specialist",
+        category: "Residential Roofing",
+        location: "O'Fallon, MO",
         year: "2024",
-        description: "Custom architectural roofing with premium underlayment system.",
-        image: "/images/portfolio/portfolio4.jpg",
-        featured: false,
+        description: "Complete roof replacement due to hail damage. We coordinated directly with insurance for full coverage. Class 4 impact-resistant shingles installed.",
+        image: residental2, // Pass directly
+        featured: true,
         size: "normal",
-        specs: { sqft: "3,600", duration: "5 days", warranty: "50 Year" },
+        specs: { sqft: "2,800", duration: "2 days", warranty: "Lifetime" },
     },
-    {
-        id: 11,
-        title: "Retail Center",
-        subtitle: "Commercial Flat Roof",
-        category: "Commercial",
-        location: "Dallas, TX",
-        year: "2023",
-        description: "Multi-unit retail center with TPO roofing system.",
-        image: "/images/portfolio/portfolio5.jpg",
-        featured: false,
-        size: "wide",
-        specs: { sqft: "32,000", duration: "20 days", warranty: "20 Year" },
-    },
+
+    // Commercial Roofing Projects
     {
         id: 12,
-        title: "Heritage Home",
-        subtitle: "Historic Restoration",
-        category: "Residential",
-        location: "Fort Worth, TX",
+        title: "Meridian Business Park",
+        subtitle: "TPO Commercial System",
+        category: "Commercial Roofing",
+        location: "Maryland Heights, MO",
         year: "2024",
-        description: "Period-appropriate roofing restoration with modern protection.",
-        image: "/images/portfolio/portfolio7.jpg",
-        featured: false,
-        size: "normal",
-        specs: { sqft: "2,900", duration: "5 days", warranty: "Lifetime" },
+        description: "80mil TPO membrane with tapered insulation system across 45,000 sq ft of commercial space. Energy-efficient white surface reduces cooling costs.",
+        image: commercialroof, // Pass directly
+        featured: true,
+        size: "wide",
+        specs: { sqft: "45,000", duration: "21 days", warranty: "20 Year NDL" },
+    },
+
+    // Siding, Soffit & Fascia Projects
+    {
+        id: 15,
+        title: "Complete Exterior Renovation",
+        subtitle: "Vinyl Siding Transformation",
+        category: "Siding, Soffit & Fascia",
+        location: "Ballwin, MO",
+        year: "2024",
+        description: "Full premium vinyl siding installation with insulated backing. Includes all new aluminum fascia wrap and vented soffit system for proper attic ventilation.",
+        image: siding, // Pass directly
+        featured: true,
+        size: "large",
+        specs: { sqft: "2,800", duration: "7 days", warranty: "Lifetime" },
+    },
+
+    // Gutters & Protection Projects
+    {
+        id: 18,
+        title: "6-Inch Seamless Gutter System",
+        subtitle: "Commercial Grade Drainage",
+        category: "Gutters & Protection",
+        location: "St. Peters, MO",
+        year: "2024",
+        description: "Complete 6-inch seamless gutter installation with micro-mesh leaf guards. Heavy-duty hidden hangers and oversized downspouts for maximum flow capacity.",
+        image: gutter, // Pass directly
+        featured: true,
+        size: "wide",
+        specs: { sqft: "N/A", duration: "2 days", warranty: "Lifetime" },
     },
 ];
 
 // ============================================================================
-// HERO SECTION - SUPER RESPONSIVE
+// HERO SECTION
 // ============================================================================
 const Hero = () => {
     return (
-        <section className="relative py-8 xs:py-10 sm:py-16 lg:py-20 overflow-hidden">
+        <section className="relative pt-8 xs:pt-10 sm:pt-12 lg:pt-16 pb-8 xs:pb-10 sm:pb-12 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
             <div className="absolute top-1/4 -left-10 xs:-left-16 w-40 xs:w-56 sm:w-64 md:w-80 lg:w-96 h-40 xs:h-56 sm:h-64 md:h-80 lg:h-96 bg-primary/5 rounded-full blur-2xl xs:blur-3xl" />
             <div className="absolute bottom-1/4 -right-10 xs:-right-16 w-40 xs:w-56 sm:w-64 md:w-80 lg:w-96 h-40 xs:h-56 sm:h-64 md:h-80 lg:h-96 bg-primary/5 rounded-full blur-2xl xs:blur-3xl" />
@@ -189,7 +225,7 @@ const Hero = () => {
                     </h1>
 
                     <p className="text-muted-foreground text-[11px] xs:text-xs sm:text-sm md:text-base max-w-[280px] xs:max-w-sm sm:max-w-lg mx-auto px-2">
-                        A curated collection of our finest roofing installations across Texas
+                        A curated collection of our finest installations across Missouri
                     </p>
 
                     <div className="w-12 xs:w-14 sm:w-16 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-4 xs:mt-5 sm:mt-6" />
@@ -200,14 +236,20 @@ const Hero = () => {
 };
 
 // ============================================================================
-// FILTER - SUPER RESPONSIVE
+// FILTER - FIXED STICKY BEHAVIOR
 // ============================================================================
-const Filter = ({ categories, activeCategory, onSelect }: { categories: string[]; activeCategory: string; onSelect: (category: string) => void }) => {
-    const allCategories = ["All", ...categories.filter(c => c !== "All")];
-
+const Filter = ({
+    categories,
+    activeCategory,
+    onSelect
+}: {
+    categories: string[];
+    activeCategory: string;
+    onSelect: (category: string) => void
+}) => {
     return (
         <div className="flex flex-wrap items-center justify-center gap-1 xs:gap-1.5 sm:gap-2">
-            {allCategories.map((category) => {
+            {categories.map((category) => {
                 const count = category === "All"
                     ? PROJECTS.length
                     : PROJECTS.filter(p => p.category === category).length;
@@ -239,7 +281,7 @@ const Filter = ({ categories, activeCategory, onSelect }: { categories: string[]
 };
 
 // ============================================================================
-// MASONRY CARD - SUPER RESPONSIVE
+// MASONRY CARD
 // ============================================================================
 const getSizeClasses = (size: string) => {
     switch (size) {
@@ -254,6 +296,11 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
     const [isHovered, setIsHovered] = useState(false);
     const [imageLoaded, setImageLoaded] = useState(false);
     const [imageError, setImageError] = useState(false);
+
+    // Validate image before rendering
+    if (!project?.image) {
+        return null;
+    }
 
     return (
         <div
@@ -272,10 +319,10 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
                 )}
 
                 {/* Image */}
-                {!imageError && (
+                {!imageError && project.image && (
                     <Image
                         src={project.image}
-                        alt={project.title}
+                        alt={project.title || "Project image"}
                         fill
                         className={`object-cover transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'
                             } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
@@ -296,7 +343,7 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
                 {/* Dark Gradient Overlay */}
                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/30 to-transparent" />
 
-                {/* Hover Overlay - ONLY PRIMARY COLOR */}
+                {/* Hover Overlay */}
                 <div
                     className={`absolute inset-0 bg-primary transition-opacity duration-300 ${isHovered ? 'opacity-70' : 'opacity-0'
                         }`}
@@ -344,7 +391,7 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
 };
 
 // ============================================================================
-// MODAL - SUPER RESPONSIVE
+// MODAL
 // ============================================================================
 const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; onClose: () => void }) => {
     const router = useRouter();
@@ -366,10 +413,14 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
         const handleEsc = (e: KeyboardEvent) => {
             if (e.key === "Escape") onClose();
         };
-        if (isOpen) {
+        if (isOpen && typeof window !== 'undefined') {
             window.addEventListener("keydown", handleEsc);
         }
-        return () => window.removeEventListener("keydown", handleEsc);
+        return () => {
+            if (typeof window !== 'undefined') {
+                window.removeEventListener("keydown", handleEsc);
+            }
+        };
     }, [isOpen, onClose]);
 
     if (!project || !isOpen) return null;
@@ -410,16 +461,18 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
                                 <span className="text-muted-foreground text-xs xs:text-sm">Image Unavailable</span>
                             </div>
                         ) : (
-                            <Image
-                                src={project.image}
-                                alt={project.title}
-                                fill
-                                className={`object-cover ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
-                                onLoad={() => setImageLoaded(true)}
-                                onError={() => setImageError(true)}
-                                sizes="(max-width: 1024px) 100vw, 50vw"
-                                priority
-                            />
+                            project.image && (
+                                <Image
+                                    src={project.image}
+                                    alt={project.title || "Project image"}
+                                    fill
+                                    className={`object-cover ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
+                                    onLoad={() => setImageLoaded(true)}
+                                    onError={() => setImageError(true)}
+                                    sizes="(max-width: 1024px) 100vw, 50vw"
+                                    priority
+                                />
+                            )
                         )}
 
                         {/* Gradient Overlay */}
@@ -494,16 +547,31 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
 };
 
 // ============================================================================
-// MAIN PAGE
+// MAIN PAGE - WITH FIXED STICKY FILTER
 // ============================================================================
 export default function GalleryPage() {
     const [activeCategory, setActiveCategory] = useState("All");
     const [selectedProject, setSelectedProject] = useState<any>(null);
+    const [isFilterSticky, setIsFilterSticky] = useState(false);
 
     const filteredProjects = useMemo(() => {
         if (activeCategory === "All") return PROJECTS;
         return PROJECTS.filter(p => p.category === activeCategory);
     }, [activeCategory]);
+
+    // Handle sticky filter on scroll
+    useEffect(() => {
+        // Check if window is defined (client-side)
+        if (typeof window === 'undefined') return;
+
+        const handleScroll = () => {
+            const scrollPosition = window.scrollY;
+            setIsFilterSticky(scrollPosition > 100);
+        };
+
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, []);
 
     return (
         <main className="relative min-h-screen bg-background">
@@ -545,16 +613,23 @@ export default function GalleryPage() {
 
             <Hero />
 
-            {/* Sticky Filter */}
-            <section className="sticky top-[49px] xs:top-[53px] sm:top-[57px] lg:top-[65px] z-30 py-2 xs:py-2.5 sm:py-3 px-2 xs:px-3 sm:px-4 bg-background/95 backdrop-blur-xl border-b border-border">
-                <div className="max-w-7xl mx-auto">
-                    <Filter
-                        categories={CATEGORIES}
-                        activeCategory={activeCategory}
-                        onSelect={setActiveCategory}
-                    />
+            {/* Filter Bar - Fixed sticky behavior */}
+            <div
+                className={`transition-all duration-300 ${isFilterSticky
+                        ? 'sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm'
+                        : 'relative z-30 bg-background border-b border-border'
+                    }`}
+            >
+                <div className="py-2 xs:py-2.5 sm:py-3 px-2 xs:px-3 sm:px-4">
+                    <div className="max-w-7xl mx-auto">
+                        <Filter
+                            categories={CATEGORIES}
+                            activeCategory={activeCategory}
+                            onSelect={setActiveCategory}
+                        />
+                    </div>
                 </div>
-            </section>
+            </div>
 
             {/* Gallery Grid */}
             <section className="px-0 pb-8 xs:pb-12 sm:pb-16">

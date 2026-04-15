@@ -23,11 +23,14 @@ import { notFound } from 'next/navigation';
 import breakcrumb from '../../../assets/Breadcrumb-Image.jpeg';
 import servicesData from '../../../data/servicesData.json';
 
-import roofingImg from '@/assets/portfolio1.png';
-import windowsImg from '@/assets/portfolio2.jpg';
-import decksImg from '@/assets/portfolio3.jpg';
-import commercialImg from '@/assets/portfolio4.jpg';
-import sidingImg from '@/assets/portfolio5.jpg';
+
+import roofingImg from '../../../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof1.jpg';
+import windowsImg from '../../../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/window5.jpg';
+import decksImg from '../../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck3.jpg';
+import commercialImg from '../../../assets/COMMERCIAL ROOFS-20260414T184732Z-3-001/COMMERCIAL ROOFS/croof2.jpg';
+import sidingImg from '../../../assets/SIDING-20260415T110420Z-3-001/SIDING/siding5.jpg';
+import gutter from '../../../assets/gutterinstallation.jpg';
+import pvcdecks from '../../../assets/pvcdecks.jpg';
 
 const iconMap = {
   Home, Layout, TreePine, Building2, Building, Droplets,
@@ -39,10 +42,11 @@ const imageMap = {
   'Residential Roofing': roofingImg,
   'Windows & Doors': windowsImg,
   'Custom Decks': decksImg,
-  'PVC Decking': decksImg,
   'Commercial Roofing': commercialImg,
   'Siding, Soffit & Fascia': sidingImg,
-  'Gutters & Protection': sidingImg,
+  'Gutters & Protection': gutter,
+  'PVC Decking': pvcdecks
+
 };
 
 // --- Counter Component ---
@@ -889,7 +893,7 @@ export default function ServiceDetailPage({ params }) {
       {/* PREMIUM DECK SHOWCASE - Enhanced Version */}
       {/* ============================================ */}
       {isDeckPage && (
-        <section className="relative py-20 xs:py-24 sm:py-28 md:py-32 bg-background border-b border-border overflow-hidden">
+        <section className="relative py-8 xs:py-10 sm:py-12 md:py-16 bg-background border-b border-border overflow-hidden">
 
           {/* Animated Background Elements */}
           <div className="absolute inset-0 pointer-events-none">
@@ -1148,7 +1152,7 @@ export default function ServiceDetailPage({ params }) {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true }}
               transition={{ duration: 0.6, delay: 0.3 }}
-              className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-20"
+              className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
               {[
                 {
@@ -1187,47 +1191,7 @@ export default function ServiceDetailPage({ params }) {
               ))}
             </motion.div>
 
-            {/* Image Gallery Strip */}
-            <motion.div
-              initial={{ opacity: 0 }}
-              whileInView={{ opacity: 1 }}
-              viewport={{ once: true }}
-              transition={{ duration: 0.8, delay: 0.4 }}
-              className="mb-16"
-            >
-              <div className="flex items-center gap-3 mb-8">
-                <div className="w-8 h-[2px] bg-primary/40" />
-                <span className="text-xs font-bold uppercase tracking-[0.3em] text-primary/60">Project Gallery</span>
-                <div className="flex-1 h-[1px] bg-gradient-to-r from-primary/20 to-transparent" />
-              </div>
-
-              <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                {[1, 2, 3, 4].map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    initial={{ opacity: 0, scale: 0.9 }}
-                    whileInView={{ opacity: 1, scale: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ delay: idx * 0.1 }}
-                    whileHover={{ scale: 1.05, zIndex: 10 }}
-                    className="relative aspect-square rounded-2xl overflow-hidden shadow-lg group cursor-pointer"
-                  >
-                    <Image
-                      src={decksImg}
-                      alt={`Deck project ${idx + 1}`}
-                      fill
-                      className="object-cover group-hover:scale-110 transition-transform duration-500"
-                    />
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                    <div className="absolute bottom-3 left-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <span className="text-white text-xs font-medium bg-black/50 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                        View Project
-                      </span>
-                    </div>
-                  </motion.div>
-                ))}
-              </div>
-            </motion.div>
+          
 
 
 
