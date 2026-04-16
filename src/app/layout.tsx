@@ -14,7 +14,7 @@ const dmSans = DM_Sans({
   variable: "--font-body",
 });
 
-const BASE_URL = "https://www.eaglerevolution.com";
+const BASE_URL = "https://eagle-revolution.vercel.app";
 
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
