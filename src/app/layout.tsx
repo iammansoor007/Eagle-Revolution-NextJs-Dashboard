@@ -22,6 +22,9 @@ export const metadata: Metadata = {
     icon: `${BASE_URL}/eagle-logo.png`,
     apple: `${BASE_URL}/eagle-logo.png`,
   },
+  facebook: {
+    appId: "YOUR_FB_APP_ID", // TODO: Replace with your actual Facebook App ID
+  },
 
   // ── Core Meta Tags ──
   title: {
