@@ -137,12 +137,14 @@ const VideoCard = ({ video, index, onClick }: { video: any; index: number; onCli
             onClick={onClick}
         >
             <div className="relative aspect-video rounded-xl overflow-hidden bg-gray-100 dark:bg-muted/20 shadow-md">
-                <img
+                <Image
                     src={error ? FALLBACK_IMAGE : getVideoThumbnail(video.videoId)}
                     alt={video.title}
+                    fill
+                    quality={100}
                     onError={() => setError(true)}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-                    loading="lazy"
+                    className="object-cover group-hover:scale-105 transition-transform duration-500"
+                    unoptimized={!error}
                 />
 
                 <div className="absolute inset-0 bg-black/30 group-hover:bg-black/40 transition-colors flex items-center justify-center">

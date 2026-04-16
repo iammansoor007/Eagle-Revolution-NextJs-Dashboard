@@ -13,6 +13,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
+import Image from "next/image";
 import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
@@ -317,7 +318,7 @@ const SocialLinks = () => {
     const iconMap: { [key: string]: string } = {
       'Facebook': 'Facebook',
       'Instagram': 'Instagram',
-      'LinkedIn': 'Linkedin',
+      'LinkedIn': 'LinkedIn',
       'X (Twitter)': 'Twitter',
       'Twitter': 'Twitter',
       'Google': 'Google'
@@ -448,20 +449,24 @@ const Footer = () => {
 
       <ParallaxLayer speed={0.03} className="z-0">
         <div className="absolute top-40 right-0 w-2/5 h-2/5">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
             alt="Abstract architecture"
-            className="w-full h-full object-cover opacity-[0.02]"
+            fill
+            quality={100}
+            className="object-cover opacity-[0.02]"
           />
         </div>
       </ParallaxLayer>
 
       <ParallaxLayer speed={0.05} className="z-0">
         <div className="absolute bottom-0 left-0 w-1/3 h-1/3">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
             alt="Heritage pattern"
-            className="w-full h-full object-cover opacity-[0.02]"
+            fill
+            quality={100}
+            className="object-cover opacity-[0.02]"
           />
         </div>
       </ParallaxLayer>

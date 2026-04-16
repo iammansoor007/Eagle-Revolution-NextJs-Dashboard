@@ -11,6 +11,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
+import Image from "next/image";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -142,9 +144,6 @@ const CTASection = () => {
     return () => ctx.revert();
   }, [isClient]);
 
-
-  // if (!isClient) return null;
-
   return (
     <section
       ref={sectionRef}
@@ -168,10 +167,12 @@ const CTASection = () => {
 
       <ParallaxLayer speed={0.1} className="z-0">
         <div className="absolute top-0 right-0 w-2/5 h-full">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
             alt="Modern architecture"
-            className="w-full h-full object-cover opacity-5"
+            fill
+            quality={100}
+            className="object-cover opacity-5"
           />
           <div className="absolute inset-0 bg-gradient-to-l from-background via-background to-transparent" />
         </div>
@@ -179,10 +180,12 @@ const CTASection = () => {
 
       <ParallaxLayer speed={0.15} className="z-0">
         <div className="absolute bottom-0 left-0 w-1/3 h-1/2">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
             alt="Architectural detail"
-            className="w-full h-full object-cover opacity-5"
+            fill
+            quality={100}
+            className="object-cover opacity-5"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-background to-transparent" />
         </div>
@@ -263,35 +266,43 @@ const CTASection = () => {
               </div>
 
               <div className="space-y-4">
-                <motion.a
+                <Link
                   href="/contact"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   className="group relative w-full px-8 py-5 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground text-xs font-medium tracking-[0.2em] uppercase rounded-full overflow-hidden shadow-lg hover:shadow-xl transition-all duration-500 block text-center"
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-3">
-                    Get Free Estimate
-                    <Icon name="ArrowRight" className="w-4 h-4" />
-                  </span>
                   <motion.div
-                    className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary"
-                    initial={{ x: '-100%' }}
-                    whileHover={{ x: 0 }}
-                    transition={{ duration: 0.4 }}
-                  />
-                </motion.a>
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full h-full"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      Get Free Estimate
+                      <Icon name="ArrowRight" className="w-4 h-4" />
+                    </span>
+                    <motion.div
+                      className="absolute inset-0 bg-gradient-to-r from-primary/90 to-primary"
+                      initial={{ x: '-100%' }}
+                      whileHover={{ x: 0 }}
+                      transition={{ duration: 0.4 }}
+                    />
+                  </motion.div>
+                </Link>
 
-                <motion.a
+                <Link
                   href="/portfolio"
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
                   className="group relative w-full px-8 py-5 bg-card text-primary text-xs font-medium tracking-[0.2em] uppercase rounded-full border-2 border-primary/20 hover:border-primary/50 transition-all duration-500 block text-center"
                 >
-                  <span className="relative z-10 flex items-center justify-center gap-3">
-                    View Gallery
-                    <Icon name="ArrowRight" className="w-4 h-4" />
-                  </span>
-                </motion.a>
+                  <motion.div
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    className="w-full h-full"
+                  >
+                    <span className="relative z-10 flex items-center justify-center gap-3">
+                      View Gallery
+                      <Icon name="ArrowRight" className="w-4 h-4" />
+                    </span>
+                  </motion.div>
+                </Link>
 
                 <div className="flex items-center justify-center gap-3 pt-4">
                   <div className="flex -space-x-2">
@@ -348,10 +359,10 @@ const CTASection = () => {
                 <h4 className="text-lg font-medium text-foreground mb-3">{item.title}</h4>
                 <p className="text-muted-foreground text-sm leading-relaxed">{item.desc}</p>
                 <div className="mt-6">
-                  <a href="#" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-xs font-medium tracking-wider uppercase transition-colors group">
+                  <Link href="/services" className="inline-flex items-center gap-2 text-primary hover:text-primary/80 text-xs font-medium tracking-wider uppercase transition-colors group">
                     Learn more
                     <span className="group-hover:translate-x-1 transition-transform">→</span>
-                  </a>
+                  </Link>
                 </div>
               </GlassCard>
             </motion.div>

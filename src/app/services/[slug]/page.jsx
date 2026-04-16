@@ -553,17 +553,19 @@ const AwardCTABanner = () => {
           </div>
 
           <div className="flex flex-col sm:flex-row gap-4">
-            <motion.a
-              href="/contact"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="relative px-8 py-4 bg-primary text-white font-bold rounded-full shadow-sm hover:text-white overflow-hidden flex items-center justify-center gap-2"
-            >
-              <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
-                Get Free Quote
-                <ArrowRight className="w-4 h-4" />
-              </span>
-            </motion.a>
+            <Link href="/contact" className="relative flex-1 sm:flex-initial">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="h-full px-8 py-4 bg-primary text-white font-bold rounded-full shadow-sm hover:text-white overflow-hidden flex items-center justify-center gap-2"
+              >
+                <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
+                  Get Free Quote
+                  <ArrowRight className="w-4 h-4" />
+                </span>
+                <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+              </motion.div>
+            </Link>
 
             <motion.a
               href="tel:636-449-9714"
@@ -669,8 +671,85 @@ export default function ServiceDetailPage({ params }) {
   // Check if current page is a deck-related page
   const isDeckPage = service.slug === 'custom-decks' || service.slug === 'pvc-decking';
 
+  // JSON-LD: FAQPage + Service structured data for rich snippets
+  const faqJsonLd = faqs.length > 0 ? {
+    "@context": "https://schema.org",
+    "@type": "FAQPage",
+    mainEntity: faqs.map((faq) => ({
+      "@type": "Question",
+      name: faq.question,
+      acceptedAnswer: {
+        "@type": "Answer",
+        text: faq.answer,
+      },
+    })),
+  } : null;
+
+  const serviceJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "Service",
+    name: service.title,
+    description: service.description,
+    provider: {
+      "@type": "LocalBusiness",
+      name: "Eagle Revolution",
+      telephone: "+1-636-449-9714",
+      address: {
+        "@type": "PostalAddress",
+        addressLocality: "St. Louis",
+        addressRegion: "MO",
+        addressCountry: "US",
+      },
+    },
+    areaServed: {
+      "@type": "City",
+      name: "St. Louis",
+    },
+    url: `https://www.eaglerevolution.com/services/${slug}`,
+  };
+
+  const breadcrumbJsonLd = {
+    "@context": "https://schema.org",
+    "@type": "BreadcrumbList",
+    itemListElement: [
+      {
+        "@type": "ListItem",
+        position: 1,
+        name: "Home",
+        item: "https://www.eaglerevolution.com",
+      },
+      {
+        "@type": "ListItem",
+        position: 2,
+        name: "Services",
+        item: "https://www.eaglerevolution.com/services",
+      },
+      {
+        "@type": "ListItem",
+        position: 3,
+        name: service.title,
+        item: `https://www.eaglerevolution.com/services/${slug}`,
+      },
+    ],
+  };
+
   return (
     <main className="bg-background text-foreground font-body overflow-x-hidden">
+      {/* JSON-LD Structured Data for this service */}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(serviceJsonLd) }}
+      />
+      {faqJsonLd && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(faqJsonLd) }}
+        />
+      )}
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(breadcrumbJsonLd) }}
+      />
 
       {/* Hero Section */}
       <section className="relative h-[300px] xs:h-[350px] sm:h-[400px] md:h-[500px] w-full">
@@ -678,6 +757,7 @@ export default function ServiceDetailPage({ params }) {
           src={breakcrumb}
           alt={service.title}
           fill
+          quality={100}
           className="object-cover"
           priority
           sizes="100vw"
@@ -780,16 +860,17 @@ export default function ServiceDetailPage({ params }) {
                 transition={{ duration: 0.6, delay: 0.3 }}
               >
                 <div className="flex flex-row flex-wrap sm:flex-nowrap items-center justify-center lg:justify-start gap-4 w-full">
-                  <motion.a
-                    href="/contact"
-                    className="group relative overflow-hidden flex-1 sm:flex-initial px-7 py-3.5 rounded-2xl inline-flex items-center justify-center gap-2 text-base font-semibold tracking-wide bg-primary text-white border border-primary/30 transition-all duration-300 active:scale-[0.98] hover:text-white"
-                    whileHover={{ scale: 1.03, y: -2 }}
-                    whileTap={{ scale: 0.98 }}
-                  >
-                    <span className="relative z-10">Start Your Project</span>
-                    <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
-                    <span className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
-                  </motion.a>
+                  <Link href="/contact" className="flex-1 sm:flex-initial">
+                    <motion.div
+                      className="group relative overflow-hidden h-full px-7 py-3.5 rounded-2xl inline-flex items-center justify-center gap-2 text-base font-semibold tracking-wide bg-primary text-white border border-primary/30 transition-all duration-300 active:scale-[0.98] hover:text-white"
+                      whileHover={{ scale: 1.03, y: -2 }}
+                      whileTap={{ scale: 0.98 }}
+                    >
+                      <span className="relative z-10">Start Your Project</span>
+                      <ArrowRight className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />
+                      <span className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300 rounded-2xl" />
+                    </motion.div>
+                  </Link>
                 </div>
               </motion.div>
             </motion.div>
@@ -806,6 +887,7 @@ export default function ServiceDetailPage({ params }) {
                   src={service.image}
                   alt={service.title}
                   fill
+                  quality={100}
                   className="object-cover"
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
@@ -976,6 +1058,7 @@ export default function ServiceDetailPage({ params }) {
                 src={decksImg}
                 alt="Premium deck showcase"
                 fill
+                quality={100}
                 className="object-cover group-hover:scale-105 transition-transform duration-1000"
                 priority
               />
@@ -1191,7 +1274,7 @@ export default function ServiceDetailPage({ params }) {
               ))}
             </motion.div>
 
-          
+
 
 
 
@@ -1351,6 +1434,7 @@ export default function ServiceDetailPage({ params }) {
                         src={s.image}
                         alt={s.title}
                         fill
+                        quality={100}
                         className="object-cover group-hover:scale-110 transition-transform duration-700"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black/70 via-black/30 to-transparent" />

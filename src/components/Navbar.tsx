@@ -83,6 +83,7 @@ const Navbar = () => {
                   className="object-contain"
                   fill
                   priority
+                  quality={100}
                 />
               </div>
             </Link>
@@ -178,13 +179,13 @@ const Navbar = () => {
             </div>
 
             <motion.div className="hidden lg:flex items-center" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <a
+              <Link
                 href="/contact"
                 className="flex items-center space-x-2 px-7 py-3.5 rounded-xl font-bold transition-all duration-300 bg-primary text-white shadow-lg shadow-primary/20 hover:text-white"
               >
                 <Icon name="Calendar" className="h-4 w-4" />
                 <span>Book Now</span>
-              </a>
+              </Link>
             </motion.div>
 
             <div className="lg:hidden flex items-center">
@@ -226,7 +227,7 @@ const Navbar = () => {
             >
               <div className="p-6 border-b border-border flex items-center justify-between">
                 <div className="relative h-10 w-24">
-                  <Image src={logo} alt="Logo" className="object-contain" fill />
+                  <Image src={logo} alt="Logo" className="object-contain" fill quality={100} />
                 </div>
                 <button onClick={() => setIsMenuOpen(false)} className="p-2 text-foreground">
                   <Icon name="X" />
@@ -271,13 +272,13 @@ const Navbar = () => {
               </div>
 
               <div className="p-6 bg-muted/30">
-                <a
+                <Link
                   href="#quote"
                   onClick={handleLinkClick}
                   className="block w-full py-4 bg-primary text-white font-bold rounded-xl text-center shadow-lg shadow-primary/20"
                 >
                   Get Preapproved Now
-                </a>
+                </Link>
               </div>
             </motion.div>
           </>

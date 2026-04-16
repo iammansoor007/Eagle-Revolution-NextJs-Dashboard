@@ -315,6 +315,7 @@ const ServiceCard = ({ service, index }) => {
               src={imageMap[service.title] || roofingImg}
               alt={service.title}
               fill
+              quality={100}
               className="object-cover transition-transform duration-1000 group-hover:scale-105"
               priority={index < 3}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -488,22 +489,23 @@ const AwardCTABanner = () => {
 
           {/* CTA Buttons */}
           <div className="flex lg:flex-row sm:flex-col gap-3 xs:gap-4">
-            <motion.a
-              href="/contact"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="group relative px-5 xs:px-6 sm:px-8 py-3 xs:py-3.5 sm:py-4 bg-primary text-white font-bold rounded-full shadow-lg hover:text-white transition-all duration-300 overflow-hidden"
-            >
-              <span className="relative z-10 flex items-center justify-center gap-2 text-xs xs:text-sm sm:text-base">
-                Get Free Quote
-                <ArrowRight className="w-3 h-3 xs:w-4 xs:h-4 group-hover:translate-x-1 transition-transform" />
-              </span>
+            <Link href="/contact">
               <motion.div
-                className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                animate={{ x: ["-100%", "100%"] }}
-                transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
-              />
-            </motion.a>
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="group relative px-5 xs:px-6 sm:px-8 py-3 xs:py-3.5 sm:py-4 bg-primary text-white font-bold rounded-full shadow-lg hover:text-white transition-all duration-300 overflow-hidden cursor-pointer"
+              >
+                <span className="relative z-10 flex items-center justify-center gap-2 text-xs xs:text-sm sm:text-base">
+                  Get Free Quote
+                  <ArrowRight className="w-3 h-3 xs:w-4 xs:h-4 group-hover:translate-x-1 transition-transform" />
+                </span>
+                <motion.div
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
+                  animate={{ x: ["-100%", "100%"] }}
+                  transition={{ duration: 1.5, repeat: Infinity, ease: "linear" }}
+                />
+              </motion.div>
+            </Link>
 
             <motion.a
               href="tel:636-449-9714"
@@ -635,6 +637,7 @@ export default function ServicesPage() {
           src={breakcrumb}
           alt="Our Services"
           fill
+          quality={100}
           className="object-cover"
           priority
           sizes="100vw"

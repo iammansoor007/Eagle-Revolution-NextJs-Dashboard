@@ -12,6 +12,8 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../../config/icons";
 import { useContent } from "../../hooks/useContent";
+import Image from "next/image";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -223,9 +225,9 @@ const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange:
                     className="flex-1 text-[11px] sm:text-xs text-muted-foreground leading-relaxed cursor-pointer"
                 >
                     I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see{' '}
-                    <a href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</a>
+                    <Link href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</Link>
                     {' '}and{' '}
-                    <a href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</a>.
+                    <Link href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</Link>.
                 </label>
             </div>
 
@@ -382,26 +384,26 @@ const ContactPage = () => {
         setIsSubmitting(true);
 
         const emailContent = `
-🦅 EAGLE REVOLUTION CONTACT FORM
+ 🦅 EAGLE REVOLUTION CONTACT FORM
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
-📋 CONTACT INFORMATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Name: ${formData.name}
-Email: ${formData.email}
-Phone: ${formData.phone}
-Subject: ${formData.subject}
-SMS Consent: Yes
+ 📋 CONTACT INFORMATION
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ Name: ${formData.name}
+ Email: ${formData.email}
+ Phone: ${formData.phone}
+ Subject: ${formData.subject}
+ SMS Consent: Yes
 
-📝 MESSAGE
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-${formData.message}
+ 📝 MESSAGE
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ${formData.message}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⏱️ Submitted: ${new Date().toLocaleString()}
-🇺🇸 Veteran Owned & Operated
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ ⏱️ Submitted: ${new Date().toLocaleString()}
+ 🇺🇸 Veteran Owned & Operated
+ ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
     `;
 
         try {
@@ -513,20 +515,24 @@ ${formData.message}
 
             <LiquidParallax speed={0.05} className="z-0">
                 <div className="absolute top-20 right-0 w-2/5 h-3/5">
-                    <img
+                    <Image
                         src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
                         alt=""
-                        className="w-full h-full object-cover opacity-[0.03]"
+                        fill
+                        quality={100}
+                        className="object-cover opacity-[0.03]"
                     />
                 </div>
             </LiquidParallax>
 
             <LiquidParallax speed={0.08} className="z-0">
                 <div className="absolute bottom-0 left-0 w-1/3 h-1/2">
-                    <img
+                    <Image
                         src="https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
                         alt=""
-                        className="w-full h-full object-cover opacity-[0.03]"
+                        fill
+                        quality={100}
+                        className="object-cover opacity-[0.03]"
                     />
                 </div>
             </LiquidParallax>

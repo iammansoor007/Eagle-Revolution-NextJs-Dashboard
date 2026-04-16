@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import Link from 'next/link';
+import Image from 'next/image';
 import {
   motion,
   useScroll,
@@ -415,12 +416,19 @@ const Services = () => {
                   style={{ clipPath: clipPathLeftToRight }}
                 >
                   <div className="relative aspect-[4/5]">
-                    <motion.img
-                      src={serviceDetail.src}
-                      alt="Eagle Revolution Services"
-                      className="absolute inset-0 w-full h-full object-cover"
+                    <motion.div
+                      className="absolute inset-0 w-full h-full"
                       style={{ scale: imageScale }}
-                    />
+                    >
+                      <Image
+                        src={serviceDetail}
+                        alt="Eagle Revolution Services"
+                        fill
+                        className="object-cover"
+                        priority
+                        quality={100}
+                      />
+                    </motion.div>
 
                     <motion.div
                       className="absolute inset-0 bg-gradient-to-tr from-primary/30 via-transparent to-transparent"
@@ -468,14 +476,15 @@ const Services = () => {
           <p className="text-muted-foreground text-lg max-w-2xl mx-auto mb-8">
             {cta.description}
           </p>
-          <motion.a
-            href={cta.buttonLink}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.98 }}
-            className="inline-block px-8 py-4 bg-primary text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:text-white"
-          >
-            {cta.buttonText}
-          </motion.a>
+          <Link href={cta.buttonLink}>
+            <motion.div
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.98 }}
+              className="inline-block px-8 py-4 bg-primary text-white font-bold rounded-full shadow-lg hover:shadow-xl transition-all duration-300 hover:text-white"
+            >
+              {cta.buttonText}
+            </motion.div>
+          </Link>
         </div>
       </div>
 

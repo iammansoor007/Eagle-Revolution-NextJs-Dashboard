@@ -12,6 +12,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
+import Link from "next/link";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -347,25 +348,25 @@ const AccordionItem = ({ item, index, isOpen, onToggle }: { item: any; index: nu
                       className="flex flex-wrap items-center gap-4 pt-4 border-t border-primary/10"
                     >
                       {item.links.map((link: any, i: number) => (
-                        <motion.a
-                          key={i}
-                          href={link.url}
-                          whileHover={{ x: 5 }}
-                          className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors group"
-                        >
-                          <span>{link.label}</span>
-                          <motion.svg
-                            width="14"
-                            height="14"
-                            viewBox="0 0 24 24"
-                            fill="none"
-                            stroke="currentColor"
-                            strokeWidth="2"
-                            className="group-hover:translate-x-1 transition-transform"
+                        <Link key={i} href={link.url}>
+                          <motion.div
+                            whileHover={{ x: 5 }}
+                            className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors group cursor-pointer"
                           >
-                            <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" />
-                          </motion.svg>
-                        </motion.a>
+                            <span>{link.label}</span>
+                            <motion.svg
+                              width="14"
+                              height="14"
+                              viewBox="0 0 24 24"
+                              fill="none"
+                              stroke="currentColor"
+                              strokeWidth="2"
+                              className="group-hover:translate-x-1 transition-transform"
+                            >
+                              <path d="M5 12h14M12 5l7 7-7 7" strokeLinecap="round" />
+                            </motion.svg>
+                          </motion.div>
+                        </Link>
                       ))}
                     </motion.div>
                   )}

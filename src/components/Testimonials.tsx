@@ -12,6 +12,7 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
+import Image from "next/image";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -99,15 +100,21 @@ const VideoThumbnailCard = ({ video, onClick, index }: { video: any; onClick: ()
       onClick={onClick}
     >
       <div className="relative aspect-[16/9] rounded-xl overflow-hidden bg-gradient-to-br from-muted to-muted/50 shadow-lg">
-        <motion.img
-          src={imageError ? 'https://via.placeholder.com/320x180?text=Eagle+Revolution' : `https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`}
-          alt={video.name}
-          className="w-full h-full object-cover"
-          initial={{ scale: 1 }}
+        <motion.div
+          className="w-full h-full relative"
           whileHover={{ scale: 1.1 }}
           transition={{ duration: 0.6, ease: [0.32, 0.72, 0, 1] }}
-          onError={() => setImageError(true)}
-        />
+        >
+          <Image
+            src={imageError ? 'https://via.placeholder.com/320x180?text=Eagle+Revolution' : `https://img.youtube.com/vi/${video.videoId}/maxresdefault.jpg`}
+            alt={video.name}
+            fill
+            quality={100}
+            className="object-cover"
+            onError={() => setImageError(true)}
+            unoptimized={!imageError} // YouTube thumbnails often need unoptimized if they error on Next.js proxy
+          />
+        </motion.div>
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 

@@ -299,10 +299,12 @@ const Hero = () => {
       {/* --- Background --- */}
       <div className="absolute inset-0 z-0">
         <motion.div style={{ y: y1 }} className="absolute inset-0">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070"
             alt="Modern Architecture"
-            className="w-full h-full object-cover opacity-20 sm:opacity-30 scale-110 grayscale-[0.5]"
+            fill
+            quality={100}
+            className="object-cover opacity-20 sm:opacity-30 scale-110 grayscale-[0.5]"
           />
         </motion.div>
 
@@ -341,15 +343,16 @@ const Hero = () => {
             </p>
 
             <div className="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start items-center">
-              <motion.a
-                href="/contact"
-                whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
-                whileTap={{ scale: 0.98 }}
-                className="px-12 sm:px-14 md:px-16 py-3 sm:py-4 md:py-5 bg-primary text-primary-foreground font-bold text-lg sm:text-lg md:text-lg rounded-xl flex items-center justify-center gap-2 sm:gap-3 group transition-all hover:text-white"
-              >
-                Contact Now
-                <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
-              </motion.a>
+              <Link href="/contact" className="w-full sm:w-auto">
+                <motion.div
+                  whileHover={{ y: -5, boxShadow: '0 20px 40px rgba(0,0,0,0.1)' }}
+                  whileTap={{ scale: 0.98 }}
+                  className="px-12 sm:px-14 md:px-16 py-3 sm:py-4 md:py-5 bg-primary text-primary-foreground font-bold text-lg rounded-xl flex items-center justify-center gap-2 sm:gap-3 group transition-all hover:text-white"
+                >
+                  Contact Now
+                  <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
+                </motion.div>
+              </Link>
             </div>
           </motion.div>
 
@@ -458,6 +461,7 @@ const FounderPortrait = () => {
             alt="Brandon Anderson - Founder, Eagle Revolution"
             className="object-cover"
             fill
+            quality={100}
             sizes="(max-width: 640px) 100vw, (max-width: 768px) 80vw, 50vw"
             priority
           />
@@ -577,20 +581,24 @@ const FounderStory = () => {
 
       <ParallaxLayer speed={0.05} className="z-0">
         <div className="absolute bottom-0 right-0 w-1/3 h-1/2">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
             alt="Heritage pattern"
-            className="w-full h-full object-cover opacity-[0.02]"
+            fill
+            quality={100}
+            className="object-cover opacity-[0.02]"
           />
         </div>
       </ParallaxLayer>
 
       <ParallaxLayer speed={0.08} className="z-0">
         <div className="absolute top-20 left-0 w-1/4 h-1/3">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
             alt="Studio"
-            className="w-full h-full object-cover opacity-[0.02]"
+            fill
+            quality={100}
+            className="object-cover opacity-[0.02]"
           />
         </div>
       </ParallaxLayer>
@@ -936,6 +944,7 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
               src={imageMap[service.title] || roofingImg}
               alt={service.title}
               fill
+              quality={100}
               className="object-cover transition-transform duration-1000 group-hover:scale-105"
               priority={index < 3}
               sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
@@ -1138,35 +1147,38 @@ const AwardCTABanner = () => {
           </div>
 
           <div className="flex flex-row gap-2 sm:gap-3 md:gap-4 w-full sm:w-auto">
-            <motion.a
-              href="/contact"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="relative flex-1 sm:flex-none px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-primary text-primary-foreground font-bold rounded-full shadow-lg hover:shadow-xl hover:text-white transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2 group"
-            >
-              <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
-                Get Preapproved
-                <motion.svg
-                  className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 transition-transform duration-300 group-hover:translate-x-1"
-                  fill="none"
-                  stroke="currentColor"
-                  viewBox="0 0 24 24"
-                >
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                </motion.svg>
-              </span>
-            </motion.a>
+            <Link href="/contact" className="flex-1 sm:flex-none">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative h-full px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-primary text-primary-foreground font-bold rounded-full shadow-lg hover:shadow-xl hover:text-white transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2 group"
+              >
+                <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                  Get Preapproved
+                  <motion.svg
+                    className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 transition-transform duration-300 group-hover:translate-x-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </motion.svg>
+                </span>
+                <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
+              </motion.div>
+            </Link>
 
-            <motion.a
-              href="/contact"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.98 }}
-              className="relative flex-1 sm:flex-none px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-background text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2"
-            >
-              <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
-                Contact Us
-              </span>
-            </motion.a>
+            <Link href="/contact" className="flex-1 sm:flex-none">
+              <motion.div
+                whileHover={{ scale: 1.03 }}
+                whileTap={{ scale: 0.98 }}
+                className="relative h-full px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-background text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2"
+              >
+                <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
+                  Contact Us
+                </span>
+              </motion.div>
+            </Link>
           </div>
         </div>
       </div>

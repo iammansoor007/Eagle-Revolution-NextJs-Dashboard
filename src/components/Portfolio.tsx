@@ -112,6 +112,7 @@ const MarqueeItem = ({ project }: { project: Project }) => {
           alt={project.title}
           className="object-cover"
           fill
+          quality={100}
           style={{
             transform: isHovered ? "scale(1.1)" : "scale(1)",
             transition: "transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1)",
@@ -356,6 +357,7 @@ const PremiumLightbox = ({
           alt="Project preview"
           className="object-contain rounded-xl sm:rounded-2xl shadow-2xl"
           fill
+          quality={100}
           sizes="90vw"
         />
       </div>

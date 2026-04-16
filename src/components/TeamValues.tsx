@@ -1,5 +1,6 @@
 import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import {
   motion,
   useScroll,
@@ -57,6 +58,7 @@ const CeoPortrait = () => {
             alt={ceo.alt}
             className="object-cover"
             fill
+            quality={100}
           />
 
           <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-secondary/20 to-transparent" />
@@ -174,20 +176,24 @@ const Leadership = () => {
 
       <ParallaxLayer speed={0.05} className="z-0">
         <div className="absolute bottom-0 right-0 w-1/3 h-1/2">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
             alt="Heritage pattern"
-            className="w-full h-full object-cover opacity-[0.02]"
+            fill
+            quality={100}
+            className="object-cover opacity-[0.02]"
           />
         </div>
       </ParallaxLayer>
 
       <ParallaxLayer speed={0.08} className="z-0">
         <div className="absolute top-20 left-0 w-1/4 h-1/3">
-          <img
+          <Image
             src="https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
             alt="Studio"
-            className="w-full h-full object-cover opacity-[0.02]"
+            fill
+            quality={100}
+            className="object-cover opacity-[0.02]"
           />
         </div>
       </ParallaxLayer>
@@ -246,24 +252,30 @@ const Leadership = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-4 mt-10 pt-4 border-t border-border">
-                <motion.a
+                <Link
                   href={ceo.social.linkedin}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
                   className="p-3 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
                   aria-label="LinkedIn"
                 >
-                  <Icon name="Linkedin" className="w-5 h-5" />
-                </motion.a>
-                <motion.a
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon name="Linkedin" className="w-5 h-5" />
+                  </motion.div>
+                </Link>
+                <Link
                   href={`mailto:${ceo.social.email}`}
-                  whileHover={{ scale: 1.1 }}
-                  whileTap={{ scale: 0.95 }}
                   className="p-3 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
                   aria-label="Email"
                 >
-                  <Icon name="Mail" className="w-5 h-5" />
-                </motion.a>
+                  <motion.div
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.95 }}
+                  >
+                    <Icon name="Mail" className="w-5 h-5" />
+                  </motion.div>
+                </Link>
                 <span className="text-sm text-muted-foreground break-all">
                   {ceo.social.email}
                 </span>

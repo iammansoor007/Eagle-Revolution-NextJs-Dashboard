@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Icon } from '../config/icons';
 import { useContent } from '../hooks/useContent';
@@ -63,9 +64,9 @@ const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange:
                     className="flex-1 text-[11px] text-muted-foreground leading-relaxed cursor-pointer"
                 >
                     I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see{' '}
-                    <a href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</a>
+                    <Link href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</Link>
                     {' '}and{' '}
-                    <a href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</a>.
+                    <Link href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</Link>.
                 </label>
             </div>
 
@@ -114,17 +115,17 @@ const QuickQuote = () => {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        
+
         // Validate SMS consent
         if (!smsConsent) {
             alert("Please agree to receive SMS communications to continue.");
             return;
         }
-        
+
         setIsSubmitting(true);
 
         const emailContent = `
-🦅 NEW QUICK QUOTE REQUEST - EAGLE REVOLUTION
+🔨 NEW QUICK QUOTE REQUEST - EAGLE REVOLUTION
 
 ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
 
@@ -156,7 +157,7 @@ ${formData.message}
                         'Accept': 'application/json'
                     },
                     body: JSON.stringify({
-                        _subject: `🦅 Quick Quote - ${formData.name}`,
+                        _subject: `🔨 Quick Quote - ${formData.name}`,
                         name: formData.name,
                         email: formData.email,
                         phone: formData.phone,
@@ -176,7 +177,7 @@ ${formData.message}
                 console.log('FormSubmit failed, using mailto fallback');
             }
 
-            const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🦅 Quick Quote - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
+            const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🔨 Quick Quote - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
             window.location.href = mailtoLink;
             showSuccess();
 
@@ -677,8 +678,8 @@ ${formData.message}
 
                                             {/* SMS Consent Checkbox - shown in step 3 */}
                                             {step === 3 && (
-                                                <SMSConsentCheckbox 
-                                                    checked={smsConsent} 
+                                                <SMSConsentCheckbox
+                                                    checked={smsConsent}
                                                     onChange={(e) => setSmsConsent(e.target.checked)}
                                                 />
                                             )}

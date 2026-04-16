@@ -324,6 +324,7 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
                         src={project.image}
                         alt={project.title || "Project image"}
                         fill
+                        quality={100}
                         className={`object-cover transition-transform duration-500 ${isHovered ? 'scale-105' : 'scale-100'
                             } ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                         onLoad={() => setImageLoaded(true)}
@@ -466,6 +467,7 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
                                     src={project.image}
                                     alt={project.title || "Project image"}
                                     fill
+                                    quality={100}
                                     className={`object-cover ${imageLoaded ? 'opacity-100' : 'opacity-0'}`}
                                     onLoad={() => setImageLoaded(true)}
                                     onError={() => setImageError(true)}

@@ -3,6 +3,7 @@ import Image from "next/image";
 import { useRef, useEffect, useState, useCallback, useMemo, memo } from "react";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
+import Link from "next/link";
 import EagleAboutImg from "@/assets/fairabout.png";
 
 const Counter = memo(({ value, suffix = "", duration = 1.8 }: { value: number; suffix?: string; duration?: number }) => {
@@ -270,6 +271,7 @@ export default function AboutSection() {
                                     alt={image.alt}
                                     className="object-cover transition-transform duration-7000 group-hover:scale-105"
                                     fill
+                                    quality={100}
                                     priority
                                     loading="eager"
                                 />
@@ -372,47 +374,47 @@ export default function AboutSection() {
                             <div className="flex flex-row flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 w-full">
                                 {buttons.map((button: any, idx: number) =>
                                     button.primary ? (
-                                        <motion.a
-                                            key={idx}
-                                            href={button.href}
-                                            whileHover={{ scale: 1.03, y: -2 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="group relative overflow-hidden flex-1 sm:flex-initial min-w-[150px] sm:min-w-[180px] px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl inline-flex items-center justify-center gap-2 bg-primary text-white border border-primary font-semibold sm:font-bold text-sm sm:text-base shadow-primary/90 transition-all duration-300 hover:bg-primary hover:border-primary hover:text-white hover:shadow-primary/50"
-                                        >
-                                            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-white/20 via-transparent to-white/10 transition-opacity duration-300" />
-                                            <span className="relative z-10 flex items-center gap-2">
-                                                {button.text}
-                                                <svg
-                                                    className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
-                                                </svg>
-                                            </span>
-                                        </motion.a>
+                                        <Link key={idx} href={button.href}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.03, y: -2 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="group relative overflow-hidden flex-1 sm:flex-initial min-w-[150px] sm:min-w-[180px] px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl inline-flex items-center justify-center gap-2 bg-primary text-white border border-primary font-semibold sm:font-bold text-sm sm:text-base shadow-primary/90 transition-all duration-300 hover:bg-primary hover:border-primary hover:text-white hover:shadow-primary/50 cursor-pointer"
+                                            >
+                                                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-white/20 via-transparent to-white/10 transition-opacity duration-300" />
+                                                <span className="relative z-10 flex items-center gap-2">
+                                                    {button.text}
+                                                    <svg
+                                                        className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:translate-x-1"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" />
+                                                    </svg>
+                                                </span>
+                                            </motion.div>
+                                        </Link>
                                     ) : (
-                                        <motion.a
-                                            key={idx}
-                                            href={button.href}
-                                            whileHover={{ scale: 1.03, y: -2 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="group relative overflow-hidden flex-1 sm:flex-initial min-w-[150px] sm:min-w-[180px] px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl inline-flex items-center justify-center gap-2 bg-white text-[#333333] border-2 border-primary font-semibold sm:font-bold text-sm sm:text-base shadow-[0_10px_25px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary hover:shadow-primary/50"
-                                        >
-                                            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-white/10 via-transparent to-white/5 transition-opacity duration-300" />
-                                            <span className="relative z-10 flex items-center gap-2">
-                                                {button.text}
-                                                <svg
-                                                    className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-45"
-                                                    fill="none"
-                                                    viewBox="0 0 24 24"
-                                                    stroke="currentColor"
-                                                >
-                                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7l7-7M7 7l7 7M7 7h10" />
-                                                </svg>
-                                            </span>
-                                        </motion.a>
+                                        <Link key={idx} href={button.href}>
+                                            <motion.div
+                                                whileHover={{ scale: 1.03, y: -2 }}
+                                                whileTap={{ scale: 0.98 }}
+                                                className="group relative overflow-hidden flex-1 sm:flex-initial min-w-[150px] sm:min-w-[180px] px-5 sm:px-8 py-3.5 sm:py-4 rounded-2xl inline-flex items-center justify-center gap-2 bg-white text-[#333333] border-2 border-primary font-semibold sm:font-bold text-sm sm:text-base shadow-[0_10px_25px_rgba(0,0,0,0.08)] transition-all duration-300 hover:bg-primary hover:text-white hover:border-primary hover:shadow-primary/50 cursor-pointer"
+                                            >
+                                                <span className="absolute inset-0 opacity-0 group-hover:opacity-100 bg-gradient-to-r from-white/10 via-transparent to-white/5 transition-opacity duration-300" />
+                                                <span className="relative z-10 flex items-center gap-2">
+                                                    {button.text}
+                                                    <svg
+                                                        className="w-4 h-4 sm:w-5 sm:h-5 transition-transform duration-300 group-hover:rotate-45"
+                                                        fill="none"
+                                                        viewBox="0 0 24 24"
+                                                        stroke="currentColor"
+                                                    >
+                                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M7 7l7-7M7 7l7 7M7 7h10" />
+                                                    </svg>
+                                                </span>
+                                            </motion.div>
+                                        </Link>
                                     )
                                 )}
                             </div>
@@ -455,4 +457,4 @@ export default function AboutSection() {
             </div>
         </section>
     );
-}
+};

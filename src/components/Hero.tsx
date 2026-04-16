@@ -5,6 +5,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
 import Image from "next/image";
+import Link from "next/link";
 
 import bgfair from "../assets/bgfair.jpg";
 
@@ -59,6 +60,7 @@ const Hero = () => {
             alt=""
             className="w-full h-full object-cover scale-105"
             fill
+            quality={100}
             priority
           />
         </div>
@@ -144,29 +146,29 @@ const Hero = () => {
                 <div className="flex flex-row flex-wrap sm:flex-nowrap items-center justify-center lg:justify-start gap-3 sm:gap-4 w-full">
                   {buttons.map((button: any, idx: number) => {
                     return button.primary ? (
-                      <motion.a
-                        key={idx}
-                        href={button.href}
-                        className="group relative overflow-hidden min-w-[150px] sm:min-w-[170px] flex-1 sm:flex-initial px-5 sm:px-7 py-3.5 rounded-2xl inline-flex items-center justify-center gap-2 text-sm sm:text-base font-semibold tracking-wide bg-primary text-primary-foreground border border-primary/30 shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-300 hover:bg-white hover:text-primary hover:border-white/70 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)] active:scale-[0.98] backdrop-blur-xl"
-                        whileHover={{ scale: 1.03, y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <span className="relative z-10">{button.text}</span>
-                        {button.icon && <Icon name={button.icon} className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />}
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </motion.a>
+                      <Link key={idx} href={button.href}>
+                        <motion.div
+                          className="group relative overflow-hidden min-w-[150px] sm:min-w-[170px] flex-1 sm:flex-initial px-5 sm:px-7 py-3.5 rounded-2xl inline-flex items-center justify-center gap-2 text-sm sm:text-base font-semibold tracking-wide bg-primary text-primary-foreground border border-primary/30 shadow-[0_10px_30px_rgba(0,0,0,0.15)] transition-all duration-300 hover:bg-white hover:text-primary hover:border-white/70 hover:shadow-[0_16px_40px_rgba(255,255,255,0.18)] active:scale-[0.98] backdrop-blur-xl cursor-pointer"
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span className="relative z-10">{button.text}</span>
+                          {button.icon && <Icon name={button.icon} className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />}
+                          <span className="absolute inset-0 bg-gradient-to-r from-white/20 via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </motion.div>
+                      </Link>
                     ) : (
-                      <motion.a
-                        key={idx}
-                        href={button.href}
-                        className="group relative overflow-hidden min-w-[150px] sm:min-w-[170px] flex-1 sm:flex-initial px-5 sm:px-7 py-3.5 rounded-2xl inline-flex items-center justify-center gap-2 text-sm sm:text-base font-semibold tracking-wide backdrop-blur-xl bg-white/10 text-white border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-all duration-300 hover:bg-white hover:text-slate-900 hover:border-white hover:shadow-[0_16px_40px_rgba(255,255,255,0.16)] active:scale-[0.98]"
-                        whileHover={{ scale: 1.03, y: -2 }}
-                        whileTap={{ scale: 0.98 }}
-                      >
-                        <span className="relative z-10">{button.text}</span>
-                        {button.icon && <Icon name={button.icon} className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />}
-                        <span className="absolute inset-0 bg-gradient-to-r from-white/15 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                      </motion.a>
+                      <Link key={idx} href={button.href}>
+                        <motion.div
+                          className="group relative overflow-hidden min-w-[150px] sm:min-w-[170px] flex-1 sm:flex-initial px-5 sm:px-7 py-3.5 rounded-2xl inline-flex items-center justify-center gap-2 text-sm sm:text-base font-semibold tracking-wide backdrop-blur-xl bg-white/10 text-white border border-white/20 shadow-[0_10px_30px_rgba(0,0,0,0.12)] transition-all duration-300 hover:bg-white hover:text-slate-900 hover:border-white hover:shadow-[0_16px_40px_rgba(255,255,255,0.16)] active:scale-[0.98] cursor-pointer"
+                          whileHover={{ scale: 1.03, y: -2 }}
+                          whileTap={{ scale: 0.98 }}
+                        >
+                          <span className="relative z-10">{button.text}</span>
+                          {button.icon && <Icon name={button.icon} className="relative z-10 w-4 h-4 transition-transform duration-300 group-hover:translate-x-1" />}
+                          <span className="absolute inset-0 bg-gradient-to-r from-white/15 via-white/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                        </motion.div>
+                      </Link>
                     );
                   })}
                 </div>
@@ -199,17 +201,17 @@ const Hero = () => {
               transition={{ duration: 0.8, delay: 0.4 }}
               className="flex justify-center lg:justify-end      lg:-mt-24 "
             >
-              <motion.a
+              <a
                 href="https://www.greensky.com/prequal/gs/prequalify-for-loan?merchant=81115616&channel=External-Button-Prequal"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="relative group"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
               >
-                {/* Darker background for better contrast */}
-                <div className="relative bg-slate-800/80 backdrop-blur-md border border-white/20 rounded-2xl px-8 py-12 shadow-2xl transition-all duration-300 group-hover:border-primary/50 group-hover:bg-slate-800/90">
-
+                <motion.div
+                  className="relative bg-slate-800/80 backdrop-blur-md border border-white/20 rounded-2xl px-8 py-12 shadow-2xl transition-all duration-300 group-hover:border-primary/50 group-hover:bg-slate-800/90"
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                >
                   {/* Subtle glow on hover */}
                   <div className="absolute inset-0 bg-gradient-to-br from-primary/10 to-transparent rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
 
@@ -233,8 +235,8 @@ const Hero = () => {
                       </svg>
                     </span>
                   </div>
-                </div>
-              </motion.a>
+                </motion.div>
+              </a>
             </motion.div>
 
           </div>

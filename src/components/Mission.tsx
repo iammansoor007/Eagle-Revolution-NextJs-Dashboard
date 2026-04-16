@@ -22,7 +22,7 @@ const Mission = () => {
       <div className="grid-editorial items-center">
         <div className="md:col-span-5 order-2 md:order-1">
           <div className="mission-image overflow-hidden aspect-[3/4] relative">
-            <Image src={teamImage} alt="Eagle Revolution team at work" className="object-cover" fill />
+            <Image src={teamImage} alt="Eagle Revolution team at work" className="object-cover" fill quality={100} />
             <div className="absolute inset-0 bg-gradient-to-t from-primary/50 to-transparent" />
             <div className="absolute bottom-6 left-6 right-6 bg-primary/90 backdrop-blur-sm p-5 border border-primary-foreground/10">
               <div className="grid grid-cols-3 gap-4">
