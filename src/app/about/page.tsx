@@ -10,12 +10,17 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 import owner from "@/assets/ownerupdatedimage.jpeg";
-import roofingImg from '@/assets/portfolio1.png';
-import windowsImg from '@/assets/portfolio2.jpg';
-import decksImg from '@/assets/portfolio3.jpg';
-import commercialImg from '@/assets/portfolio4.jpg';
-import sidingImg from '@/assets/portfolio5.jpg';
+import roofingImg from '../../assets/roof1.jpg.jpeg';
+import windowsImg from '../../assets/window5.jpeg';
+import decksImg from '../../assets/outdoor-sitting-desk.png';
+import commercialImg from '../../assets/commercial-tpo.png';
+import sidingImg from '../../assets/siding5.jpg.jpeg';
+import gutter from '../../assets/gutterinstallation.jpg.jpeg';
+import pvcdecks from '../../assets/pvcdecks.jpg.jpeg';
 import servicesData from '../../data/servicesData.json';
+
+
+
 
 import {
   MousePointer2,
@@ -59,7 +64,8 @@ const imageMap: Record<string, any> = {
   'Custom Decks': decksImg,
   'Commercial Roofing': commercialImg,
   'Siding, Soffit & Fascia': sidingImg,
-  'Gutters & Protection': sidingImg,
+  'Gutters & Protection': gutter,
+  'PVC Decking': pvcdecks,
 };
 
 // ==================== CUSTOM SVG ICONS ====================
@@ -618,7 +624,7 @@ const FounderStory = () => {
           </h2>
 
           <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-xl font-light max-w-2xl mx-auto px-3 sm:px-4">
-            Born in St. Charles, Missouri. Built on military precision. Driven by integrity.
+            Born in O'Fallon, Missouri. Built on military precision. Driven by integrity.
           </p>
         </div>
 
@@ -1232,14 +1238,7 @@ const ValuesGrid = () => {
       stat: '∞',
       statLabel: 'Continuous',
     },
-    {
-      title: 'Humility',
-      description: 'Humility is about putting the needs of the customer above our own and being open to feedback, learning, and improvement. By embracing humility, we stay grounded, continually refining our skills and enhancing the customer experience.',
-      icon: Heart,
-      number: '06',
-      stat: '24/7',
-      statLabel: 'Client Focus',
-    },
+
   ];
 
   return (

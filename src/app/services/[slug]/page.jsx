@@ -1120,13 +1120,7 @@ export default function ServiceDetailPage({ params }) {
                     : 'border-border hover:border-primary/30 bg-card'
                     }`}
                 >
-                  {service.slug === 'custom-decks' && (
-                    <div className="absolute top-0 right-0 z-20">
-                      <div className="bg-primary text-white text-xs font-bold px-6 py-2 rounded-bl-2xl shadow-lg">
-                        ⭐ RECOMMENDED
-                      </div>
-                    </div>
-                  )}
+
 
                   <div className="p-8 sm:p-10">
                     <div className="flex items-center gap-4 mb-6">
@@ -1173,12 +1167,19 @@ export default function ServiceDetailPage({ params }) {
                 <motion.div
                   whileHover={{ y: -10 }}
                   transition={{ type: "spring", stiffness: 300, damping: 20 }}
-                  className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-500 ${service.slug === 'pvc-decking'
+                  className={`relative rounded-3xl overflow-hidden border-2 transition-all duration-500 ${service.slug === 'custom-decks'
                     ? 'border-primary shadow-2xl shadow-primary/20 bg-gradient-to-b from-primary/5 to-transparent'
                     : 'border-border hover:border-primary/30 bg-card'
                     }`}
                 >
                   {service.slug === 'pvc-decking' && (
+                    <div className="absolute top-0 right-0 z-20">
+                      <div className="bg-primary text-white text-xs font-bold px-6 py-2 rounded-bl-2xl shadow-lg">
+                        ⭐ RECOMMENDED
+                      </div>
+                    </div>
+                  )}
+                  {service.slug === 'custom-decks' && (
                     <div className="absolute top-0 right-0 z-20">
                       <div className="bg-primary text-white text-xs font-bold px-6 py-2 rounded-bl-2xl shadow-lg">
                         ⭐ RECOMMENDED

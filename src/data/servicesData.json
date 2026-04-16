@@ -16,7 +16,7 @@
       ],
       "stats": [
         {
-          "value": "25",
+          "value": "50",
           "label": "Year Fade Warranty",
           "icon": "Shield"
         },
@@ -125,8 +125,8 @@
       ],
       "stats": [
         {
-          "value": "Lifetime",
-          "label": "Rot Warranty",
+          "value": "50",
+          "label": "Year Rot Warranty",
           "icon": "Shield"
         },
         {
