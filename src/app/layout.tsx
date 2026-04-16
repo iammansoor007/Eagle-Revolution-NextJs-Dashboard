@@ -19,8 +19,8 @@ const BASE_URL = "https://www.eaglerevolution.com";
 export const metadata: Metadata = {
   metadataBase: new URL(BASE_URL),
   icons: {
-    icon: "/eagle-logo.png",
-    apple: "/eagle-logo.png",
+    icon: `${BASE_URL}/eagle-logo.png`,
+    apple: `${BASE_URL}/eagle-logo.png`,
   },
 
   // ── Core Meta Tags ──
@@ -78,7 +78,7 @@ export const metadata: Metadata = {
       "Veteran-owned roofing & exterior remodeling experts serving the greater St. Louis area. Professional residential & commercial roofing, siding, windows, decks, and gutters. Free estimates available.",
     images: [
       {
-        url: "/eagle-logo.png",
+        url: `${BASE_URL}/eagle-logo.png`,
         width: 1200,
         height: 630,
         alt: "Eagle Revolution – Veteran Owned Roofing & Home Improvement",
@@ -93,7 +93,7 @@ export const metadata: Metadata = {
     title: "Eagle Revolution | #1 Roofing & Home Improvement in St. Louis, MO",
     description:
       "Veteran-owned roofing & home improvement company. Expert residential & commercial roofing, siding, windows, decks & gutters in St. Louis, MO.",
-    images: ["/eagle-logo.png"],
+    images: [`${BASE_URL}/eagle-logo.png`],
     creator: "@EagleRevolution",
   },
 
@@ -110,6 +110,7 @@ export const metadata: Metadata = {
     "geo.position": "38.627003;-90.199404",
     ICBM: "38.627003, -90.199404",
     "format-detection": "telephone=yes",
+    image: `${BASE_URL}/eagle-logo.png`,
   },
 };
 
