@@ -50,15 +50,15 @@ const imageMap = {
 };
 
 // --- Counter Component ---
-const Counter = ({ value, suffix = "", duration = 2, start = false }) => {
+const Counter = ({ value, suffix = "", duration = 2, start = false }: any) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (start) {
-      let startTime;
-      const animate = (timestamp) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      let startTime: number | undefined;
+      const animate = (timestamp: any) => {
+        if (!startTime!) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime!) / (duration * 1000), 1);
         const easedProgress = 1 - Math.pow(1 - progress, 4);
         setCount(Math.floor(easedProgress * value));
 
@@ -79,15 +79,15 @@ const Counter = ({ value, suffix = "", duration = 2, start = false }) => {
 };
 
 // --- StatCard Component ---
-const StatCard = ({ stat, index }) => {
-  const cardRef = useRef(null);
+const StatCard = ({ stat, index }: any) => {
+  const cardRef = useRef<any>(null);
   const inView = useInView(cardRef, { once: true, margin: "50px" });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-0.5, 0.5], [10, -10]);
   const rotateY = useTransform(x, [-0.5, 0.5], [-10, 10]);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: any) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
@@ -159,10 +159,10 @@ const StatCard = ({ stat, index }) => {
 };
 
 // --- Process Card Component ---
-const ProcessCard = ({ step, index }) => {
+const ProcessCard = ({ step, index }: { step: any, index: number }) => {
   const [isHovered, setIsHovered] = useState(false);
   const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
-  const cardRef = useRef(null);
+  const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: "-50px" });
 
   const x = useMotionValue(0);
@@ -172,7 +172,7 @@ const ProcessCard = ({ step, index }) => {
   const rotateX = useTransform(springY, [-0.3, 0.3], [3, -3]);
   const rotateY = useTransform(springX, [-0.3, 0.3], [-3, 3]);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const mouseX = e.clientX - rect.left;
@@ -348,15 +348,15 @@ const ProcessCard = ({ step, index }) => {
 };
 
 // --- FAQ Item Component ---
-const FAQItem = ({ faq, index, isOpen, onToggle }) => {
+const FAQItem = ({ faq, index, isOpen, onToggle }: { faq: any, index: number, isOpen: boolean, onToggle: (i: number) => void }) => {
   const [isHovered, setIsHovered] = useState(false);
-  const buttonRef = useRef(null);
+  const buttonRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
   const springX = useSpring(mouseX, { stiffness: 40, damping: 12 });
   const springY = useSpring(mouseY, { stiffness: 40, damping: 12 });
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: React.MouseEvent) => {
     if (!buttonRef.current) return;
     const rect = buttonRef.current.getBoundingClientRect();
     const x = ((e.clientX - rect.left) / rect.width) * 100;
@@ -586,7 +586,7 @@ const AwardCTABanner = () => {
 };
 
 // --- Material Comparison Card (For Deck Pages) ---
-const MaterialComparisonCard = ({ type, features, isRecommended }) => {
+const MaterialComparisonCard = ({ type, features, isRecommended }: { type: string, features: string[], isRecommended?: boolean }) => {
   return (
     <motion.div
       whileHover={{ y: -8 }}
@@ -603,7 +603,7 @@ const MaterialComparisonCard = ({ type, features, isRecommended }) => {
       <div className="p-6 sm:p-8 bg-card">
         <h4 className="text-2xl font-bold text-foreground mb-4">{type}</h4>
         <ul className="space-y-3">
-          {features.map((feature, idx) => (
+          {features.map((feature: any, idx: number) => (
             <li key={idx} className="flex items-start gap-3">
               <CheckCircle className="w-5 h-5 text-primary flex-shrink-0 mt-0.5" />
               <span className="text-muted-foreground">{feature}</span>
@@ -616,17 +616,17 @@ const MaterialComparisonCard = ({ type, features, isRecommended }) => {
 };
 
 // --- Main Component ---
-export default function ServiceDetailPage({ params }) {
+export default function ServiceDetailPage({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = use(params);
-  const [openFaq, setOpenFaq] = useState(null);
+  const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const allServices = servicesData.services.map(service => ({
+  const allServices = servicesData.services.map((service: any) => ({
     ...service,
-    image: imageMap[service.title] || roofingImg
+    image: (imageMap as any)[service.title] || roofingImg
   }));
 
-  const service = allServices.find(s => s.slug === slug);
+  const service = allServices.find((s: any) => s.slug === slug);
 
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 100);
@@ -649,23 +649,23 @@ export default function ServiceDetailPage({ params }) {
     );
   }
 
-  const IconComponent = iconMap[service.icon] || Home;
+  const IconComponent = (iconMap as any)[service.icon] || Home;
 
   const faqs = service.faq || [];
 
-  const benefits = (service.benefits || []).map(b => ({
+  const benefits = (service.benefits || []).map((b: any) => ({
     ...b,
-    icon: iconMap[b.icon] || Shield
+    icon: (iconMap as any)[b.icon] || Shield
   }));
 
-  const processSteps = (service.process || []).map(p => ({
+  const processSteps = (service.process || []).map((p: any) => ({
     ...p,
-    icon: iconMap[p.icon] || Shield
+    icon: (iconMap as any)[p.icon] || Shield
   }));
 
-  const statsData = (service.stats || []).map(s => ({
+  const statsData = (service.stats || []).map((s: any) => ({
     ...s,
-    icon: iconMap[s.icon] || Shield
+    icon: (iconMap as any)[s.icon] || Shield
   }));
 
   // Check if current page is a deck-related page
@@ -675,7 +675,7 @@ export default function ServiceDetailPage({ params }) {
   const faqJsonLd = faqs.length > 0 ? {
     "@context": "https://schema.org",
     "@type": "FAQPage",
-    mainEntity: faqs.map((faq) => ({
+    mainEntity: faqs.map((faq: any) => ({
       "@type": "Question",
       name: faq.question,
       acceptedAnswer: {
@@ -806,7 +806,7 @@ export default function ServiceDetailPage({ params }) {
             }} />
 
             <div className="relative z-10 grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-6 lg:gap-8">
-              {statsData.map((stat, idx) => (
+              {statsData.map((stat: any, idx: number) => (
                 <StatCard key={idx} stat={stat} index={idx} />
               ))}
             </div>
@@ -843,7 +843,7 @@ export default function ServiceDetailPage({ params }) {
               </p>
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 mb-8 sm:mb-10 w-full lg:max-w-none mx-auto lg:mx-0">
-                {service.features.map((feature, idx) => (
+                {service.features.map((feature: any, idx: number) => (
                   <div key={idx} className="flex items-center justify-center lg:justify-start gap-2 sm:gap-3">
                     <div className="w-4 h-4 sm:w-5 sm:h-5 rounded-md sm:rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
                       <CheckCircle className="w-3 h-3 sm:w-3.5 sm:h-3.5 text-primary" />
@@ -934,7 +934,7 @@ export default function ServiceDetailPage({ params }) {
           </motion.div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
-            {benefits.map((benefit, idx) => (
+            {benefits.map((benefit: any, idx: number) => (
               <motion.div
                 key={idx}
                 initial={{ opacity: 0, y: 30 }}
@@ -1333,13 +1333,13 @@ export default function ServiceDetailPage({ params }) {
           </motion.div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-7 mb-4 sm:mb-6 lg:mb-7">
-            {processSteps.slice(0, 3).map((step, idx) => (
+            {processSteps.slice(0, 3).map((step: any, idx: number) => (
               <ProcessCard key={idx} step={step} index={idx} />
             ))}
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-4 sm:gap-6 lg:gap-7">
-            {processSteps.slice(3, 6).map((step, idx) => (
+            {processSteps.slice(3, 6).map((step: any, idx: number) => (
               <ProcessCard key={idx + 3} step={step} index={idx + 3} />
             ))}
           </div>
@@ -1371,7 +1371,7 @@ export default function ServiceDetailPage({ params }) {
           </motion.div>
 
           <div className="space-y-3 sm:space-y-4">
-            {faqs.map((faq, idx) => (
+            {faqs.map((faq: any, idx: number) => (
               <FAQItem
                 key={idx}
                 faq={faq}
@@ -1416,7 +1416,7 @@ export default function ServiceDetailPage({ params }) {
 
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
             {allServices.filter(s => s.slug !== service.slug).slice(0, 3).map((s, idx) => {
-              const SIcon = iconMap[s.icon] || Home;
+              const SIcon = (iconMap as any)[s.icon] || Home;
               return (
                 <motion.div
                   key={idx}

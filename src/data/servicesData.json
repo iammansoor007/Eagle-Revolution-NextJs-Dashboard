@@ -457,13 +457,13 @@
           "icon": "Shield"
         },
         {
-          "value": "5M+",
+          "value": "50000+",
           "label": "SqFt Installed",
           "icon": "Building"
         },
         {
-          "value": "24/7",
-          "label": "Response Time",
+          "value": "24",
+          "label": "Hour Availability",
           "icon": "Clock"
         },
         {

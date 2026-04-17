@@ -48,15 +48,15 @@ const imageMap = {
 };
 
 // --- Counter Component ---
-const Counter = ({ value, suffix = "", duration = 2, start = false }) => {
+const Counter = ({ value, suffix = "", duration = 2, start = false }: any) => {
   const [count, setCount] = useState(0);
 
   useEffect(() => {
     if (start) {
-      let startTime;
-      const animate = (timestamp) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / (duration * 1000), 1);
+      let startTime: number | undefined;
+      const animate = (timestamp: any) => {
+        if (!startTime!) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime!) / (duration * 1000), 1);
         const easedProgress = 1 - Math.pow(1 - progress, 4);
         setCount(Math.floor(easedProgress * value));
 
@@ -77,15 +77,15 @@ const Counter = ({ value, suffix = "", duration = 2, start = false }) => {
 };
 
 // --- StatCard Component ---
-const StatCard = ({ stat, index }) => {
-  const cardRef = useRef(null);
+const StatCard = ({ stat, index }: any) => {
+  const cardRef = useRef<any>(null);
   const inView = useInView(cardRef, { once: true, margin: "50px" });
   const x = useMotionValue(0);
   const y = useMotionValue(0);
   const rotateX = useTransform(y, [-0.5, 0.5], [10, -10]);
   const rotateY = useTransform(x, [-0.5, 0.5], [-10, 10]);
 
-  const handleMouseMove = (e) => {
+  const handleMouseMove = (e: any) => {
     if (!cardRef.current) return;
     const rect = cardRef.current.getBoundingClientRect();
     const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
@@ -159,17 +159,17 @@ const StatCard = ({ stat, index }) => {
 };
 
 // --- StatCounter Component for Stats Section ---
-const StatCounter = ({ value, label, suffix, delay, icon: Icon, description }) => {
+const StatCounter = ({ value, label, suffix, delay, icon: Icon, description }: any) => {
   const [count, setCount] = useState(0);
-  const countRef = useRef(null);
+  const countRef = useRef<any>(null);
   const inView = useInView(countRef, { once: true, margin: "50px" });
 
   useEffect(() => {
     if (inView) {
-      let startTime;
-      const animate = (timestamp) => {
-        if (!startTime) startTime = timestamp;
-        const progress = Math.min((timestamp - startTime) / 2000, 1);
+      let startTime: number | undefined;
+      const animate = (timestamp: any) => {
+        if (!startTime!) startTime = timestamp;
+        const progress = Math.min((timestamp - startTime!) / 2000, 1);
         const easedProgress = 1 - Math.pow(1 - progress, 4);
         setCount(Math.floor(easedProgress * value));
 
@@ -226,7 +226,7 @@ const InteractiveBackground = () => {
     checkScreenSize();
     window.addEventListener('resize', checkScreenSize);
 
-    const handleMouseMove = (e) => {
+    const handleMouseMove = (e: any) => {
       setMousePos({ x: e.clientX, y: e.clientY });
     };
 
@@ -293,8 +293,8 @@ const InteractiveBackground = () => {
 };
 
 // --- Enhanced Service Card with Fixed Hover ---
-const ServiceCard = ({ service, index }) => {
-  const SIcon = iconMap[service.icon] || Home;
+const ServiceCard = ({ service, index }: any) => {
+  const SIcon = (iconMap as any)[service.icon] || Home;
   const [isHovered, setIsHovered] = useState(false);
 
   return (
@@ -312,7 +312,7 @@ const ServiceCard = ({ service, index }) => {
           {/* Image Container - Fixed aspect ratio */}
           <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-lg transition-all duration-700 group-hover:shadow-2xl">
             <Image
-              src={imageMap[service.title] || roofingImg}
+              src={(imageMap as any)[service.title] || roofingImg}
               alt={service.title}
               fill
               quality={100}
@@ -622,9 +622,9 @@ const StatsSection = () => {
 };
 
 export default function ServicesPage() {
-  const services = (servicesData?.services || []).map(service => ({
+  const services = (servicesData?.services || []).map((service: any) => ({
     ...service,
-    image: imageMap[service.title] || roofingImg
+    image: (imageMap as any)[service.title] || roofingImg
   }));
 
   return (

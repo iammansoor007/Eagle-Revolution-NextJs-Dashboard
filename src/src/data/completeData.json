@@ -62,7 +62,19 @@
       {
         "label": "About",
         "href": "/about",
-        "icon": "Users"
+        "icon": "Users",
+        "subLinks": [
+          {
+            "label": "Meet The Team",
+            "href": "/about/team",
+            "icon": "Users"
+          },
+          {
+            "label": "Careers",
+            "href": "/about/careers",
+            "icon": "Users"
+          }
+        ]
       },
       {
         "label": "Gallery",

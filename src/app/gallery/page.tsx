@@ -5,18 +5,34 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 
 // Import images directly - NOT wrapped in objects
-import commercialroof from "../../assets/COMMERCIAL ROOFS-20260414T184732Z-3-001/COMMERCIAL ROOFS/croof2.jpg";
-import decks from "../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck12.jpg";
-import deck3 from "../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck5.jpg";
-import deck2 from "../../assets/DECKS-20260414T184734Z-3-001/DECKS/deck11.jpg";
+import commercialroof from '../../assets/commercial-tpo.png';
+import decks from '../../assets/outdoor-sitting-desk.png';
+import deck3 from '../../assets/outdoor-sitting-desk.png';
+import deck2 from '../../assets/outdoor-sitting-desk.png';
 import door from "../../assets/DOORS-20260414T184740Z-3-001/DOORS/DOOR1.jpg";
-import residental1 from "../../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof4 - Copy (2).png";
-import residental2 from "../../assets/RESIDENTIAL ROOFS-20260414T184752Z-3-001/RESIDENTIAL ROOFS/roof9.jpg";
-import siding from "../../assets/SIDING-20260415T110420Z-3-001/SIDING/siding5.jpg";
-import windowImg from "../../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows10.jpg";
-import gutter from '../../assets/gutterinstallation.jpg';
-import pvc from "../../assets/pvcdecks.jpg";
-import window2 from "../../assets/WINDOWS-20260414T184759Z-3-001/WINDOWS/windows2.jpg";
+import residental1 from '../../assets/roof1.jpg.jpeg';
+import residental2 from '../../assets/roof1.jpg.jpeg';
+import siding from '../../assets/siding5.jpg.jpeg';
+import windowImg from '../../assets/window5.jpeg';
+import gutter from '../../assets/gutterinstallation.jpg.jpeg';
+import pvc from '../../assets/pvcdecks.jpg.jpeg';
+import window2 from '../../assets/window5.jpeg';
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // ============================================================================
 // PROJECT DATA - Mapped to your services
@@ -259,8 +275,8 @@ const Filter = ({
                         key={category}
                         onClick={() => onSelect(category)}
                         className={`relative px-2 xs:px-2.5 sm:px-4 py-1 xs:py-1.5 sm:py-2 text-[9px] xs:text-[10px] sm:text-xs font-medium transition-all duration-200 ${activeCategory === category
-                                ? "text-primary"
-                                : "text-muted-foreground hover:text-foreground"
+                            ? "text-primary"
+                            : "text-muted-foreground hover:text-foreground"
                             }`}
                     >
                         <span className="flex items-center gap-0.5 xs:gap-1">
@@ -618,8 +634,8 @@ export default function GalleryPage() {
             {/* Filter Bar - Fixed sticky behavior */}
             <div
                 className={`transition-all duration-300 ${isFilterSticky
-                        ? 'sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm'
-                        : 'relative z-30 bg-background border-b border-border'
+                    ? 'sticky top-0 z-40 bg-background/95 backdrop-blur-xl border-b border-border shadow-sm'
+                    : 'relative z-30 bg-background border-b border-border'
                     }`}
             >
                 <div className="py-2 xs:py-2.5 sm:py-3 px-2 xs:px-3 sm:px-4">

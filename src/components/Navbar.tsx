@@ -161,19 +161,55 @@ const Navbar = () => {
               </div>
 
               <div className="flex items-center space-x-1 ml-2">
-                {companyLinks.slice(1).map((link: any) => (
-                  <Link
-                    key={link.label}
-                    href={link.href}
-                    onClick={handleLinkClick}
-                    className={`flex items-center space-x-2 px-4 py-2.5 transition-all duration-300 font-bold rounded-xl relative group ${scrolled ? "text-black hover:text-primary" : "text-black hover:text-primary"
-                      }`}
-                  >
-                    <Icon name={link.icon} className="h-4 w-4" />
-                    <span>{link.label}</span>
-                    <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-3/4 transition-all duration-500" />
-                  </Link>
-                ))}
+                {companyLinks.slice(1).map((link: any) => {
+                  if (link.subLinks) {
+                    return (
+                      <div key={link.label} className="relative group">
+                        <Link
+                          href={link.href}
+                          onClick={handleLinkClick}
+                          className={`flex items-center space-x-2 px-4 py-2.5 transition-all duration-300 font-bold rounded-xl relative group ${scrolled ? "text-black hover:text-primary" : "text-black hover:text-primary"
+                            }`}
+                        >
+                          <Icon name={link.icon} className="h-4 w-4" />
+                          <span>{link.label}</span>
+                          <Icon name="ChevronDown" className="h-3 w-3 ml-1 transition-transform group-hover:rotate-180" />
+                          <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-3/4 transition-all duration-500" />
+                        </Link>
+
+                        <div className="absolute left-0 top-full w-48 bg-white rounded-xl shadow-lg border border-border opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all duration-300 transform origin-top-left -translate-y-2 group-hover:translate-y-0" style={{ zIndex: 1000 }}>
+                          <div className="py-2">
+                            {link.subLinks.map((subLink: any) => (
+                              <Link
+                                key={subLink.label}
+                                href={subLink.href}
+                                className="flex items-center space-x-2 px-4 py-2 text-sm font-bold text-foreground hover:text-primary hover:bg-primary/5 transition-colors"
+                                onClick={handleLinkClick}
+                              >
+                                {subLink.icon && <Icon name={subLink.icon} className="h-4 w-4" />}
+                                <span>{subLink.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  }
+
+                  return (
+                    <Link
+                      key={link.label}
+                      href={link.href}
+                      onClick={handleLinkClick}
+                      className={`flex items-center space-x-2 px-4 py-2.5 transition-all duration-300 font-bold rounded-xl relative group ${scrolled ? "text-black hover:text-primary" : "text-black hover:text-primary"
+                        }`}
+                    >
+                      <Icon name={link.icon} className="h-4 w-4" />
+                      <span>{link.label}</span>
+                      <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-3/4 transition-all duration-500" />
+                    </Link>
+                  );
+                })}
               </div>
 
             </div>
@@ -258,14 +294,31 @@ const Navbar = () => {
                   <h3 className="text-primary font-bold uppercase tracking-widest text-xs mb-4">Quick Links</h3>
                   <div className="grid gap-2">
                     {companyLinks.map((link: any) => (
-                      <Link
-                        key={link.label}
-                        href={link.href}
-                        onClick={handleLinkClick}
-                        className="flex items-center space-x-3 p-3 font-bold text-foreground hover:text-primary"
-                      >
-                        <span>{link.label}</span>
-                      </Link>
+                      <div key={link.label} className="flex flex-col">
+                        <Link
+                          href={link.href}
+                          onClick={handleLinkClick}
+                          className="flex items-center space-x-3 p-3 font-bold text-foreground hover:text-primary"
+                        >
+                          <Icon name={link.icon} className="h-4 w-4" />
+                          <span>{link.label}</span>
+                        </Link>
+                        {link.subLinks && (
+                          <div className="pl-6 flex flex-col space-y-1 mt-1 border-l-2 border-border/50 ml-5">
+                            {link.subLinks.map((subLink: any) => (
+                              <Link
+                                key={subLink.label}
+                                href={subLink.href}
+                                onClick={handleLinkClick}
+                                className="flex items-center space-x-2 p-2 text-sm font-bold text-muted-foreground hover:text-primary"
+                              >
+                                {subLink.icon && <Icon name={subLink.icon} className="h-4 w-4" />}
+                                <span>{subLink.label}</span>
+                              </Link>
+                            ))}
+                          </div>
+                        )}
+                      </div>
                     ))}
                   </div>
                 </div>
