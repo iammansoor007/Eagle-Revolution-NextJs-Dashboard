@@ -187,28 +187,7 @@ const MarqueeItem = ({ project }: { project: Project }) => {
                       {project.architect || "Eagle Revolution"}
                     </p>
                   </div>
-                  <motion.button
-                    className="px-1.5 sm:px-2 py-0.5 sm:py-1 bg-primary/40 backdrop-blur-sm rounded-lg text-white text-[8px] sm:text-[10px] font-medium flex items-center gap-0.5 sm:gap-1 hover:bg-primary/60 transition-colors border border-white/30"
-                    whileHover={{ x: 3 }}
-                    onClick={(e) => {
-                      e.stopPropagation();
-                    }}
-                  >
-                    View
-                    <svg
-                      className="w-2 h-2 sm:w-2.5 sm:h-2.5 md:w-3 md:h-3"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      stroke="currentColor"
-                      strokeWidth="2"
-                    >
-                      <path
-                        d="M5 12h14M12 5l7 7-7 7"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      />
-                    </svg>
-                  </motion.button>
+
                 </div>
               </motion.div>
             )}
