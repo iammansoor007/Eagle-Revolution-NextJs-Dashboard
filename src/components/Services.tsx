@@ -170,8 +170,8 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
         className="absolute inset-0 rounded-2xl"
         animate={{
           boxShadow: isHovered
-            ? 'inset 0 0 0 2px hsl(var(--primary)/0.15), inset 0 0 20px hsl(var(--primary)/0.1)'
-            : 'inset 0 0 0 0px hsl(var(--primary)/0)'
+            ? 'inset 0 0 0 2px rgba(36, 48, 210, 0.15), inset 0 0 20px rgba(36, 48, 210, 0.1)'
+            : 'inset 0 0 0 0px rgba(36, 48, 210, 0)'
         }}
         transition={{ duration: 0.4 }}
       />

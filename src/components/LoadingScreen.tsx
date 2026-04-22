@@ -139,7 +139,7 @@ const PremiumLoader = ({ onComplete }: LoaderProps) => {
         {phase === 1 && <SimpleDark key="dark" />}
         {phase === 2 && <RoofDraw key="roof" />}
         {phase === 3 && <LogoText key="logo" />}
-        {phase === 4 && <Ready key="ready" onComplete={() => setPhase(4)} />}
+        {phase === 4 && <Ready key="ready" onComplete={onComplete} />}
       </AnimatePresence>
     </motion.div>
   );

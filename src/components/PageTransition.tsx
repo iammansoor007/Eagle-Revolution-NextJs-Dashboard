@@ -10,49 +10,52 @@ export default function PageTransition({ children }: { children: React.ReactNode
   const { hasLoaded } = useGlobalLoading();
   const initialPath = useRef(pathname);
   const [hasNavigated, setHasNavigated] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
 
-  // Use useEffect for state updates to avoid render-phase side effects
   useEffect(() => {
     if (pathname !== initialPath.current) {
       setHasNavigated(true);
+      setIsTransitioning(true);
+      
+      // Reset transition state after shutters should have cleared
+      const timer = setTimeout(() => setIsTransitioning(false), 800);
+      return () => clearTimeout(timer);
     }
   }, [pathname]);
 
   const shouldPlayShutters = hasLoaded && hasNavigated;
 
   return (
-    <AnimatePresence mode="wait">
-      <motion.div 
-        key={pathname} 
-        className="relative min-h-screen"
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        exit={{ opacity: 0 }}
-        transition={{ duration: 0.4, ease: "easeInOut" }}
-      >
-        {/* Content wrapper with its own animation to ensure it shows up */}
-        <motion.div
-          initial={{ opacity: 0, y: 5 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.1 }}
+    <div className="relative min-h-screen">
+      <AnimatePresence mode="popLayout">
+        <motion.div 
+          key={pathname} 
+          className="relative w-full"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
         >
           {children}
         </motion.div>
+      </AnimatePresence>
 
-        {shouldPlayShutters && (
+      <AnimatePresence>
+        {shouldPlayShutters && isTransitioning && (
           <>
-            {/* Top Shutter - uses fixed height and robust exit animation */}
+            {/* Top Shutter */}
             <motion.div
               className="fixed inset-0 bg-primary z-[9999] pointer-events-none"
-              initial={{ translateY: "0%" }}
-              animate={{ translateY: "-100%" }}
+              initial={{ translateY: "100%" }}
+              animate={{ translateY: ["100%", "0%", "-100%"] }}
               transition={{
-                duration: 0.6,
-                ease: [0.76, 0, 0.24, 1],
+                duration: 0.8,
+                times: [0, 0.5, 1],
+                ease: "easeInOut"
               }}
             >
               <div className="absolute inset-0 flex items-center justify-center">
-                <span className="text-white text-xl sm:text-2xl md:text-3xl font-black tracking-widest uppercase text-center px-4 drop-shadow-lg">
+                <span className="text-white text-2xl md:text-4xl font-black tracking-widest uppercase px-4">
                   Eagle Revolution
                 </span>
               </div>
@@ -61,17 +64,18 @@ export default function PageTransition({ children }: { children: React.ReactNode
             {/* Bottom Shutter */}
             <motion.div
               className="fixed inset-0 bg-secondary z-[9998] pointer-events-none"
-              initial={{ translateY: "0%" }}
-              animate={{ translateY: "100%" }}
+              initial={{ translateY: "100%" }}
+              animate={{ translateY: ["100%", "0%", "100%"] }}
               transition={{
-                duration: 0.6,
-                ease: [0.76, 0, 0.24, 1],
+                duration: 0.8,
+                times: [0, 0.5, 1],
+                ease: "easeInOut",
                 delay: 0.05
               }}
             />
           </>
         )}
-      </motion.div>
-    </AnimatePresence>
+      </AnimatePresence>
+    </div>
   );
 }

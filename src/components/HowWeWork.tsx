@@ -287,9 +287,9 @@ const FeatureCard = ({ feature, index }: { feature: any; index: number }) => {
                     <div className="relative mb-6">
                         <div className="relative w-20 h-20">
                             <motion.div
-                                className="absolute inset-0 border border-primary/20"
+                                className="absolute inset-0 border"
                                 animate={{
-                                    borderColor: isHovered ? 'hsl(var(--primary))' : 'hsl(var(--primary)/0.2)',
+                                    borderColor: isHovered ? 'hsl(235, 70%, 48%)' : 'rgba(36, 48, 210, 0.2)',
                                     scale: isHovered ? 1.05 : 1
                                 }}
                                 transition={{ duration: 0.3 }}

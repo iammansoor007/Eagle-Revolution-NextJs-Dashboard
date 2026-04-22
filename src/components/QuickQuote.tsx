@@ -249,7 +249,7 @@ ${formData.message}
                         key={i}
                         className="absolute inset-0 rounded-full"
                         style={{
-                            background: `radial-gradient(circle, hsl(var(--primary)/${0.3 - i * 0.1}) 0%, transparent 70%)`,
+                            background: `radial-gradient(circle, rgba(36, 48, 210, ${0.3 - i * 0.1}) 0%, transparent 70%)`,
                         }}
                         animate={{
                             scale: [1, 1.8, 1],
@@ -296,8 +296,8 @@ ${formData.message}
                     className="relative w-16 h-16 md:w-20 md:h-20 rounded-full bg-gradient-to-br from-primary via-primary to-primary/90 shadow-2xl flex items-center justify-center cursor-pointer border-2 border-white/30"
                     animate={{
                         boxShadow: isHovered
-                            ? '0 30px 50px -15px hsl(var(--primary)/0.7), 0 0 0 3px rgba(255,255,255,0.4)'
-                            : '0 20px 40px -12px hsl(var(--primary)/0.5)',
+                            ? '0 30px 50px -15px rgba(36, 48, 210, 0.7), 0 0 0 3px rgba(255,255,255,0.4)'
+                            : '0 20px 40px -12px rgba(36, 48, 210, 0.5)',
                         rotate: isHovered ? [0, -5, 5, -5, 5, 0] : 0
                     }}
                     transition={{
@@ -528,9 +528,9 @@ ${formData.message}
                                                             animate={i === step ? {
                                                                 scale: [1, 1.1, 1],
                                                                 boxShadow: [
-                                                                    '0 4px 6px -1px hsl(var(--primary)/0.1)',
-                                                                    '0 10px 15px -3px hsl(var(--primary)/0.3)',
-                                                                    '0 4px 6px -1px hsl(var(--primary)/0.1)'
+                                                                    '0 4px 6px -1px rgba(36, 48, 210, 0.1)',
+                                                                    '0 10px 15px -3px rgba(36, 48, 210, 0.3)',
+                                                                    '0 4px 6px -1px rgba(36, 48, 210, 0.1)'
                                                                 ]
                                                             } : {}}
                                                             transition={{

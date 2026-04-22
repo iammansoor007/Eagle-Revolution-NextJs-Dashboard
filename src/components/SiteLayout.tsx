@@ -14,7 +14,16 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
   useEffect(() => {
     setMounted(true);
-  }, []);
+    
+    // Failsafe: Ensure the site is visible after a maximum delay
+    if (!hasLoaded) {
+      const timer = setTimeout(() => {
+        console.log("Loading failsafe triggered");
+        setHasLoaded(true);
+      }, 5000);
+      return () => clearTimeout(timer);
+    }
+  }, [hasLoaded, setHasLoaded]);
 
   const isSplashPhase = !hasLoaded;
 
@@ -42,39 +51,37 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   };
 
   return (
-    <>
+    <div className="relative min-h-screen bg-background">
       <AnimatePresence>
         {isSplashPhase && mounted && (
           <LoadingScreen onComplete={() => setHasLoaded(true)} key="loader" />
         )}
       </AnimatePresence>
 
-      {/* 
-        We use hasLoaded to show content. 
-        Added a fallback background to prevent white screen flash during state transitions.
-      */}
-      <div className={`relative min-h-screen transition-opacity duration-500 ${hasLoaded ? "opacity-100" : "opacity-0"}`}>
-        {hasLoaded && (
-          <motion.div 
-            className="relative z-10 flex flex-col min-h-screen"
-            variants={containerVariants}
-            initial="hidden"
-            animate="visible"
-          >
-            <motion.div variants={itemVariants} className="z-50">
-              <Navbar />
-            </motion.div>
-            
-            <motion.main variants={itemVariants} className="flex-grow">
-              <PageTransition>{children}</PageTransition>
-            </motion.main>
-            
-            <motion.div variants={itemVariants}>
-              <Footer />
-            </motion.div>
+      <div className="relative min-h-screen">
+        {/* 
+          Always render the structure but only show when loaded.
+          This prevents the "blank screen" by keeping the layout mounted.
+        */}
+        <motion.div 
+          className="relative z-10 flex flex-col min-h-screen"
+          variants={containerVariants}
+          initial="hidden"
+          animate={hasLoaded ? "visible" : "hidden"}
+        >
+          <motion.div variants={itemVariants} className="z-50">
+            <Navbar />
           </motion.div>
-        )}
+          
+          <motion.main variants={itemVariants} className="flex-grow">
+            <PageTransition>{children}</PageTransition>
+          </motion.main>
+          
+          <motion.div variants={itemVariants}>
+            <Footer />
+          </motion.div>
+        </motion.div>
       </div>
-    </>
+    </div>
   );
 }
