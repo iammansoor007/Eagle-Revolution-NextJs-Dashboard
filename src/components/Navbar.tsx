@@ -56,9 +56,16 @@ const Navbar = () => {
   };
 
   const handleLinkClick = () => {
+    // Reset all menu states
     setActiveMegaMenu(null);
     setIsMenuOpen(false);
     setHoveredService(null);
+    
+    // In production, we want to ensure any active mega menus are fully hidden
+    // before the page transition shutters cover the screen
+    if (typeof window !== 'undefined') {
+      window.scrollTo({ top: 0, behavior: 'instant' });
+    }
   };
 
   return (
