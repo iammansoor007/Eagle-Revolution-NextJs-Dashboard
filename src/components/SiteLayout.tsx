@@ -18,7 +18,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
     // Failsafe: Ensure the site is visible after a maximum delay
     if (!hasLoaded) {
       const timer = setTimeout(() => {
-        console.log("Loading failsafe triggered");
         setHasLoaded(true);
       }, 5000);
       return () => clearTimeout(timer);
@@ -26,29 +25,6 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   }, [hasLoaded, setHasLoaded]);
 
   const isSplashPhase = !hasLoaded;
-
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        staggerChildren: 0.1,
-        delayChildren: 0.05
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 10 },
-    visible: { 
-      opacity: 1, 
-      y: 0,
-      transition: { 
-        duration: 0.4, 
-        ease: easeOut 
-      }
-    }
-  };
 
   return (
     <div className="relative min-h-screen bg-background">
@@ -60,27 +36,22 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
 
       <div className="relative min-h-screen">
         {/* 
-          Always render the structure but only show when loaded.
-          This prevents the "blank screen" by keeping the layout mounted.
+          Keep the layout structure static and only animate children.
+          This prevents the Navbar/Footer from flashing during transitions.
         */}
-        <motion.div 
-          className="relative z-10 flex flex-col min-h-screen"
-          variants={containerVariants}
-          initial="hidden"
-          animate={hasLoaded ? "visible" : "hidden"}
-        >
-          <motion.div variants={itemVariants} className="z-50">
+        <div className={`relative z-10 flex flex-col min-h-screen transition-opacity duration-700 ${hasLoaded ? "opacity-100" : "opacity-0"}`}>
+          <div className="z-50">
             <Navbar />
-          </motion.div>
+          </div>
           
-          <motion.main variants={itemVariants} className="flex-grow">
+          <main className="flex-grow">
             <PageTransition>{children}</PageTransition>
-          </motion.main>
+          </main>
           
-          <motion.div variants={itemVariants}>
+          <div>
             <Footer />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </div>
     </div>
   );
