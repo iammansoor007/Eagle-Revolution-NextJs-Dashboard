@@ -17,6 +17,7 @@ const Navbar = () => {
   const [scrolled, setScrolled] = useState(false);
   const [isHoveringMegaMenu, setIsHoveringMegaMenu] = useState(false);
   const [hoveredService, setHoveredService] = useState<string | null>(null);
+  const [expandedMobileLink, setExpandedMobileLink] = useState<string | null>(null);
 
   const servicesButtonRef = useRef<HTMLButtonElement>(null);
   const megaMenuRef = useRef<HTMLDivElement>(null);
@@ -60,7 +61,8 @@ const Navbar = () => {
     setActiveMegaMenu(null);
     setIsMenuOpen(false);
     setHoveredService(null);
-    
+    setExpandedMobileLink(null);
+
     // In production, we want to ensure any active mega menus are fully hidden
     // before the page transition shutters cover the screen
     if (typeof window !== 'undefined') {
@@ -289,7 +291,7 @@ const Navbar = () => {
                         className="flex items-center space-x-4 p-3 rounded-xl border border-border active:bg-primary/5"
                       >
                         <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
-                          <Icon name="Wrench" className="h-5 w-5" />
+                          <Icon name={service.icon} className="h-5 w-5" />
                         </div>
                         <span className="font-bold text-foreground">{service.title}</span>
                       </Link>
@@ -300,44 +302,75 @@ const Navbar = () => {
                 <div>
                   <h3 className="text-primary font-bold uppercase tracking-widest text-xs mb-4">Quick Links</h3>
                   <div className="grid gap-2">
-                    {companyLinks.map((link: any) => (
-                      <div key={link.label} className="flex flex-col">
-                        <Link
-                          href={link.href}
-                          onClick={handleLinkClick}
-                          className="flex items-center space-x-3 p-3 font-bold text-foreground hover:text-primary"
-                        >
-                          <Icon name={link.icon} className="h-4 w-4" />
-                          <span>{link.label}</span>
-                        </Link>
-                        {link.subLinks && (
-                          <div className="pl-6 flex flex-col space-y-1 mt-1 border-l-2 border-border/50 ml-5">
-                            {link.subLinks.map((subLink: any) => (
-                              <Link
-                                key={subLink.label}
-                                href={subLink.href}
-                                onClick={handleLinkClick}
-                                className="flex items-center space-x-2 p-2 text-sm font-bold text-muted-foreground hover:text-primary"
+                    {companyLinks.map((link: any) => {
+                      const hasSubLinks = link.subLinks && link.subLinks.length > 0;
+                      const isExpanded = expandedMobileLink === link.label;
+
+                      return (
+                        <div key={link.label} className="flex flex-col">
+                          <div className="flex items-center justify-between p-3">
+                            <Link
+                              href={link.href}
+                              onClick={handleLinkClick}
+                              className="flex items-center space-x-3 font-bold text-foreground hover:text-primary flex-1"
+                            >
+                              <Icon name={link.icon} className="h-4 w-4" />
+                              <span>{link.label}</span>
+                            </Link>
+                            {hasSubLinks && (
+                              <button
+                                onClick={() => setExpandedMobileLink(isExpanded ? null : link.label)}
+                                className="p-2 text-muted-foreground hover:text-primary transition-colors"
                               >
-                                {subLink.icon && <Icon name={subLink.icon} className="h-4 w-4" />}
-                                <span>{subLink.label}</span>
-                              </Link>
-                            ))}
+                                <motion.div
+                                  animate={{ rotate: isExpanded ? 180 : 0 }}
+                                  transition={{ duration: 0.2 }}
+                                >
+                                  <Icon name="ChevronDown" className="h-4 w-4" />
+                                </motion.div>
+                              </button>
+                            )}
                           </div>
-                        )}
-                      </div>
-                    ))}
+                          
+                          <AnimatePresence>
+                            {hasSubLinks && isExpanded && (
+                              <motion.div
+                                initial={{ height: 0, opacity: 0 }}
+                                animate={{ height: "auto", opacity: 1 }}
+                                exit={{ height: 0, opacity: 0 }}
+                                transition={{ duration: 0.3, ease: "easeInOut" }}
+                                className="overflow-hidden"
+                              >
+                                <div className="pl-6 flex flex-col space-y-1 mb-2 border-l-2 border-primary/20 ml-5">
+                                  {link.subLinks.map((subLink: any) => (
+                                    <Link
+                                      key={subLink.label}
+                                      href={subLink.href}
+                                      onClick={handleLinkClick}
+                                      className="flex items-center space-x-3 p-2.5 text-sm font-bold text-muted-foreground hover:text-primary transition-colors rounded-lg hover:bg-primary/5"
+                                    >
+                                      {subLink.icon && <Icon name={subLink.icon} className="h-4 w-4" />}
+                                      <span>{subLink.label}</span>
+                                    </Link>
+                                  ))}
+                                </div>
+                              </motion.div>
+                            )}
+                          </AnimatePresence>
+                        </div>
+                      );
+                    })}
                   </div>
                 </div>
               </div>
 
               <div className="p-6 bg-muted/30">
                 <Link
-                  href="#quote"
+                  href="/contact"
                   onClick={handleLinkClick}
                   className="block w-full py-4 bg-primary text-white font-bold rounded-xl text-center shadow-lg shadow-primary/20"
                 >
-                  Get Preapproved Now
+                  Book Now
                 </Link>
               </div>
             </motion.div>
