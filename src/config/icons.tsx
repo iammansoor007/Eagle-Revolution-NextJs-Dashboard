@@ -7,7 +7,8 @@ import {
     FileText, Image, CreditCard, DollarSign, ThumbsUp, User, Send,
     ClipboardCheck, TreePine, Droplets, Hammer, Sun, CloudRain,
     Layout, Square, Building, Plus, Minus, Search, Infinity,
-    Volume2, VolumeX, Play, Pause, ChevronUp, Quote, BadgeCheck as Verified
+    Volume2, VolumeX, Play, Pause, ChevronUp, Quote,
+    CheckCircle, Gem, Globe, Scale, ShieldCheck, Target, TrendingUp, Zap, BadgeCheck
 } from 'lucide-react';
 
 // For Google, we can use a custom icon
@@ -28,7 +29,12 @@ export const iconMap: Record<string, any> = {
     FileText, Image, CreditCard, DollarSign, ThumbsUp, User, Send,
     ClipboardCheck, TreePine, Droplets, Hammer, Sun, CloudRain,
     Layout, Square, Building, Plus, Minus, Search, Infinity,
-    Volume2, VolumeX, Play, Pause, ChevronUp, Google, Quote, Verified
+    Volume2, VolumeX, Play, Pause, ChevronUp, Google, Quote,
+    CheckCircle, Gem, Globe, Scale, ShieldCheck, Target, TrendingUp, Zap, BadgeCheck,
+    // Aliases for alternate naming used in data files
+    Warranty: Shield,
+    LinkedIn: Linkedin,
+    Verified: BadgeCheck,
 };
 
 // Helper component to render icons - Fixed to properly render React components

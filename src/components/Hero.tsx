@@ -112,10 +112,10 @@ const Hero = () => {
               </motion.div>
 
               <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold text-white mb-6 leading-[1.2] tracking-tight">
-                {headlines.map((line: string, i: number) => (
+                {headlines.map((line: { text: string; highlight: boolean }, i: number) => (
                   <motion.span
                     key={i}
-                    className="block"
+                    className={`block${line.highlight ? " text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80" : ""}`}
                     initial={{ opacity: 0, y: 40 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{
@@ -123,7 +123,7 @@ const Hero = () => {
                       delay: 0.2 + 0.15 * i,
                     }}
                   >
-                    {line}
+                    {line.text}
                   </motion.span>
                 ))}
               </h1>

@@ -331,16 +331,9 @@ const SocialLinks = () => {
   const { social } = footer;
 
   // Map platform names to ensure proper icon mapping
-  const getIconName = (platform: string) => {
-    const iconMap: { [key: string]: string } = {
-      'Facebook': 'Facebook',
-      'Instagram': 'Instagram',
-      'LinkedIn': 'LinkedIn',
-      'X (Twitter)': 'Twitter',
-      'Twitter': 'Twitter',
-      'Google': 'Google'
-    };
-    return iconMap[platform] || platform;
+  const getIconName = (item: any) => {
+    // Use the icon field from data if present, otherwise fall back to platform name
+    return item.icon || item.platform;
   };
 
   return (
@@ -356,7 +349,7 @@ const SocialLinks = () => {
           className="relative w-10 h-10 rounded-full bg-muted border border-border flex items-center justify-center text-muted-foreground hover:text-primary hover:bg-primary/5 hover:border-primary/20 transition-all duration-300 group"
           aria-label={socialItem.platform}
         >
-          <Icon name={getIconName(socialItem.platform)} className="w-5 h-5" />
+          <Icon name={getIconName(socialItem)} className="w-5 h-5" />
           <motion.div
             className="absolute inset-0 rounded-full bg-primary/20 blur-lg"
             initial={{ opacity: 0, scale: 0.8 }}

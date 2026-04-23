@@ -129,8 +129,14 @@
   "hero": {
     "badge": "Veteran Owned & Operated",
     "headlines": [
-      "Soaring Beyond",
-      "Expectations"
+      {
+        "text": "Soaring Beyond",
+        "highlight": false
+      },
+      {
+        "text": "Expectations",
+        "highlight": false
+      }
     ],
     "description": "One of the Top Window, Deck, and Roofing Companies in St. Louis. Veteran owned and operated with easy financing options and long-lasting transferable warranties.",
     "buttons": [
@@ -368,6 +374,345 @@
       }
     }
   },
+  "team": {
+    "section": {
+      "badge": "Our Leadership",
+      "headline": "Guiding with vision & integrity",
+      "description": "Experienced leadership committed to excellence in every project, partnership, and promise."
+    },
+    "members": [
+      {
+        "id": "brandon-anderson",
+        "name": "Brandon Anderson",
+        "role": "Founder & CEO",
+        "image": "BrandonAnderson",
+        "badge1": "FOUNDER & CEO",
+        "badge2": "VISION • INTEGRITY",
+        "description": [
+          "Originally from Nashville, Tennessee, Brandon was raised in Southern Illinois. Growing up in a difficult home environment, he faced challenges that forced him to mature quickly. Later, his grandparents stepped in to raise him and his two brothers, teaching him what it truly means to show up for family and build something stronger than what you were given.",
+          "Brandon carried those lessons into his service in the United States Army, where he developed discipline, resilience, and the ability to perform under pressure. The military reinforced a mindset that still defines him today. No excuses. No shortcuts. Just execution.",
+          "After his service, he pursued a career in high-performance environments, earning multiple promotions and working with top-tier organizations. At the center of Brandon's life is his family—his devoted wife Cassandra and their children. Everything he builds is rooted in creating stability, opportunity, and a legacy reflecting strength, integrity, and purpose."
+        ]
+      },
+      {
+        "id": "chrissy-long",
+        "name": "Chrissy Long",
+        "role": "Executive Assistant",
+        "image": "ChrissyLong",
+        "badge1": "EXECUTIVE ASSISTANT",
+        "badge2": "RELIABLE • PURPOSEFUL",
+        "description": [
+          "Say hello to the newest powerhouse at Eagle Revolution- our amazing new executive assistant, Chrissy Long! She is the backbone that ensures nothing falls through the cracks - because every great company needs a reliable teammate, and every great customer deserves amazing work!",
+          "Here is a little bit about Chrissy and what she has to say about working at Eagle Revolution:",
+          "\" I have found my home, a place with genuine people who really care about their customers and employees, which today is sometimes rare. I truly believe my calling in life is to help others, and this job is exactly that, purposeful and fulfilling. It also gives me the opportunity to live a better-tuned life, take care of my daughters, and still have time for the hobbies I enjoy. When I'm not at work; I am either napping, training for a kickboxing match, serving at my local church, or enjoying time with my family. I really love a simplistic, peaceful lifestyle and I hope to bring those attributes into my work life. \""
+        ]
+      },
+      {
+        "id": "austin",
+        "name": "Austin",
+        "role": "Canvas Manager",
+        "image": "Austin",
+        "badge1": "CANVAS MANAGER",
+        "badge2": "GROWTH • MINDFULNESS",
+        "alignRight": true,
+        "description": [
+          "Drumroll, please! 🥁 It's time for you to meet the dream team behind Eagle Revolution!🦅",
+          "First up is our amazing canvas manager, Austin! We are so grateful to have a leader who brings creativity, care, and amazing organization to every project.",
+          "Here's what Austin has to say about working for the company:",
+          "\"As a Canvas Manager at Eagle Revolution, going on 5 months I'm proud and grateful to be part of a team where growth isn't just encouraged-it's built into everything we do. That mindset doesn't stop at work; it flows into how I live. I thrive outdoors; whether I'm at the park with my kids, exploring nature, or enjoying a sporting event. I truly believe connection, movement, and joy go hand in hand. Yoga and mindfulness practices keep me grounded, but I'm always reaching forward, learning, and evolving. At work and in life, I believe growth isn't a destination-it's a daily practice, shaped by purpose, presence and the courage to keep showing up, fully.\"",
+          "Thank you Austin for all you do for the team!"
+        ]
+      },
+      {
+        "id": "brandon-sales",
+        "name": "Brandon",
+        "role": "Construction Sales Professional",
+        "image": "BrandonSales",
+        "badge1": "SALES PROFESSIONAL",
+        "badge2": "KNOWLEDGE • HONESTY",
+        "description": [
+          "Brandon is a construction sales professional with over 12 years of experience specializing in windows, doors, and roofing. He's known for his straightforward approach, strong product knowledge, and commitment to helping customers find the right solutions for their homes.",
+          "As an Illinois resident, Brandon takes pride in serving his local community with honesty and dependable service. Outside of work, Brandon is a dedicated softball dad and enjoys spending his free time on the golf course."
+        ]
+      }
+    ]
+  },
+  "aboutPage": {
+    "hero": {
+      "headline": {
+        "line1": "SOARING",
+        "line2": "BEYOND",
+        "line3": "EXPECTATIONS."
+      },
+      "description": "Born in O'Fallon, Missouri. Built on military precision. Driven by integrity.",
+      "cta": "Contact Now",
+      "phone": "636-449-9714",
+      "phoneLabel": "Call for Free Estimate",
+      "trustLabel": "Trusted by 500+ Homeowners",
+      "stats": [
+        {
+          "label": "Veteran Owned",
+          "val": "USA",
+          "icon": "ShieldCheck"
+        },
+        {
+          "label": "Quality Guarantee",
+          "val": "Lifetime",
+          "icon": "Zap"
+        },
+        {
+          "label": "Support",
+          "val": "24/7",
+          "icon": "Globe"
+        }
+      ]
+    },
+    "recognition": [
+      "ProVia Certified",
+      "IKO Pro",
+      "Shingle Master",
+      "TimberTech",
+      "Veteran Owned",
+      "Contractor Excellence",
+      "Wolf Home Products Certified"
+    ],
+    "story": {
+      "badge": "Our Story",
+      "headline": "Soaring Beyond Expectations",
+      "highlight": "Expectations",
+      "description": "Born in O'Fallon, Missouri. Built on military precision. Driven by integrity.",
+      "portrait": {
+        "badgeLeft": "VETERAN OWNED",
+        "badgeRight": "ProVia • IKO • CertainTeed • Wolf"
+      },
+      "founder": {
+        "name": "Brandon Anderson",
+        "title": "Founder • U.S. Army Veteran • Globally Licensed Combat Sports Official",
+        "quote": "Eagle Revolution was built to be more than just a remodeling company. It was built to lead a movement.",
+        "bio": [
+          "Based in O'Fallon, Missouri, Eagle Revolution was founded by Brandon Anderson, an Army veteran and globally licensed combat sports official who brings discipline, precision, and accountability to every project. With years of leadership experience at some of the largest home improvement companies in North America, Brandon saw firsthand how the industry had shifted away from homeowners and toward profits, leaving people with high prices, poor communication, and broken trust.",
+          "He knew it didn't have to be that way. Eagle Revolution was created to restore what the industry lost—trust, craftsmanship, and doing the job right the first time. Today, we stand as a local company built to compete with the biggest names in the country, not through gimmicks, but through transparency, quality work, and a relentless commitment to our customers.",
+          "Our systems are built for precision, but our strength is our people—driven professionals who take ownership, communicate clearly, and treat every home like their own."
+        ],
+        "secondaryQuote": "This is freedom in construction form—freedom from overpriced corporate contractors, freedom from broken promises, and freedom to expect more from your remodeler.",
+        "footer": "— Brandon Anderson, CEO",
+        "email": "banderson@eaglerevolution.com",
+        "social": {
+          "linkedin": "https://www.linkedin.com/company/eagle-revolution/people/"
+        }
+      }
+    },
+    "stats": {
+      "badge": "Our Impact",
+      "headline": "Trusted by Homeowners Across the Region",
+      "description": "Numbers speak louder than words. Here's what we've achieved together with our valued customers.",
+      "items": [
+        {
+          "value": 50,
+          "label": "Years Combined Experience",
+          "suffix": "+",
+          "icon": "Clock",
+          "description": "Industry expertise across our team"
+        },
+        {
+          "value": 1000,
+          "label": "Homes Transformed",
+          "suffix": "+",
+          "icon": "Home",
+          "description": "Satisfied homeowners"
+        },
+        {
+          "value": 100,
+          "label": "Veteran Owned",
+          "suffix": "%",
+          "icon": "BadgeCheck",
+          "description": "Proudly serving our community"
+        },
+        {
+          "value": 10,
+          "label": "Year Workmanship Guarantee",
+          "suffix": "YR",
+          "icon": "Shield",
+          "description": "Peace of mind guaranteed"
+        }
+      ],
+      "trustBadges": [
+        {
+          "text": "500+ 5-Star Reviews",
+          "icon": "Users"
+        },
+        {
+          "text": "A+ BBB Rating",
+          "icon": "Award"
+        },
+        {
+          "text": "Top Rated Contractor",
+          "icon": "Star"
+        }
+      ]
+    },
+    "mission": {
+      "badge": "Mission",
+      "headline": "Our Mission",
+      "highlight": "Mission",
+      "description": "To revolutionize the remodeling industry by putting people first—restoring trust through transparency, exceptional craftsmanship, and an unwavering commitment to doing what’s right.",
+      "stats": [
+        {
+          "value": "100%",
+          "label": "Customer First"
+        },
+        {
+          "value": "0%",
+          "label": "Hidden Agendas"
+        },
+        {
+          "value": "∞",
+          "label": "Commitment"
+        }
+      ],
+      "principles": [
+        {
+          "title": "Fairness",
+          "desc": "Honest pricing with zero hidden agendas. Every quote is transparent, every invoice is exact—building trust through radical transparency.",
+          "val": "01",
+          "icon": "Scale"
+        },
+        {
+          "title": "Honesty",
+          "desc": "Transparent communication at every milestone. No surprises, no shortcuts—just unwavering integrity that defines our character.",
+          "val": "02",
+          "icon": "Gem"
+        },
+        {
+          "title": "Hard Work",
+          "desc": "Relentless pursuit of perfection until excellence is achieved. We measure success by your satisfaction, not by the clock.",
+          "val": "03",
+          "icon": "Zap"
+        },
+        {
+          "title": "Precision",
+          "desc": "Military-grade accuracy in every detail. From initial measurements to final execution—where craftsmanship meets mathematical certainty.",
+          "val": "04",
+          "icon": "Target"
+        }
+      ]
+    },
+    "capabilities": {
+      "badge": "Eagle Revolution",
+      "headline": "World Class Capabilities",
+      "highlight": "Capabilities",
+      "description": "Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area.",
+      "cta": "View All Services"
+    },
+    "values": {
+      "badge": "Our Core Values",
+      "headline": "Built on Unshakable Principles",
+      "highlight": "Built on",
+      "description": "Six principles that guide every decision, every interaction, and every project we undertake.",
+      "items": [
+        {
+          "title": "Customer First",
+          "description": "Our customers always come first here at Eagle Revolution. We ensure that our customers can have complete confidence in the quality of our work, knowing that we will always act in their best interests and stand behind our products and services with unwavering dedication.",
+          "number": "01",
+          "stat": "500+",
+          "statLabel": "Happy Clients",
+          "icon": "BadgeCheck"
+        },
+        {
+          "title": "Integrity",
+          "description": "In the remodeling industry, integrity means consistently doing what is right, even when no one is watching. We believe in keeping our promises, providing accurate estimates, and delivering on our commitments without cutting corners.",
+          "number": "02",
+          "stat": "0%",
+          "statLabel": "Hidden Fees",
+          "icon": "CheckCircle"
+        },
+        {
+          "title": "Extreme Ownership",
+          "description": "By embracing this mindset, we ensure that we always act in the best interests of our clients, driving continuous improvement and achieving excellence in every project we undertake. We are not perfect by any means, but we are perfect at fixing any mistake along the way.",
+          "number": "03",
+          "stat": "100%",
+          "statLabel": "Accountability",
+          "icon": "Shield"
+        },
+        {
+          "title": "Gratitude",
+          "description": "By expressing gratitude, we build lasting relationships and create a positive impact, ensuring every interaction is rooted in kindness and acknowledgment. We believe that a thankful mindset inspires excellence in service and craftsmanship, making every project a shared celebration.",
+          "number": "04",
+          "stat": "100%",
+          "statLabel": "Grateful",
+          "icon": "Sparkles"
+        },
+        {
+          "title": "Growth",
+          "description": "We believe that growth is essential not only for individual team members but also for the company as a whole. This core value drives us to seek out new learning opportunities, embrace innovation, and stay up-to-date with industry trends and best practices.",
+          "number": "05",
+          "stat": "∞",
+          "statLabel": "Continuous",
+          "icon": "TrendingUp"
+        }
+      ]
+    },
+    "ctaBanner": {
+      "badge": "Get Preapproved",
+      "headline": "Ready to Start Your Revolution?",
+      "highlight": "Revolution?",
+      "description": "Get preapproved in seconds and take the first step toward transforming your home with military precision and unwavering integrity.",
+      "features": [
+        "No Obligation",
+        "Free Estimate",
+        "5 Year Guarantee"
+      ],
+      "primaryCta": "Get Preapproved",
+      "secondaryCta": "Contact Us"
+    }
+  },
+  "careers": {
+    "section": {
+      "badge": "Join Eagle Revolution",
+      "headline": "Construct your future with absolute precision",
+      "description": "We are seeking driven professionals who refuse to take shortcuts. Bring your expertise to a team that values craft, integrity, and long-term growth."
+    },
+    "roles": [
+      {
+        "value": "Project Manager",
+        "label": "Project Manager"
+      },
+      {
+        "value": "Lead Contractor",
+        "label": "Lead Contractor"
+      },
+      {
+        "value": "Sales Representative",
+        "label": "Sales Representative"
+      },
+      {
+        "value": "Roofing/Exterior Specialist",
+        "label": "Roofing & Exterior Specialist"
+      },
+      {
+        "value": "Administrative Support",
+        "label": "Administrative Support"
+      },
+      {
+        "value": "Other",
+        "label": "Other Inquiry"
+      }
+    ],
+    "success": {
+      "title": "Application Submitted!",
+      "description": "Thank you for your interest in joining Eagle Revolution. Our operations team will review your CV and be in touch shortly."
+    },
+    "labels": {
+      "name": "Full Name",
+      "email": "Email Address",
+      "phone": "Phone Number",
+      "role": "Position Applying For",
+      "summary": "Professional Summary",
+      "attachment": "Resume / CV Attachment",
+      "submit": "SUBMIT APPLICATION",
+      "submitting": "SECURELY SENDING..."
+    }
+  },
   "portfolio": {
     "section": {
       "badge": "Our Work",
@@ -600,6 +945,11 @@
       "badge": "Knowledge Base",
       "headline": "Frequently Asked Questions",
       "description": "Answers to common questions about our exterior remodeling services in St. Louis."
+    },
+    "labels": {
+      "noResults": "No questions found matching your criteria.",
+      "clearFilters": "Clear filters",
+      "searchPlaceholder": "Search questions..."
     },
     "categories": [
       {
@@ -1059,10 +1409,38 @@
     "sunday": "Closed"
   },
   "images": {
+    "logo": "/src/assets/eaglelogo.png",
     "hero": "/src/assets/bgfair.jpg",
     "about": "/src/assets/fairabout.png",
     "services": "/src/assets/fairservice.png",
-    "ceo": "/src/assets/eagleowner.jpeg",
+    "ceo": "/src/assets/ownerupdatedimage.jpeg",
+    "contact": {
+      "office": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80",
+      "exterior": "https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+    },
+    "footer": {
+      "bg1": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80",
+      "bg2": "https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80"
+    },
+    "aboutPage": {
+      "hero": "/src/assets/fairabout.png",
+      "pattern": "https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+      "studio": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
+    },
+    "gallery": {
+      "commercialroof": "/src/assets/commercial-tpo.png",
+      "decks": "/src/assets/outdoor-sitting-desk.png",
+      "deck2": "/src/assets/decks2 (2).jpg",
+      "deck3": "/src/assets/decks2 (1).jpg",
+      "door": "/src/assets/DOORS-20260414T184740Z-3-001/DOORS/DOOR1.jpg",
+      "residental1": "/src/assets/roof1.jpg.jpeg",
+      "residental2": "/src/assets/residentalroofing2ndimage.jpg",
+      "siding": "/src/assets/siding5.jpg.jpeg",
+      "windowImg": "/src/assets/window5.jpeg",
+      "gutter": "/src/assets/gutterinstallation.jpg.jpeg",
+      "pvc": "/src/assets/pvcdecks.jpg.jpeg",
+      "window2": "/src/assets/windowimage.jpg"
+    },
     "portfolio": {
       "home1": "/src/assets/portfolio1.png",
       "home2": "/src/assets/portfolio2.jpg",
@@ -1074,6 +1452,28 @@
       "home8": "/src/assets/portfolio2.jpg",
       "home9": "/src/assets/portfolio3.jpg",
       "home10": "/src/assets/portfolio4.jpg"
+    },
+    "team": {
+      "BrandonAnderson": "/src/assets/ownerupdatedimage.jpeg",
+      "ChrissyLong": "/src/assets/Chrissyteam.jpeg",
+      "Austin": "/src/assets/Austinteam.jpeg",
+      "BrandonSales": "/src/assets/allenteam.jpeg",
+      "Pattern": "https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+      "Studio": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
+    },
+    "aboutPage": {
+      "hero": "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070",
+      "pattern": "https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+      "studio": "https://images.unsplash.com/photo-1497366216548-37526070297c?ixlib=rb-4.0.3&auto=format&fit=crop&w=2069&q=80"
+    },
+    "servicesGrid": {
+      "Residential Roofing": "/src/assets/roof1.jpg.jpeg",
+      "Windows & Doors": "/src/assets/window5.jpeg",
+      "Custom Decks": "/src/assets/outdoor-sitting-desk.png",
+      "Commercial Roofing": "/src/assets/commercial-tpo.png",
+      "Siding, Soffit & Fascia": "/src/assets/siding5.jpg.jpeg",
+      "Gutters & Protection": "/src/assets/gutterinstallation.jpg.jpeg",
+      "PVC Decking": "/src/assets/pvcdecks.jpg.jpeg"
     }
   },
   "loader": {
@@ -1147,5 +1547,313 @@
         "icon": "Flag"
       }
     ]
+  },
+  "contactPage": {
+    "header": {
+      "badge": "Contact Us",
+      "headline": "Let's Start a Conversation",
+      "highlight": "Conversation",
+      "description": "Whether you have a question about our services, need a quote, or want to discuss a project, our team is ready to help. Reach out and we'll get back to you within 4-8 hours."
+    },
+    "infoCards": [
+      {
+        "type": "email",
+        "title": "Email Us",
+        "description": "Send us a message and we'll respond within 4-8 hours",
+        "value": "banderson@eaglerevolution.com",
+        "label": "24/7 Support Available",
+        "icon": "Mail"
+      },
+      {
+        "type": "phone",
+        "title": "Call Us",
+        "description": "Speak directly with our team during business hours",
+        "value": "+1 (636) 449-9714",
+        "label": "Mon-Fri: 9am - 6pm CST",
+        "icon": "Phone"
+      },
+      {
+        "type": "location",
+        "title": "Visit Us",
+        "description": "Veteran-owned and operated from the heart of Texas",
+        "value": "O’Fallon, Missouri 63366",
+        "label": "Virtual meetings available",
+        "subLabel": "United States",
+        "icon": "MapPin"
+      }
+    ],
+    "form": {
+      "labels": {
+        "name": "Full name",
+        "email": "Email address",
+        "phone": "Phone number",
+        "subject": "Subject",
+        "message": "How can we help you?",
+        "submit": "Send Message",
+        "submitting": "Sending..."
+      },
+      "footer": {
+        "veteran": "Veteran owned & operated",
+        "confidential": "100% confidential",
+        "response": "Response within 4-8 hours"
+      }
+    },
+    "successModal": {
+      "title": "Message Sent Successfully!",
+      "description": "Thank you for reaching out to Eagle Revolution.",
+      "responseLabel": "We'll respond within 4-8 hours.",
+      "button": "Close"
+    },
+    "smsConsent": {
+      "text": "I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see ",
+      "privacyLabel": "Privacy Policy",
+      "termsLabel": "Terms and Conditions"
+    }
+  },
+  "galleryPage": {
+    "header": {
+      "badge": "Our Portfolio",
+      "headline": "Featured Projects",
+      "highlight": "Projects",
+      "description": "A curated collection of our finest installations across Missouri"
+    },
+    "labels": {
+      "all": "All",
+      "noResults": "No projects found in this category",
+      "viewAll": "View all projects",
+      "inquire": "Inquire About This Project",
+      "imageUnavailable": "Image Unavailable",
+      "featured": "★ Featured",
+      "specs": {
+        "sqft": "Sq Ft",
+        "duration": "Duration",
+        "warranty": "Warranty"
+      }
+    },
+    "categories": [
+      "All",
+      "Custom Decks",
+      "PVC Decking",
+      "Windows & Doors",
+      "Residential Roofing",
+      "Commercial Roofing",
+      "Siding, Soffit & Fascia",
+      "Gutters & Protection"
+    ],
+    "projects": [
+      {
+        "id": 1,
+        "title": "Lakeside Composite Deck",
+        "subtitle": "Premium Outdoor Living",
+        "category": "Custom Decks",
+        "location": "Lake Ozark, MO",
+        "year": "2024",
+        "description": "Expansive composite deck with built-in lighting, custom pergola, and glass railings overlooking the lake. Features hidden fasteners and premium weather-resistant materials.",
+        "image": "decks",
+        "featured": true,
+        "size": "large",
+        "specs": {
+          "sqft": "850",
+          "duration": "12 days",
+          "warranty": "25 Year"
+        }
+      },
+      {
+        "id": 2,
+        "title": "Multi-Level Entertainment Deck",
+        "subtitle": "Architectural Masterpiece",
+        "category": "Custom Decks",
+        "location": "Chesterfield, MO",
+        "year": "2023",
+        "description": "Three-tier deck system with integrated hot tub platform, outdoor kitchen area, and custom cable railing system for unobstructed views.",
+        "image": "deck2",
+        "featured": true,
+        "size": "wide",
+        "specs": {
+          "sqft": "1,200",
+          "duration": "18 days",
+          "warranty": "25 Year"
+        }
+      },
+      {
+        "id": 3,
+        "title": "Cedar Deck with Pergola",
+        "subtitle": "Natural Wood Beauty",
+        "category": "Custom Decks",
+        "location": "Wildwood, MO",
+        "year": "2024",
+        "description": "Premium cedar deck with custom-built pergola, built-in bench seating, and ambient LED lighting throughout for evening entertaining.",
+        "image": "deck3",
+        "featured": false,
+        "size": "normal",
+        "specs": {
+          "sqft": "450",
+          "duration": "8 days",
+          "warranty": "Lifetime"
+        }
+      },
+      {
+        "id": 4,
+        "title": "Poolside PVC Paradise",
+        "subtitle": "Waterproof Performance",
+        "category": "PVC Decking",
+        "location": "Town & Country, MO",
+        "year": "2024",
+        "description": "100% polymer PVC decking surrounding an infinity pool. Features cool-touch technology and superior slip resistance for wet conditions.",
+        "image": "pvc",
+        "featured": true,
+        "size": "tall",
+        "specs": {
+          "sqft": "620",
+          "duration": "10 days",
+          "warranty": "Lifetime"
+        }
+      },
+      {
+        "id": 6,
+        "title": "Whole-Home Window Transformation",
+        "subtitle": "Energy Efficiency Upgrade",
+        "category": "Windows & Doors",
+        "location": "Clayton, MO",
+        "year": "2024",
+        "description": "Complete window replacement with Energy Star rated vinyl windows featuring Low-E glass and argon gas fills. 35% energy savings achieved.",
+        "image": "windowImg",
+        "featured": true,
+        "size": "wide",
+        "specs": {
+          "sqft": "N/A",
+          "duration": "5 days",
+          "warranty": "Lifetime"
+        }
+      },
+      {
+        "id": 7,
+        "title": "Custom Entry Door System",
+        "subtitle": "Security & Curb Appeal",
+        "category": "Windows & Doors",
+        "location": "Ladue, MO",
+        "year": "2024",
+        "description": "Premium fiberglass entry door with multi-point locking system, decorative glass inserts, and custom sidelights for maximum curb appeal.",
+        "image": "door",
+        "featured": true,
+        "size": "tall",
+        "specs": {
+          "sqft": "N/A",
+          "duration": "2 days",
+          "warranty": "Lifetime"
+        }
+      },
+      {
+        "id": 8,
+        "title": "Patio Door Installation",
+        "subtitle": "Indoor-Outdoor Flow",
+        "category": "Windows & Doors",
+        "location": "Creve Coeur, MO",
+        "year": "2023",
+        "description": "Premium sliding patio door with UV protection glass and smooth-glide track system. Dramatically improves natural light and access.",
+        "image": "window2",
+        "featured": false,
+        "size": "normal",
+        "specs": {
+          "sqft": "N/A",
+          "duration": "1 day",
+          "warranty": "20 Year"
+        }
+      },
+      {
+        "id": 9,
+        "title": "Presidential TL Estate",
+        "subtitle": "Luxury Asphalt Roofing",
+        "category": "Residential Roofing",
+        "location": "Frontenac, MO",
+        "year": "2024",
+        "description": "GAF Presidential TL shingles with copper flashing, premium ridge ventilation, and full ice & water shield underlayment. 50-year warranty.",
+        "image": "residental1",
+        "featured": true,
+        "size": "large",
+        "specs": {
+          "sqft": "4,200",
+          "duration": "4 days",
+          "warranty": "50 Year"
+        }
+      },
+      {
+        "id": 10,
+        "title": "Storm Damage Restoration",
+        "subtitle": "Insurance Claim Specialist",
+        "category": "Residential Roofing",
+        "location": "O'Fallon, MO",
+        "year": "2024",
+        "description": "Complete roof replacement due to hail damage. We coordinated directly with insurance for full coverage. Class 4 impact-resistant shingles installed.",
+        "image": "residental2",
+        "featured": true,
+        "size": "normal",
+        "specs": {
+          "sqft": "2,800",
+          "duration": "2 days",
+          "warranty": "Lifetime"
+        }
+      },
+      {
+        "id": 12,
+        "title": "Meridian Business Park",
+        "subtitle": "TPO Commercial System",
+        "category": "Commercial Roofing",
+        "location": "Maryland Heights, MO",
+        "year": "2024",
+        "description": "80mil TPO membrane with tapered insulation system across 45,000 sq ft of commercial space. Energy-efficient white surface reduces cooling costs.",
+        "image": "commercialroof",
+        "featured": true,
+        "size": "wide",
+        "specs": {
+          "sqft": "45,000",
+          "duration": "21 days",
+          "warranty": "20 Year NDL"
+        }
+      },
+      {
+        "id": 15,
+        "title": "Complete Exterior Renovation",
+        "subtitle": "Vinyl Siding Transformation",
+        "category": "Siding, Soffit & Fascia",
+        "location": "Ballwin, MO",
+        "year": "2024",
+        "description": "Full premium vinyl siding installation with insulated backing. Includes all new aluminum fascia wrap and vented soffit system for proper attic ventilation.",
+        "image": "siding",
+        "featured": true,
+        "size": "large",
+        "specs": {
+          "sqft": "2,800",
+          "duration": "7 days",
+          "warranty": "Lifetime"
+        }
+      },
+      {
+        "id": 18,
+        "title": "6-Inch Seamless Gutter System",
+        "subtitle": "Commercial Grade Drainage",
+        "category": "Gutters & Protection",
+        "location": "St. Peters, MO",
+        "year": "2024",
+        "description": "Complete 6-inch seamless gutter installation with micro-mesh leaf guards. Heavy-duty hidden hangers and oversized downspouts for maximum flow capacity.",
+        "image": "gutter",
+        "featured": true,
+        "size": "wide",
+        "specs": {
+          "sqft": "N/A",
+          "duration": "2 days",
+          "warranty": "Lifetime"
+        }
+      }
+    ]
+  },
+  "brandStore": {
+    "url": "https://gbrandusa.chipply.com/eaglerevolution/?action=viewall",
+    "badge": "Official Store • Limited Collection",
+    "headline": {
+      "prefix": "REP THE",
+      "highlight": "REVOLUTION"
+    },
+    "description": "Premium hoodies • Tees • Hats • Bags<br />Made to order • Veteran owned"
   }
 }
