@@ -49,7 +49,7 @@ export default function CareersPage() {
     formData.append("_template", "table");
 
     try {
-      const response = await fetch("https://formsubmit.co/ajax/banderson@eaglerevolution.com", {
+      const response = await fetch("/api/send", {
         method: "POST",
         body: formData,
         headers: {

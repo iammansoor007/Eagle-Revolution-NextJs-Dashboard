@@ -480,6 +480,32 @@ export default function TestimonialsPage() {
         setIsSubmitting(true);
 
         try {
+            const response = await fetch('/api/send', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    type: 'Testimonial Submission',
+                    subject: `Testimonial - ${formData.name}`,
+                    name: formData.name,
+                    email: formData.email,
+                    company: formData.company,
+                    position: formData.position,
+                    rating: formData.rating,
+                    message: formData.testimonial
+                })
+            });
+
+            if (response.ok) {
+                setShowForm(false);
+                setShowSuccess(true);
+            } else {
+                throw new Error('Submission failed');
+            }
+        } catch (error) {
+            console.error('Submission error:', error);
+            // Fallback to mailto if Resend fails
             const subject = encodeURIComponent(`Testimonial - ${formData.name}`);
             const body = encodeURIComponent(`
 Name: ${formData.name}
@@ -493,8 +519,6 @@ ${formData.testimonial}
             window.location.href = `mailto:banderson@eaglerevolution.com?subject=${subject}&body=${body}`;
             setShowForm(false);
             setShowSuccess(true);
-        } catch (error) {
-            console.error('Submission error:', error);
         } finally {
             setIsSubmitting(false);
         }

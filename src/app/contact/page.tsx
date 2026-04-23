@@ -408,22 +408,20 @@ const ContactPage = () => {
 
         try {
             try {
-                const response = await fetch('https://formsubmit.co/ajax/banderson@eaglerevolution.com', {
+                const response = await fetch('/api/send', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        _subject: `🦅 Eagle Revolution Contact - ${formData.subject}`,
+                        type: 'Contact Form',
+                        subject: `🦅 Eagle Revolution Contact - ${formData.subject}`,
                         name: formData.name,
                         email: formData.email,
                         phone: formData.phone,
-                        subject: formData.subject,
+                        subject_line: formData.subject,
                         message: formData.message,
-                        sms_consent: 'Yes',
-                        _template: 'table',
-                        _captcha: 'false'
+                        sms_consent: 'Yes'
                     })
                 });
 
@@ -441,7 +439,7 @@ const ContactPage = () => {
                     return;
                 }
             } catch (fetchError) {
-                console.log('FormSubmit failed, using mailto fallback');
+                console.log('Resend failed, using mailto fallback');
             }
 
             window.location.href = `mailto:banderson@eaglerevolution.com?subject=${encodeURIComponent(`Contact: ${formData.subject}`)}&body=${encodeURIComponent(emailContent)}`;

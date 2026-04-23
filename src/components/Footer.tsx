@@ -94,9 +94,26 @@ const NewsletterForm = () => {
   const [isFocused, setIsFocused] = useState(false);
   const [isSubscribed, setIsSubscribed] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (email) {
+      try {
+        await fetch('/api/send', {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            type: 'Newsletter Subscription',
+            subject: 'New Newsletter Subscription',
+            name: 'Newsletter Subscriber',
+            email: email,
+            message: `New subscription from: ${email}`
+          })
+        });
+      } catch (error) {
+        console.error('Newsletter submission failed:', error);
+      }
       setIsSubscribed(true);
       setEmail('');
       setTimeout(() => setIsSubscribed(false), 3000);

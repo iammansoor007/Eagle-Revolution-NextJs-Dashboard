@@ -150,22 +150,20 @@ ${formData.message}
 
         try {
             try {
-                const response = await fetch('https://formsubmit.co/ajax/banderson@eaglerevolution.com', {
+                const response = await fetch('/api/send', {
                     method: 'POST',
                     headers: {
-                        'Content-Type': 'application/json',
-                        'Accept': 'application/json'
+                        'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        _subject: `🔨 Quick Quote - ${formData.name}`,
+                        type: 'Quick Quote',
+                        subject: `🔨 Quick Quote - ${formData.name}`,
                         name: formData.name,
                         email: formData.email,
                         phone: formData.phone,
                         project_type: projectTypes.find(t => t.value === formData.projectType)?.label,
                         message: formData.message,
-                        sms_consent: 'Yes',
-                        _template: 'table',
-                        _captcha: 'false'
+                        sms_consent: 'Yes'
                     })
                 });
 
@@ -174,7 +172,7 @@ ${formData.message}
                     return;
                 }
             } catch (fetchError) {
-                console.log('FormSubmit failed, using mailto fallback');
+                console.log('Resend failed, using mailto fallback');
             }
 
             const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🔨 Quick Quote - ${formData.name}&body=${encodeURIComponent(emailContent)}`;

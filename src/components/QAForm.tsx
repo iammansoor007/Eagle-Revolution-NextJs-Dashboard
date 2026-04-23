@@ -457,9 +457,9 @@ const SMSConsentCheckbox = ({ checked, onChange, showError }: { checked: boolean
     >
       <div className={`
         relative flex items-start gap-3 p-4 rounded-xl transition-all duration-500
-        ${showError ? 'bg-red-500/5 border border-red-500/50' : 
-          isFocused ? 'bg-primary/5 border border-primary/30' : 
-          'bg-muted/30 border border-border/50 hover:border-primary/20'}
+        ${showError ? 'bg-red-500/5 border border-red-500/50' :
+          isFocused ? 'bg-primary/5 border border-primary/30' :
+            'bg-muted/30 border border-border/50 hover:border-primary/20'}
       `}>
         <div className="relative">
           <input
@@ -576,14 +576,14 @@ const GetQuote = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     // Validate SMS consent
     if (!smsConsent) {
       setShowSmsError(true);
       setFormStep(1);
       return;
     }
-    
+
     setIsSubmitting(true);
 
     const serviceNames = selectedServices
@@ -617,28 +617,33 @@ ${formData.message}
 
     try {
       try {
-        const response = await fetch('https://formsubmit.co/ajax/banderson@eaglerevolution.com', {
+        console.log('Attempting Resend submission...', {
+          name: formData.name,
+          email: formData.email,
+          services: serviceNames
+        });
+
+        const response = await fetch('/api/send', {
           method: 'POST',
           headers: {
-            'Content-Type': 'application/json',
-            'Accept': 'application/json'
+            'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            _subject: `🦅 Eagle Revolution Quote Request - ${formData.name}`,
+            type: 'Quote Request',
+            subject: `🦅 Eagle Revolution Quote Request - ${formData.name}`,
             name: formData.name,
             email: formData.email,
             phone: formData.phone,
-            zip_code: formData.zipCode,
-            timeline: timelines.find((t: any) => t.value === formData.timeline)?.label,
-            services: serviceNames,
+            zipCode: formData.zipCode,
+            timeline: timelines?.find((t: any) => t.value === formData.timeline)?.label || 'Not specified',
+            services: serviceNames || 'None selected',
             message: formData.message,
-            sms_consent: 'Yes',
-            _template: 'table',
-            _captcha: 'false'
+            sms_consent: 'Yes'
           })
         });
 
         if (response.ok) {
+          console.log('Resend submission successful');
           setShowSuccess(true);
           setFormStep(1);
           setSelectedServices([]);
@@ -655,12 +660,16 @@ ${formData.message}
           });
           setIsSubmitting(false);
           return;
+        } else {
+          const errorData = await response.json().catch(() => ({}));
+          console.error('Resend submission failed with status:', response.status, errorData);
         }
       } catch (fetchError) {
-        console.log('FormSubmit failed, using mailto fallback');
+        console.error('Network error during Resend submission:', fetchError);
       }
 
-      window.location.href = `mailto:${email}?subject=🦅 Eagle Revolution Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
+      console.log('Falling back to mailto link');
+      window.location.href = `mailto:${email || 'banderson@eaglerevolution.com'}?subject=🦅 Eagle Revolution Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
       setShowSuccess(true);
       setFormStep(1);
       setSelectedServices([]);
@@ -677,8 +686,8 @@ ${formData.message}
       });
 
     } catch (error) {
-      console.error('Submission error:', error);
-      alert(`Please email us directly at ${email} with your project details.`);
+      console.error('Final submission error:', error);
+      alert(`There was an issue sending your request. Please email us directly at ${email || 'banderson@eaglerevolution.com'}`);
     } finally {
       setIsSubmitting(false);
     }
@@ -898,8 +907,8 @@ ${formData.message}
                       </div>
 
                       {/* SMS Consent Checkbox */}
-                      <SMSConsentCheckbox 
-                        checked={smsConsent} 
+                      <SMSConsentCheckbox
+                        checked={smsConsent}
                         onChange={(e) => {
                           setSmsConsent(e.target.checked);
                           if (e.target.checked) setShowSmsError(false);
