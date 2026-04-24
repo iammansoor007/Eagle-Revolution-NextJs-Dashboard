@@ -750,7 +750,7 @@ const MissionSection = () => {
 
           {/* RIGHT CARDS */}
           <div className="w-full lg:w-7/12 grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4 md:gap-5">
-            {corePrinciples.map((item, i) => (
+            {(corePrinciples as any[]).map((item: any, i: number) => (
               <motion.div
                 key={i}
                 initial={{ opacity: 0, y: 40 }}
@@ -1211,7 +1211,7 @@ const ValuesGrid = () => {
         </div>
 
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3 sm:gap-4 md:gap-5 lg:gap-6 xl:gap-8">
-          {values.map((value, idx) => {
+          {(values as any[]).map((value: any, idx: number) => {
             const Icon = value.icon;
             const isHovered = hoveredCard === idx;
 

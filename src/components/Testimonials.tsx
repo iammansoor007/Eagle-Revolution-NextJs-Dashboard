@@ -536,7 +536,7 @@ const Testimonials = () => {
 
               <div className="absolute -bottom-12 left-0 right-0">
                 <div className="flex gap-1 justify-center">
-                  {testimonials.map((_, idx) => (
+                  {(testimonials as any[]).map((_: any, idx: number) => (
                     <motion.button
                       key={idx}
                       onClick={() => setActiveIndex(idx)}

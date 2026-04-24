@@ -134,7 +134,7 @@ const QuickQuote = () => {
 Name: ${formData.name}
 Email: ${formData.email}
 Phone: ${formData.phone}
-Project Type: ${projectTypes.find(t => t.value === formData.projectType)?.label || 'Not specified'}
+Project Type: ${(projectTypes as any[]).find((t: any) => t.value === formData.projectType)?.label || 'Not specified'}
 SMS Consent: Yes
 
 📝 MESSAGE
@@ -161,7 +161,7 @@ ${formData.message}
                         name: formData.name,
                         email: formData.email,
                         phone: formData.phone,
-                        project_type: projectTypes.find(t => t.value === formData.projectType)?.label,
+                        project_type: (projectTypes as any[]).find((t: any) => t.value === formData.projectType)?.label,
                         message: formData.message,
                         sms_consent: 'Yes'
                     })
@@ -636,7 +636,7 @@ ${formData.message}
                                                                 className="w-full px-5 py-4 bg-muted border border-border rounded-xl focus:outline-none focus:border-primary focus:ring-4 focus:ring-primary/10 transition-all text-foreground appearance-none"
                                                             >
                                                                 <option value="">Select project type</option>
-                                                                {projectTypes.map(type => (
+                                                                {projectTypes.map((type: any) => (
                                                                     <option key={type.value} value={type.value}>
                                                                         {type.label}
                                                                     </option>
