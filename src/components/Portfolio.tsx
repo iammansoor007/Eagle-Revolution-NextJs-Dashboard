@@ -49,6 +49,7 @@ interface Section {
 
 interface Button {
   text?: string;
+  link?: string;
 }
 
 const imageMap: Record<string, any> = {
@@ -107,17 +108,29 @@ const MarqueeItem = ({ project }: { project: Project }) => {
       className="relative w-[200px] sm:w-[240px] md:w-[280px] h-[280px] sm:h-[320px] md:h-[360px] flex-shrink-0 cursor-pointer will-change-transform transition-transform duration-300"
     >
       <div className="relative w-full h-full rounded-xl overflow-hidden shadow-2xl shadow-gray-300/50">
-        <Image
-          src={imageMap[project.image as keyof typeof imageMap]}
-          alt={project.title}
-          className="object-cover"
-          fill
-          quality={100}
-          style={{
-            transform: isHovered ? "scale(1.1)" : "scale(1)",
-            transition: "transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1)",
-          }}
-        />
+        {project.image && (project.image.startsWith('http') || project.image.startsWith('/uploads')) ? (
+          <img
+            src={project.image}
+            alt={project.title}
+            className="w-full h-full object-cover"
+            style={{
+              transform: isHovered ? "scale(1.1)" : "scale(1)",
+              transition: "transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1)",
+            }}
+          />
+        ) : (
+          <Image
+            src={imageMap[project.image as keyof typeof imageMap] || project.image}
+            alt={project.title}
+            className="object-cover"
+            fill
+            quality={100}
+            style={{
+              transform: isHovered ? "scale(1.1)" : "scale(1)",
+              transition: "transform 0.6s cubic-bezier(0.215, 0.61, 0.355, 1)",
+            }}
+          />
+        )}
 
         <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent" />
 
@@ -432,7 +445,7 @@ const Portfolio = () => {
           className="flex justify-center mt-8 sm:mt-10 md:mt-12"
         >
           <button
-            onClick={() => router.push("/gallery")}
+            onClick={() => router.push(button.link || "/gallery")}
             className="px-4 sm:px-5 md:px-6 py-2 sm:py-2.5 md:py-3 bg-gradient-to-r from-primary to-primary/80 text-white text-xs sm:text-sm font-medium rounded-full shadow-lg hover:shadow-xl transition-all duration-300 flex items-center gap-1 sm:gap-2 hover:scale-105 hover:from-primary/90 hover:to-primary/70"
           >
             {button.text || "View All Projects"}

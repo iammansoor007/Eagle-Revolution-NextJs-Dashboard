@@ -64,6 +64,7 @@ export default function HomeEditor() {
     { id: "about", label: "About Section", icon: Type },
     { id: "services", label: "Services Section", icon: LayoutTemplate },
     { id: "founder", label: "Founder Section", icon: Type },
+    { id: "portfolio", label: "Portfolio Section", icon: ImageIcon },
     { id: "whyChooseUs", label: "Why Choose Us", icon: ImageIcon },
     { id: "quote", label: "Quote CTA", icon: Type },
   ];
@@ -989,6 +990,78 @@ export default function HomeEditor() {
                     {(!data.leadership?.ceo?.socials || data.leadership.ceo.socials.length === 0) && (
                       <p className="text-white/40 text-sm text-center py-4 italic">No social links added yet.</p>
                     )}
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "portfolio" && (
+              <motion.div key="portfolio" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <div>
+                    <h2 className="text-2xl font-bold text-white">Portfolio Section</h2>
+                    <p className="text-white/40 text-sm mt-1">Configure the design settings for the homepage portfolio section. (To add/remove actual projects, use the Projects sidebar tab).</p>
+                  </div>
+                  <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">Section 5</span>
+                </div>
+                
+                {/* Intro Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Type className="w-5 h-5 text-primary" />
+                    Section Headers
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Section Badge</label>
+                      <input
+                        type="text"
+                        value={data.portfolio?.section?.badge || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, portfolio: { ...prev.portfolio, section: { ...prev.portfolio.section, badge: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        placeholder="e.g. OUR WORK"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Section Heading</label>
+                      <input
+                        type="text"
+                        value={data.portfolio?.section?.headline || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, portfolio: { ...prev.portfolio, section: { ...prev.portfolio.section, headline: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        placeholder="e.g. Featured Projects"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Bottom CTA Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <ChevronRight className="w-5 h-5 text-primary" />
+                    Bottom Call to Action Button
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Button Label</label>
+                      <input
+                        type="text"
+                        value={data.portfolio?.button?.text || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, portfolio: { ...prev.portfolio, button: { ...prev.portfolio.button, text: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        placeholder="e.g. View All Projects"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Destination Link</label>
+                      <input
+                        type="text"
+                        value={data.portfolio?.button?.link || "/gallery"}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, portfolio: { ...prev.portfolio, button: { ...prev.portfolio.button, link: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        placeholder="e.g. /gallery"
+                      />
+                    </div>
                   </div>
                 </div>
               </motion.div>

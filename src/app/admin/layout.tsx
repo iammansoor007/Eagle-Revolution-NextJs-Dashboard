@@ -7,12 +7,13 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, FileText, Briefcase, Users, Star,
   HelpCircle, ImageIcon, Phone, Settings, LogOut,
-  Shield, Menu, X, ChevronRight, Globe
+  Shield, Menu, X, ChevronRight, Globe, Folder
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard",   href: "/admin",          icon: LayoutDashboard },
   { label: "Pages",       href: "/admin/pages",     icon: FileText },
+  { label: "Projects",    href: "/admin/projects",  icon: Folder },
   { label: "Services",    href: "/admin/services",  icon: Briefcase },
   { label: "Team",        href: "/admin/team",       icon: Users },
   { label: "Reviews",     href: "/admin/reviews",   icon: Star },
