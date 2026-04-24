@@ -3,6 +3,7 @@
 import React, { useState, useRef } from 'react';
 import { motion, useScroll, useTransform, useInView } from 'framer-motion';
 import { Upload, Send, Briefcase, FileText, User, Mail, Phone, CheckCircle, ArrowRight } from 'lucide-react';
+import { useContent } from "../../../hooks/useContent";
 
 const Images = {
   Pattern: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
@@ -25,6 +26,7 @@ const ParallaxLayer = ({ children, speed = 0.1, className = "" }: any) => {
 };
 
 export default function CareersPage() {
+  const { careers: careersData } = useContent();
   const [fileName, setFileName] = useState<string | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
@@ -116,7 +118,7 @@ export default function CareersPage() {
             >
               <div className="w-8 h-[2px] bg-gradient-to-r from-blue-300 to-blue-500" />
               <span className="text-xs font-medium tracking-[0.2em] uppercase text-blue-600">
-                Join Eagle Revolution
+                {careersData?.section?.badge || "Join Eagle Revolution"}
               </span>
               <div className="w-8 h-[2px] bg-gradient-to-r from-blue-500 to-blue-300" />
             </motion.div>
@@ -127,9 +129,9 @@ export default function CareersPage() {
               transition={{ duration: 0.6, delay: 0.1 }}
               className="text-4xl md:text-6xl lg:text-7xl font-light text-slate-900 mb-6 leading-tight tracking-tight"
             >
-              Construct your future with<br />
+              {careersData?.section?.headline?.split('with')[0]} with<br />
               <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-900">
-                absolute precision
+                {careersData?.section?.headline?.split('with')[1]}
               </span>
             </motion.h1>
 
@@ -139,7 +141,7 @@ export default function CareersPage() {
               transition={{ duration: 0.6, delay: 0.2 }}
               className="text-slate-600 text-base xs:text-lg md:text-xl font-light max-w-2xl mx-auto px-2 xs:px-4"
             >
-              We are seeking driven professionals who refuse to take shortcuts. Bring your expertise to a team that values craft, integrity, and long-term growth.
+              {careersData?.section?.description}
             </motion.p>
           </div>
 
@@ -159,9 +161,9 @@ export default function CareersPage() {
                     <div className="w-20 h-20 xs:w-24 xs:h-24 bg-green-100 rounded-full flex items-center justify-center mb-6 xs:mb-8">
                       <CheckCircle className="w-10 h-10 xs:w-12 xs:h-12 text-green-600" />
                     </div>
-                    <h2 className="text-2xl xs:text-3xl font-bold text-slate-900 mb-3 xs:mb-4">Application Submitted!</h2>
+                    <h2 className="text-2xl xs:text-3xl font-bold text-slate-900 mb-3 xs:mb-4">{careersData?.success?.title}</h2>
                     <p className="text-base xs:text-lg text-slate-600 max-w-md mx-auto">
-                      Thank you for your interest in joining Eagle Revolution. Our operations team will review your CV and be in touch shortly.
+                      {careersData?.success?.description}
                     </p>
                   </div>
                 ) : (
@@ -174,7 +176,7 @@ export default function CareersPage() {
                       <div className="space-y-3">
                         <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
                           <User className="w-4 h-4 text-blue-500" />
-                          Full Name
+                          {careersData?.labels?.name}
                         </label>
                         <input
                           type="text"
@@ -189,7 +191,7 @@ export default function CareersPage() {
                       <div className="space-y-3">
                         <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
                           <Mail className="w-4 h-4 text-blue-500" />
-                          Email Address
+                          {careersData?.labels?.email}
                         </label>
                         <input
                           type="email"
@@ -204,7 +206,7 @@ export default function CareersPage() {
                       <div className="space-y-3">
                         <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
                           <Phone className="w-4 h-4 text-blue-500" />
-                          Phone Number
+                          {careersData?.labels?.phone}
                         </label>
                         <input
                           type="tel"
@@ -219,7 +221,7 @@ export default function CareersPage() {
                       <div className="space-y-3">
                         <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
                           <Briefcase className="w-4 h-4 text-blue-500" />
-                          Position Applying For
+                          {careersData?.labels?.role}
                         </label>
                         <div className="relative">
                           <select
@@ -229,12 +231,9 @@ export default function CareersPage() {
                             className="w-full px-4 py-3 xs:px-5 xs:py-4 bg-slate-50/50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 focus:border-blue-500 focus:bg-white outline-none transition-all text-slate-800 appearance-none"
                           >
                             <option value="" disabled>Select role...</option>
-                            <option value="Project Manager">Project Manager</option>
-                            <option value="Lead Contractor">Lead Contractor</option>
-                            <option value="Sales Representative">Sales Representative</option>
-                            <option value="Roofing/Exterior Specialist">Roofing & Exterior Specialist</option>
-                            <option value="Administrative Support">Administrative Support</option>
-                            <option value="Other">Other Inquiry</option>
+                            {careersData?.roles?.map((role: any, index: number) => (
+                              <option key={index} value={role.value}>{role.label}</option>
+                            ))}
                           </select>
                           <div className="absolute right-5 top-1/2 -translate-y-1/2 pointer-events-none text-slate-400">
                             <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="m6 9 6 6 6-6" /></svg>
@@ -247,7 +246,7 @@ export default function CareersPage() {
                     <div className="space-y-3">
                       <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
                         <FileText className="w-4 h-4 text-blue-500" />
-                        Professional Summary
+                        {careersData?.labels?.summary}
                       </label>
                       <textarea
                         name="message"
@@ -262,7 +261,7 @@ export default function CareersPage() {
                     <div className="space-y-3">
                       <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
                         <Upload className="w-4 h-4 text-blue-500" />
-                        Resume / CV Attachment
+                        {careersData?.labels?.attachment || "Resume / CV Attachment"}
                       </label>
                       <div className={`relative group overflow-hidden cursor-pointer w-full border-2 ${fileName ? 'border-green-500 bg-green-50/30' : 'border-dashed border-blue-200 bg-blue-50/30 hover:bg-blue-50 hover:border-blue-300'} rounded-2xl p-6 xs:p-8 sm:p-10 transition-all flex flex-col items-center justify-center`}>
                         <input
@@ -302,7 +301,7 @@ export default function CareersPage() {
                         className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold tracking-widest shadow-lg shadow-blue-600/20 transition-all duration-300 flex items-center justify-center gap-3 disabled:opacity-70 disabled:cursor-not-allowed group overflow-hidden relative"
                       >
                         <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
-                        <span className="relative z-10 text-xs xs:text-sm">{isSubmitting ? 'SECURELY SENDING...' : 'SUBMIT APPLICATION'}</span>
+                        <span className="relative z-10 text-xs xs:text-sm">{isSubmitting ? (careersData?.labels?.submitting || 'SECURELY SENDING...') : (careersData?.labels?.submit || 'SUBMIT APPLICATION')}</span>
                         {!isSubmitting && <ArrowRight className="w-4 h-4 xs:w-5 xs:h-5 relative z-10 group-hover:translate-x-1 transition-transform" />}
                       </button>
                     </div>

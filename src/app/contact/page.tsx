@@ -167,6 +167,7 @@ const QuantumTextarea = ({ icon: IconName, label, ...props }: { icon: string; la
 
 // SMS Consent Checkbox Component
 const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange: (e: React.ChangeEvent<HTMLInputElement>) => void }) => {
+    const { contactPage: contactData } = useContent();
     const [isHovered, setIsHovered] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
 
@@ -224,10 +225,10 @@ const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange:
                     htmlFor="smsConsent"
                     className="flex-1 text-[11px] sm:text-xs text-muted-foreground leading-relaxed cursor-pointer"
                 >
-                    I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see{' '}
-                    <Link href="/privacy" className="text-primary hover:underline transition-colors">Privacy Policy</Link>
+                    {contactData?.smsConsent?.text || "I agree to receive informational SMS text messages from Eagle Revolution related to my request, including appointment scheduling and service updates, at the number I provided. Message frequency varies. Msg & data rates may apply. Reply STOP to opt out, HELP for help. Consent is not a condition of purchase. Please see "}
+                    <Link href="/privacy" className="text-primary hover:underline transition-colors">{contactData?.smsConsent?.privacyLabel || "Privacy Policy"}</Link>
                     {' '}and{' '}
-                    <Link href="/terms" className="text-primary hover:underline transition-colors">Terms and Conditions</Link>.
+                    <Link href="/terms" className="text-primary hover:underline transition-colors">{contactData?.smsConsent?.termsLabel || "Terms and Conditions"}</Link>.
                 </label>
             </div>
 
@@ -244,6 +245,7 @@ const SMSConsentCheckbox = ({ checked, onChange }: { checked: boolean; onChange:
 
 // Success Modal
 const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
+    const { contactPage: contactData } = useContent();
     useEffect(() => {
         if (isOpen) {
             document.body.style.overflow = 'hidden';
@@ -312,7 +314,7 @@ const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                                 transition={{ delay: 0.5 }}
                                 className="text-xl sm:text-2xl font-light text-foreground mb-2 sm:mb-3"
                             >
-                                Message Sent Successfully!
+                                {contactData?.successModal?.title || "Message Sent Successfully!"}
                             </motion.h3>
 
                             <motion.p
@@ -321,10 +323,10 @@ const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                                 transition={{ delay: 0.6 }}
                                 className="text-muted-foreground text-xs sm:text-sm leading-relaxed"
                             >
-                                Thank you for reaching out to Eagle Revolution.
+                                {contactData?.successModal?.description || "Thank you for reaching out to Eagle Revolution."}
                                 <br />
                                 <span className="font-medium text-primary mt-2 block">
-                                    We'll respond within 4-8 hours.
+                                    {contactData?.successModal?.responseLabel || "We'll respond within 4-8 hours."}
                                 </span>
                             </motion.p>
 
@@ -337,7 +339,7 @@ const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                                Close
+                                {contactData?.successModal?.button || "Close"}
                             </motion.button>
                         </div>
 
@@ -352,6 +354,7 @@ const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
 // Main Contact Page Component
 const ContactPage = () => {
+    const { contactPage: contactData } = useContent();
     const sectionRef = useRef(null);
     const [isClient, setIsClient] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
@@ -564,198 +567,88 @@ const ContactPage = () => {
                     <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
                         <div className="w-8 sm:w-12 h-[2px] bg-gradient-to-r from-transparent via-primary to-transparent" />
                         <span className="text-[10px] sm:text-xs font-mono tracking-[0.2em] sm:tracking-[0.3em] uppercase text-primary/80">
-                            Contact Us
+                            {contactData?.header?.badge || "Contact Us"}
                         </span>
                         <div className="w-8 sm:w-12 h-[2px] bg-gradient-to-r from-primary via-primary to-transparent" />
                     </div>
 
                     <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-normal text-foreground mb-4 sm:mb-6 leading-tight">
-                        Let's Start a <span className="text-primary font-bold">Conversation</span>
+                        {contactData?.header?.headline?.replace("Conversation", "") || "Let's Start a "}<span className="text-primary font-bold">{contactData?.header?.headline?.includes("Conversation") ? "Conversation" : ""}</span>
                     </h1>
 
                     <p className="text-sm sm:text-base md:text-lg text-muted-foreground font-light max-w-2xl mx-auto px-4">
-                        Whether you have a question about our services, need a quote, or want to discuss a project,
-                        our team is ready to help. Reach out and we'll get back to you within 4-8 hours.
+                        {contactData?.header?.description || "Whether you have a question about our services, need a quote, or want to discuss a project, our team is ready to help. Reach out and we'll get back to you within 4-8 hours."}
                     </p>
                 </div>
 
                 {/* Contact Info Cards */}
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-6 mb-16">
-                    {/* Email Card */}
-                    <motion.div
-                        whileHover={{ y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative group"
-                    >
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
+                    {contactData?.infoCards?.map((card: any, index: number) => (
+                        <motion.div
+                            key={index}
+                            whileHover={{ y: -8 }}
+                            transition={{ duration: 0.3 }}
+                            className="relative group"
+                        >
+                            <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
 
-                        <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
-                            </div>
+                            <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
+                                <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
+                                    <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
+                                    <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
+                                </div>
 
-                            <div className="relative p-7">
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
-                                        <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                                <div className="relative p-7">
+                                    <div className="relative mb-5">
+                                        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
+                                            <Icon name={card.icon} className="w-7 h-7 text-primary" />
+                                        </div>
+                                        <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+                                    </div>
+
+                                    <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
+                                        {card.title}
+                                    </h3>
+
+                                    <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
+                                        {card.description}
+                                    </p>
+
+                                    <div className="space-y-2 pt-3 border-t border-primary/10">
+                                        {card.value && (
+                                            <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+                                                <span className="text-foreground/80 font-mono text-xs">{card.value}</span>
+                                            </div>
+                                        )}
+                                        {card.subLabel && (
+                                            <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+                                                <span className="text-foreground/80 font-mono text-xs">{card.subLabel}</span>
+                                            </div>
+                                        )}
+                                        {card.label && (
+                                            <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
+                                                <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
+                                                <span className="text-foreground/80 font-mono text-xs">{card.label}</span>
+                                            </div>
+                                        )}
+                                    </div>
+
+                                    <div className="absolute top-3 right-3">
+                                        <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                                         </svg>
                                     </div>
-                                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
+
+                                    <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
+                                    <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
+
+                                    <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                                 </div>
-
-                                <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
-                                    Email Us
-                                </h3>
-
-                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    Send us a message and we'll respond within 4-8 hours
-                                </p>
-
-                                <div className="space-y-2 pt-3 border-t border-primary/10">
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">banderson@eaglerevolution.com</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">24/7 Support Available</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-3 right-3">
-                                    <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
-
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
                             </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Phone Card */}
-                    <motion.div
-                        whileHover={{ y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative group"
-                    >
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-
-                        <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
-                            </div>
-
-                            <div className="relative p-7">
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
-                                        <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
-                                        </svg>
-                                    </div>
-                                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                </div>
-
-                                <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
-                                    Call Us
-                                </h3>
-
-                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    Speak directly with our team during business hours
-                                </p>
-
-                                <div className="space-y-2 pt-3 border-t border-primary/10">
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">+1 (636) 449-9714</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">Mon-Fri: 9am - 6pm CST</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-3 right-3">
-                                    <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
-
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Location Card */}
-                    <motion.div
-                        whileHover={{ y: -8 }}
-                        transition={{ duration: 0.3 }}
-                        className="relative group"
-                    >
-                        <div className="absolute -inset-0.5 bg-gradient-to-r from-primary to-primary/80 rounded-2xl blur-xl opacity-0 group-hover:opacity-20 transition-opacity duration-500" />
-
-                        <div className="relative bg-gradient-to-br from-card/95 to-card/80 backdrop-blur-sm rounded-2xl border border-primary/10 hover:border-primary/40 transition-all duration-500 overflow-hidden">
-                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700">
-                                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 via-transparent to-primary/5" />
-                                <div className="absolute inset-0 bg-gradient-to-r from-primary/0 via-primary/10 to-primary/0 animate-[shimmer_2s_infinite]" />
-                            </div>
-
-                            <div className="relative p-7">
-                                <div className="relative mb-5">
-                                    <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/5 flex items-center justify-center group-hover:shadow-lg transition-all duration-500">
-                                        <svg className="w-7 h-7 text-primary" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-                                        </svg>
-                                    </div>
-                                    <div className="absolute inset-0 rounded-2xl bg-primary/20 blur-md opacity-0 group-hover:opacity-100 transition-opacity duration-500" />
-                                </div>
-
-                                <h3 className="text-lg font-medium mb-2 text-foreground group-hover:text-transparent group-hover:bg-clip-text group-hover:bg-gradient-to-r group-hover:from-primary group-hover:to-primary/80 transition-all duration-500">
-                                    Visit Us
-                                </h3>
-
-                                <p className="text-sm text-muted-foreground mb-4 leading-relaxed">
-                                    Veteran-owned and operated from the heart of Texas
-                                </p>
-
-                                <div className="space-y-2 pt-3 border-t border-primary/10">
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">O’Fallon, Missouri 63366</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">United States</span>
-                                    </div>
-                                    <div className="flex items-center gap-2 text-sm opacity-70 group-hover:opacity-100 transition-opacity">
-                                        <div className="w-1.5 h-1.5 rounded-full bg-primary/60" />
-                                        <span className="text-foreground/80 font-mono text-xs">Virtual meetings available</span>
-                                    </div>
-                                </div>
-
-                                <div className="absolute top-3 right-3">
-                                    <svg className="w-4 h-4 text-primary/50 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform duration-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                                    </svg>
-                                </div>
-
-                                <div className="absolute top-4 left-4 w-6 h-6 border-t-2 border-l-2 border-primary/20" />
-                                <div className="absolute bottom-4 right-4 w-6 h-6 border-b-2 border-r-2 border-primary/20" />
-
-                                <div className="absolute bottom-0 left-0 right-0 h-0.5 bg-gradient-to-r from-primary/0 via-primary to-primary/0 scale-x-0 group-hover:scale-x-100 transition-transform duration-500" />
-                            </div>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    ))}
                 </div>
 
                 <style jsx>{`
@@ -809,7 +702,7 @@ const ContactPage = () => {
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                                     <HolographicInput
                                         icon="User"
-                                        label="Full name"
+                                        label={contactData?.form?.labels?.name || "Full name"}
                                         name="name"
                                         value={formData.name}
                                         onChange={handleInputChange}
@@ -818,7 +711,7 @@ const ContactPage = () => {
                                     <HolographicInput
                                         icon="Mail"
                                         type="email"
-                                        label="Email address"
+                                        label={contactData?.form?.labels?.email || "Email address"}
                                         name="email"
                                         value={formData.email}
                                         onChange={handleInputChange}
@@ -830,7 +723,7 @@ const ContactPage = () => {
                                     <HolographicInput
                                         icon="Phone"
                                         type="tel"
-                                        label="Phone number"
+                                        label={contactData?.form?.labels?.phone || "Phone number"}
                                         name="phone"
                                         value={formData.phone}
                                         onChange={handleInputChange}
@@ -838,7 +731,7 @@ const ContactPage = () => {
                                     />
                                     <HolographicInput
                                         icon="FileText"
-                                        label="Subject"
+                                        label={contactData?.form?.labels?.subject || "Subject"}
                                         name="subject"
                                         value={formData.subject}
                                         onChange={handleInputChange}
@@ -854,7 +747,7 @@ const ContactPage = () => {
 
                                 <QuantumTextarea
                                     icon="MessageCircle"
-                                    label="How can we help you?"
+                                    label={contactData?.form?.labels?.message || "How can we help you?"}
                                     name="message"
                                     value={formData.message}
                                     onChange={handleInputChange}
@@ -894,11 +787,11 @@ const ContactPage = () => {
                                                         transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
                                                         className="w-4 h-4 border-2 border-primary-foreground border-t-transparent rounded-full"
                                                     />
-                                                    <span className="hidden xs:inline">Sending...</span>
+                                                    <span className="hidden xs:inline">{contactData?.form?.labels?.submitting || "Sending..."}</span>
                                                 </>
                                             ) : (
                                                 <>
-                                                    <span className="hidden xs:inline">Send Message</span>
+                                                    <span className="hidden xs:inline">{contactData?.form?.labels?.submit || "Send Message"}</span>
                                                     <span className="xs:hidden">Send</span>
                                                     <Icon name="Send" className="w-4 h-4" />
                                                 </>
@@ -917,15 +810,15 @@ const ContactPage = () => {
                             <div className="flex flex-col xs:flex-row items-center justify-center gap-3 sm:gap-6 mt-8 sm:mt-10 pt-6 sm:pt-8 border-t border-primary/10">
                                 <div className="text-[10px] sm:text-xs font-mono text-primary flex items-center gap-1 sm:gap-2">
                                     <span className="animate-pulse">●</span>
-                                    <span>Veteran owned & operated</span>
+                                    <span>{contactData?.form?.footer?.veteran || "Veteran owned & operated"}</span>
                                 </div>
                                 <div className="hidden xs:block w-px h-4 sm:h-6 bg-border" />
                                 <div className="text-[10px] sm:text-xs text-muted-foreground">
-                                    <span className="font-semibold text-foreground">100%</span> confidential
+                                    {contactData?.form?.footer?.confidential || <><span className="font-semibold text-foreground">100%</span> confidential</>}
                                 </div>
                                 <div className="hidden xs:block w-px h-4 sm:h-6 bg-border" />
                                 <div className="text-[10px] sm:text-xs text-muted-foreground">
-                                    Response within <span className="text-primary font-semibold">4-8 hours</span>
+                                    {contactData?.form?.footer?.response || <>Response within <span className="text-primary font-semibold">4-8 hours</span></>}
                                 </div>
                             </div>
                         </div>
