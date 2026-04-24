@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Loader2, Folder, Image as ImageIcon } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Folder, Image as ImageIcon, ChevronRight, Save, X, Calendar, MapPin } from "lucide-react";
+import { motion, AnimatePresence } from "framer-motion";
+import Link from "next/link";
 
 export default function ProjectsAdminPage() {
   const [data, setData] = useState<any>(null);
@@ -69,10 +71,9 @@ export default function ProjectsAdminPage() {
     }
 
     const newProjects = [...projects];
-    if (isEditing !== null) {
+    if (isEditing !== null && isEditing < projects.length) {
       newProjects[isEditing] = { ...form };
     } else {
-      // Auto-assign number like 01, 02
       const number = String(newProjects.length + 1).padStart(2, '0');
       newProjects.push({ ...form, number });
     }
@@ -96,169 +97,241 @@ export default function ProjectsAdminPage() {
   }
 
   return (
-    <div className="max-w-5xl mx-auto pb-20 p-6">
-      <div className="flex items-center justify-between mb-8">
+    <div className="max-w-6xl mx-auto pb-20">
+      {/* Header */}
+      <div className="flex items-center justify-between mb-10">
         <div>
-          <h1 className="text-3xl font-bold text-gray-900 flex items-center gap-3">
-            <Folder className="w-8 h-8 text-primary" />
-            Projects Management
+          <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
+            <Link href="/admin" className="hover:text-primary transition-colors">Dashboard</Link>
+            <ChevronRight className="w-3 h-3" />
+            <span className="text-slate-900 font-bold">Projects</span>
+          </div>
+          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
+            Portfolio Projects
           </h1>
-          <p className="text-gray-500 text-sm mt-1">Add, edit, or remove projects shown in the portfolio.</p>
+          <p className="text-slate-500 font-medium mt-1">Showcase your best work to potential clients.</p>
         </div>
+        
         {!isEditing && (
           <button
             onClick={() => setIsEditing(projects.length)}
-            className="flex items-center gap-2 bg-primary-white px-5 py-2.5 rounded-xl font-medium transition-all"
+            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02]"
           >
-            <Plus className="w-4 h-4" />
-            Create Project
+            <Plus className="w-5 h-5" />
+            Add New Project
           </button>
         )}
       </div>
 
-      {isEditing !== null && (
-        <div className="bg-white shadow-sm border border-gray-200 rounded-2xl p-6 mb-8 shadow-xl">
-          <h2 className="text-xl font-bold text-gray-900 mb-6">
-            {isEditing < projects.length ? "Edit Project" : "Create New Project"}
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-6">
-            <div className="space-y-3">
-              <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Project Image</label>
-              {form.image && (
-                <div className="mb-3 relative w-full h-40 rounded-xl overflow-hidden border-2 border-gray-200">
-                  <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
-                </div>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={async (e) => {
-                  const file = e.target.files?.[0];
-                  if (!file) return;
-                  const formData = new FormData();
-                  formData.append("file", file);
-                  try {
-                    const res = await fetch("/api/upload", { method: "POST", body: formData });
-                    if (res.ok) {
-                      const { url } = await res.json();
-                      setForm({ ...form, image: url });
-                    }
-                  } catch (err) {
-                    alert("Upload failed.");
-                  }
-                }}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:bg-primary-white"
-              />
+      <AnimatePresence mode="wait">
+        {isEditing !== null ? (
+          <motion.div 
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="bg-white border border-slate-200 rounded-3xl p-8 mb-12 shadow-xl shadow-slate-200/50"
+          >
+            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
+              <h2 className="text-2xl font-extrabold text-slate-900">
+                {isEditing < projects.length ? "Edit Project" : "Create New Project"}
+              </h2>
+              <button onClick={() => setIsEditing(null)} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
+                <X className="w-6 h-6" />
+              </button>
             </div>
 
-            <div className="space-y-4">
-              <div className="space-y-2">
-                <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Project Name</label>
-                <input
-                  type="text"
-                  value={form.title}
-                  onChange={(e) => setForm({ ...form, title: e.target.value })}
-                  className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:border-primary/50 outline-none"
-                  placeholder="e.g. Modern Home Renovation"
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-4">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Category</label>
-                  <input
-                    type="text"
-                    value={form.category}
-                    onChange={(e) => setForm({ ...form, category: e.target.value })}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:border-primary/50 outline-none"
-                    placeholder="e.g. ROOFING"
-                  />
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Year</label>
-                  <input
-                    type="text"
-                    value={form.year}
-                    onChange={(e) => setForm({ ...form, year: e.target.value })}
-                    className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:border-primary/50 outline-none"
-                    placeholder="e.g. 2024"
-                  />
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
+              {/* Image Upload Column */}
+              <div className="space-y-4">
+                <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Showcase Image</label>
+                <div className="relative group">
+                  <div className="w-full h-64 rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center relative">
+                    {form.image ? (
+                      <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
+                    ) : (
+                      <div className="text-center p-6">
+                        <ImageIcon className="w-12 h-12 text-slate-300 mx-auto mb-2" />
+                        <p className="text-slate-400 text-sm font-medium">No image selected</p>
+                      </div>
+                    )}
+                  </div>
+                  <div className="mt-4">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      onChange={async (e) => {
+                        const file = e.target.files?.[0];
+                        if (!file) return;
+                        const formData = new FormData();
+                        formData.append("file", file);
+                        try {
+                          const res = await fetch("/api/upload", { method: "POST", body: formData });
+                          if (res.ok) {
+                            const { url } = await res.json();
+                            setForm({ ...form, image: url });
+                          }
+                        } catch (err) {
+                          alert("Upload failed.");
+                        }
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all cursor-pointer"
+                    />
+                  </div>
                 </div>
               </div>
+
+              {/* Details Column */}
+              <div className="space-y-6">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Title</label>
+                    <input
+                      type="text"
+                      value={form.title}
+                      onChange={(e) => setForm({ ...form, title: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
+                      placeholder="e.g. Modern Residential Roof"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Category</label>
+                    <input
+                      type="text"
+                      value={form.category}
+                      onChange={(e) => setForm({ ...form, category: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
+                      placeholder="e.g. ROOFING"
+                    />
+                  </div>
+                </div>
+
+                <div className="grid grid-cols-2 gap-4">
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Completion Year</label>
+                    <input
+                      type="text"
+                      value={form.year}
+                      onChange={(e) => setForm({ ...form, year: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
+                      placeholder="e.g. 2024"
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Location</label>
+                    <input
+                      type="text"
+                      value={form.location}
+                      onChange={(e) => setForm({ ...form, location: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
+                      placeholder="e.g. Dallas, TX"
+                    />
+                  </div>
+                </div>
+
+                <div className="space-y-2">
+                  <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Description</label>
+                  <textarea
+                    rows={4}
+                    value={form.desc}
+                    onChange={(e) => setForm({ ...form, desc: e.target.value })}
+                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
+                    placeholder="Provide some details about the scope of work..."
+                  />
+                </div>
+              </div>
             </div>
 
-            <div className="space-y-2 md:col-span-2">
-              <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Description</label>
-              <textarea
-                rows={3}
-                value={form.desc}
-                onChange={(e) => setForm({ ...form, desc: e.target.value })}
-                className="w-full bg-white border border-gray-200 rounded-xl px-4 py-3 text-gray-900 text-sm focus:border-primary/50 outline-none"
-              />
+            <div className="flex items-center gap-4 border-t border-slate-100 mt-10 pt-8">
+              <button
+                onClick={handleSaveProject}
+                disabled={saving}
+                className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] disabled:opacity-50"
+              >
+                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+                {saving ? "Saving Changes..." : "Save Project"}
+              </button>
+              <button
+                onClick={() => setIsEditing(null)}
+                className="bg-slate-100 text-slate-600 px-8 py-3 rounded-2xl font-bold hover:bg-slate-200 transition-all"
+              >
+                Cancel
+              </button>
             </div>
-          </div>
-
-          <div className="flex items-center gap-4 border-t border-gray-200 pt-6">
-            <button
-              onClick={handleSaveProject}
-              disabled={saving}
-              className="bg-primary-white px-6 py-2.5 rounded-xl font-medium transition-all"
-            >
-              {saving ? "Saving..." : "Save Project"}
-            </button>
-            <button
-              onClick={() => setIsEditing(null)}
-              className="bg-gray-50 hover:bg-gray-100 text-gray-900 bg-gray-50 hover:bg-gray-100 px-6 py-2.5 rounded-xl font-medium transition-all"
-            >
-              Cancel
-            </button>
-          </div>
-        </div>
-      )}
+          </motion.div>
+        ) : null}
+      </AnimatePresence>
 
       {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
         {projects.map((project, idx) => (
-          <div key={idx} className="bg-white shadow-sm border border-gray-100 rounded-2xl overflow-hidden group">
-            <div className="relative h-48 bg-gray-100">
+          <motion.div 
+            key={idx}
+            initial={{ opacity: 0, scale: 0.95 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ delay: idx * 0.05 }}
+            className="bg-white border border-slate-200 rounded-3xl overflow-hidden group hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 relative"
+          >
+            <div className="relative h-56 overflow-hidden">
               {project.image ? (
                 <img
                   src={project.image}
                   alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
+                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="w-8 h-8 text-gray-900/20" />
+                <div className="w-full h-full bg-slate-50 flex items-center justify-center">
+                  <ImageIcon className="w-12 h-12 text-slate-200" />
                 </div>
               )}
-              <div className="absolute inset-0 bg-gradient-to-t from-gray-900/80 to-transparent" />
-              <div className="absolute bottom-4 left-4">
-                <span className="text-[10px] uppercase tracking-widest font-bold text-primary bg-primary/20 px-2 py-1 rounded-md backdrop-blur-md">
-                  {project.category}
+              <div className="absolute top-4 left-4">
+                <span className="bg-primary/90 text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg">
+                  {project.category || "Project"}
                 </span>
-                <h3 className="text-gray-900 font-bold mt-2">{project.title}</h3>
               </div>
-            </div>
-            <div className="p-4 flex items-center justify-between bg-gray-50">
-              <span className="text-gray-500 text-sm">{project.year}</span>
-              <div className="flex items-center gap-2">
+              <div className="absolute top-4 right-4 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
                 <button
-                  onClick={() => handleEdit(idx)}
-                  className="p-2 bg-gray-50 hover:bg-gray-100 text-gray-600 hover:text-gray-900 rounded-lg transition-colors"
+                  onClick={(e) => { e.preventDefault(); handleEdit(idx); }}
+                  className="p-2.5 bg-white text-slate-900 rounded-xl shadow-xl hover:bg-primary hover:text-white transition-all"
                 >
                   <Pencil className="w-4 h-4" />
                 </button>
                 <button
-                  onClick={() => handleDelete(idx)}
-                  className="p-2 bg-red-500/10 hover:bg-red-500/20 text-red-400 rounded-lg transition-colors"
+                  onClick={(e) => { e.preventDefault(); handleDelete(idx); }}
+                  className="p-2.5 bg-white text-red-600 rounded-xl shadow-xl hover:bg-red-600 hover:text-white transition-all"
                 >
                   <Trash2 className="w-4 h-4" />
                 </button>
               </div>
             </div>
-          </div>
+            <div className="p-6 space-y-4">
+              <div>
+                <h3 className="text-xl font-extrabold text-slate-900 mb-2 leading-tight">{project.title}</h3>
+                <p className="text-slate-500 text-sm font-medium line-clamp-2 leading-relaxed">
+                  {project.desc || "No description provided."}
+                </p>
+              </div>
+              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-slate-400 font-bold text-[10px] uppercase tracking-widest">
+                <div className="flex items-center gap-1.5">
+                  <Calendar className="w-3.5 h-3.5" />
+                  {project.year || "2024"}
+                </div>
+                {project.location && (
+                  <div className="flex items-center gap-1.5">
+                    <MapPin className="w-3.5 h-3.5" />
+                    {project.location}
+                  </div>
+                )}
+              </div>
+            </div>
+          </motion.div>
         ))}
+        
+        {projects.length === 0 && (
+          <div className="col-span-full py-20 text-center bg-white border border-slate-200 border-dashed rounded-3xl">
+            <Folder className="w-16 h-16 text-slate-100 mx-auto mb-4" />
+            <p className="text-slate-400 font-bold">No projects found. Start by adding one!</p>
+          </div>
+        )}
       </div>
     </div>
   );
