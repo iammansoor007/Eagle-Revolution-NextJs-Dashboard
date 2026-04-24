@@ -1,6 +1,7 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
+import { useContent } from "../../../hooks/useContent";
 import {
   motion,
   useScroll,
@@ -188,6 +189,7 @@ const TeamPortrait = ({ image, title, badge1, badge2, alignRight = false }: any)
 export default function MeetTheTeamPage() {
   const sectionRef = useRef<any>(null);
   const [isClient, setIsClient] = useState(false);
+  const { team: teamData } = useContent();
 
   useEffect(() => {
     setIsClient(true);
@@ -274,188 +276,102 @@ export default function MeetTheTeamPage() {
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-6">
               <div className="w-6 sm:w-8 h-[2px] bg-gradient-to-r from-blue-300 to-blue-500" />
               <span className="text-[10px] sm:text-xs font-semibold tracking-[0.2em] uppercase text-blue-600">
-                Our Leadership
+                {teamData?.section?.badge || "Our Leadership"}
               </span>
               <div className="w-6 sm:w-8 h-[2px] bg-gradient-to-r from-blue-500 to-blue-300" />
             </div>
 
             <h1 className="text-3xl min-[350px]:text-4xl sm:text-5xl lg:text-6xl font-light text-slate-900 mb-4 sm:mb-6 leading-tight px-1 sm:px-2">
-              Guiding with<br />
+              {teamData?.section?.headline?.split('with')[0]} with<br />
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-950">
-                vision & integrity
+                {teamData?.section?.headline?.split('with')[1]}
               </span>
             </h1>
 
             <p className="text-slate-500 text-[13px] min-[350px]:text-sm sm:text-lg font-light max-w-2xl mx-auto px-4 leading-relaxed">
-              Experienced leadership committed to excellence in every project, partnership, and promise.
+              {teamData?.section?.description}
             </p>
           </div>
 
-          {/* ====================== */}
-          {/* TEAM MEMBER 1 (Brandon Anderson) - IMAGE LEFT */}
-          {/* ====================== */}
-          <div className="grid lg:grid-cols-12 gap-8 min-[350px]:gap-12 sm:gap-16 md:gap-20 items-center lg:items-start mb-24 sm:mb-32 md:mb-40 relative">
-            <div className="lg:col-span-5 leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0">
-              <TeamPortrait
-                image={Images.BrandonAnderson}
-                title="Brandon Anderson - Founder & CEO"
-                badge1="FOUNDER & CEO"
-                badge2="VISION • INTEGRITY"
-              />
-            </div>
+          {teamData?.members?.map((member: any, index: number) => {
+            const alignRight = index % 2 !== 0;
+            return (
+              <div key={member.id || index} className="grid lg:grid-cols-12 gap-8 min-[350px]:gap-12 sm:gap-16 md:gap-20 items-center lg:items-start mb-24 sm:mb-32 md:mb-40 relative">
+                {alignRight ? (
+                  <>
+                    <div className="lg:col-span-7 space-y-8 order-2 lg:order-1 leadership-reveal relative z-10 lg:pr-6 w-full">
+                      <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 min-[350px]:p-8 sm:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
+                        <h3 className="text-2xl min-[350px]:text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-2 sm:mb-3">
+                          {member.name}
+                          <span className="block text-[10px] sm:text-xs font-mono font-bold text-blue-600 mt-2 sm:mt-3 tracking-[0.2em] uppercase">
+                            {member.role}
+                          </span>
+                        </h3>
 
-            <div className="lg:col-span-7 space-y-8 leadership-reveal relative z-10 lg:pl-6 w-full">
-              <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 min-[350px]:p-8 sm:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
-                <h3 className="text-2xl min-[350px]:text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-2 sm:mb-3">
-                  Brandon Anderson
-                  <span className="block text-[10px] sm:text-xs font-mono font-bold text-blue-600 mt-2 sm:mt-3 tracking-[0.2em] uppercase">
-                    Founder & CEO
-                  </span>
-                </h3>
+                        <div className="mt-8 sm:mt-10 relative">
+                          <div className="absolute -left-3 sm:-left-6 -top-4 sm:-top-6 text-blue-100/60 scale-[1.2] sm:scale-[1.8] pointer-events-none">
+                            <Icons.Quote />
+                          </div>
+                          <div className="space-y-4 sm:space-y-6 text-slate-600 text-[13px] min-[350px]:text-sm sm:text-base md:text-lg leading-relaxed relative z-10">
+                            {member.description.map((paragraph: string, i: number) => (
+                              <p key={i} className={paragraph.startsWith('"') || paragraph.startsWith('\"') ? "italic font-medium text-slate-700" : ""}>
+                                {paragraph}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
 
-                <div className="mt-8 sm:mt-10 relative">
-                  <div className="absolute -left-3 sm:-left-6 -top-4 sm:-top-6 text-blue-100/60 scale-[1.2] sm:scale-[1.8] pointer-events-none">
-                    <Icons.Quote />
-                  </div>
-                  <div className="space-y-4 sm:space-y-6 text-slate-600 text-[13px] min-[350px]:text-sm sm:text-base md:text-lg leading-relaxed relative z-10">
-                    <p>
-                      Originally from Nashville, Tennessee, Brandon was raised in Southern Illinois. Growing up in a difficult home environment, he faced challenges that forced him to mature quickly. Later, his grandparents stepped in to raise him and his two brothers, teaching him what it truly means to show up for family and build something stronger than what you were given.
-                    </p>
-                    <p>
-                      Brandon carried those lessons into his service in the United States Army, where he developed discipline, resilience, and the ability to perform under pressure. The military reinforced a mindset that still defines him today. No excuses. No shortcuts. Just execution.
-                    </p>
-                    <p>
-                      After his service, he pursued a career in high-performance environments, earning multiple promotions and working with top-tier organizations. At the center of Brandon's life is his family—his devoted wife Cassandra and their children. Everything he builds is rooted in creating stability, opportunity, and a legacy reflecting strength, integrity, and purpose.
-                    </p>
-                  </div>
-                </div>
+                    <div className="lg:col-span-5 order-1 lg:order-2 leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0">
+                      <TeamPortrait
+                        image={Images[member.image as keyof typeof Images] || Images.BrandonAnderson}
+                        title={`${member.name} - ${member.role}`}
+                        badge1={member.badge1}
+                        badge2={member.badge2}
+                        alignRight
+                      />
+                    </div>
+                  </>
+                ) : (
+                  <>
+                    <div className="lg:col-span-5 leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0">
+                      <TeamPortrait
+                        image={Images[member.image as keyof typeof Images] || Images.BrandonAnderson}
+                        title={`${member.name} - ${member.role}`}
+                        badge1={member.badge1}
+                        badge2={member.badge2}
+                      />
+                    </div>
+
+                    <div className="lg:col-span-7 space-y-8 leadership-reveal relative z-10 lg:pl-6 w-full">
+                      <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 min-[350px]:p-8 sm:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
+                        <h3 className="text-2xl min-[350px]:text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-2 sm:mb-3">
+                          {member.name}
+                          <span className="block text-[10px] sm:text-xs font-mono font-bold text-blue-600 mt-2 sm:mt-3 tracking-[0.2em] uppercase">
+                            {member.role}
+                          </span>
+                        </h3>
+
+                        <div className="mt-8 sm:mt-10 relative">
+                          <div className="absolute -left-3 sm:-left-6 -top-4 sm:-top-6 text-blue-100/60 scale-[1.2] sm:scale-[1.8] pointer-events-none">
+                            <Icons.Quote />
+                          </div>
+                          <div className="space-y-4 sm:space-y-6 text-slate-600 text-[13px] min-[350px]:text-sm sm:text-base md:text-lg leading-relaxed relative z-10">
+                            {member.description.map((paragraph: string, i: number) => (
+                              <p key={i} className={paragraph.startsWith('"') || paragraph.startsWith('\"') ? "italic font-medium text-slate-700" : ""}>
+                                {paragraph}
+                              </p>
+                            ))}
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </>
+                )}
               </div>
-            </div>
-          </div>
-
-
-
-          {/* ====================== */}
-          {/* TEAM MEMBER 3 (Chrissy Long) - IMAGE LEFT */}
-          {/* ====================== */}
-          <div className="grid lg:grid-cols-12 gap-8 min-[350px]:gap-12 sm:gap-16 md:gap-20 items-center lg:items-start mb-24 sm:mb-32 md:mb-40 relative">
-            <div className="lg:col-span-5 leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0">
-              <TeamPortrait
-                image={Images.ChrissyLong}
-                title="Chrissy Long - Executive Assistant"
-                badge1="EXECUTIVE ASSISTANT"
-                badge2="RELIABLE • PURPOSEFUL"
-              />
-            </div>
-
-            <div className="lg:col-span-7 space-y-8 leadership-reveal relative z-10 lg:pl-6 w-full">
-              <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 min-[350px]:p-8 sm:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
-                <h3 className="text-2xl min-[350px]:text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-2 sm:mb-3">
-                  Chrissy Long
-                  <span className="block text-[10px] sm:text-xs font-mono font-bold text-blue-600 mt-2 sm:mt-3 tracking-[0.2em] uppercase">
-                    Executive Assistant
-                  </span>
-                </h3>
-
-                <div className="mt-8 sm:mt-10 relative">
-                  <div className="absolute -left-3 sm:-left-6 -top-4 sm:-top-6 text-blue-100/60 scale-[1.2] sm:scale-[1.8] pointer-events-none">
-                    <Icons.Quote />
-                  </div>
-                  <div className="space-y-4 sm:space-y-6 text-slate-600 text-[13px] min-[350px]:text-sm sm:text-base md:text-lg leading-relaxed relative z-10">
-                    <p>
-                      Say hello to the newest powerhouse at Eagle Revolution- our amazing new executive assistant, Chrissy Long! She is the backbone that ensures nothing falls through the cracks - because every great company needs a reliable teammate, and every great customer deserves amazing work!
-                    </p>
-                    <p>
-                      Here is a little bit about Chrissy and what she has to say about working at Eagle Revolution:
-                    </p>
-                    <p className="italic font-medium text-slate-700">
-                      " I have found my home, a place with genuine people who really care about their customers and employees, which today is sometimes rare. I truly believe my calling in life is to help others, and this job is exactly that, purposeful and fulfilling. It also gives me the opportunity to live a better-tuned life, take care of my daughters, and still have time for the hobbies I enjoy. When I'm not at work; I am either napping, training for a kickboxing match, serving at my local church, or enjoying time with my family. I really love a simplistic, peaceful lifestyle and I hope to bring those attributes into my work life. "
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* ====================== */}
-          {/* TEAM MEMBER 4 (Austin) - IMAGE RIGHT */}
-          {/* ====================== */}
-          <div className="grid lg:grid-cols-12 gap-8 min-[350px]:gap-12 sm:gap-16 md:gap-20 items-center lg:items-start mb-24 sm:mb-32 md:mb-40 relative">
-            <div className="lg:col-span-7 space-y-8 order-2 lg:order-1 leadership-reveal relative z-10 lg:pr-6 w-full">
-              <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 min-[350px]:p-8 sm:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
-                <h3 className="text-2xl min-[350px]:text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-2 sm:mb-3">
-                  Austin
-                  <span className="block text-[10px] sm:text-xs font-mono font-bold text-blue-600 mt-2 sm:mt-3 tracking-[0.2em] uppercase">
-                    Canvas Manager
-                  </span>
-                </h3>
-
-                <div className="mt-8 sm:mt-10 relative">
-                  <div className="absolute -left-3 sm:-left-6 -top-4 sm:-top-6 text-blue-100/60 scale-[1.2] sm:scale-[1.8] pointer-events-none">
-                    <Icons.Quote />
-                  </div>
-                  <div className="space-y-4 sm:space-y-6 text-slate-600 text-[13px] min-[350px]:text-sm sm:text-base md:text-lg leading-relaxed relative z-10">
-                    <p>Drumroll, please! 🥁 It's time for you to meet the dream team behind Eagle Revolution!🦅</p>
-                    <p>First up is our amazing canvas manager, Austin! We are so grateful to have a leader who brings creativity, care, and amazing organization to every project.</p>
-                    <p>Here's what Austin has to say about working for the company:</p>
-                    <p className="italic font-medium text-slate-700">
-                      "As a Canvas Manager at Eagle Revolution, going on 5 months I'm proud and grateful to be part of a team where growth isn't just encouraged-it's built into everything we do. That mindset doesn't stop at work; it flows into how I live. I thrive outdoors; whether I'm at the park with my kids, exploring nature, or enjoying a sporting event. I truly believe connection, movement, and joy go hand in hand. Yoga and mindfulness practices keep me grounded, but I'm always reaching forward, learning, and evolving. At work and in life, I believe growth isn't a destination-it's a daily practice, shaped by purpose, presence and the courage to keep showing up, fully."
-                    </p>
-                    <p>Thank you Austin for all you do for the team!</p>
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            <div className="lg:col-span-5 order-1 lg:order-2 leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0">
-              <TeamPortrait
-                image={Images.Austin}
-                title="Austin - Canvas Manager"
-                badge1="CANVAS MANAGER"
-                badge2="GROWTH • MINDFULNESS"
-                alignRight
-              />
-            </div>
-          </div>
-
-          {/* ====================== */}
-          {/* TEAM MEMBER 5 (Brandon) - IMAGE LEFT */}
-          {/* ====================== */}
-          <div className="grid lg:grid-cols-12 gap-8 min-[350px]:gap-12 sm:gap-16 md:gap-20 items-center lg:items-start mb-24 sm:mb-32 md:mb-40 relative">
-            <div className="lg:col-span-5 leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0">
-              <TeamPortrait
-                image={Images.BrandonSales}
-                title="Brandon - Construction Sales Professional"
-                badge1="SALES PROFESSIONAL"
-                badge2="KNOWLEDGE • HONESTY"
-              />
-            </div>
-
-            <div className="lg:col-span-7 space-y-8 leadership-reveal relative z-10 lg:pl-6 w-full">
-              <div className="bg-white/70 backdrop-blur-xl rounded-[2rem] sm:rounded-[2.5rem] p-6 min-[350px]:p-8 sm:p-10 border border-white shadow-[0_20px_40px_-15px_rgba(0,0,0,0.05)]">
-                <h3 className="text-2xl min-[350px]:text-3xl sm:text-4xl md:text-5xl font-light text-slate-900 mb-2 sm:mb-3">
-                  Brandon
-                  <span className="block text-[10px] sm:text-xs font-mono font-bold text-blue-600 mt-2 sm:mt-3 tracking-[0.2em] uppercase">
-                    Construction Sales Professional
-                  </span>
-                </h3>
-
-                <div className="mt-8 sm:mt-10 relative">
-                  <div className="absolute -left-3 sm:-left-6 -top-4 sm:-top-6 text-blue-100/60 scale-[1.2] sm:scale-[1.8] pointer-events-none">
-                    <Icons.Quote />
-                  </div>
-                  <div className="space-y-4 sm:space-y-6 text-slate-600 text-[13px] min-[350px]:text-sm sm:text-base md:text-lg leading-relaxed relative z-10">
-                    <p>
-                      Brandon is a construction sales professional with over 12 years of experience specializing in windows, doors, and roofing. He's known for his straightforward approach, strong product knowledge, and commitment to helping customers find the right solutions for their homes.
-                    </p>
-                    <p>
-                      As an Illinois resident, Brandon takes pride in serving his local community with honesty and dependable service. Outside of work, Brandon is a dedicated softball dad and enjoys spending his free time on the golf course.
-                    </p>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
+            );
+          })}
 
           {/* ====================== */}
           {/* FOOTER NOTE */}

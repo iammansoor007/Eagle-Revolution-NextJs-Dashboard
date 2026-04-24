@@ -202,40 +202,10 @@ const StatCounter = ({ value, label, suffix = "", delay = 0, icon: Icon, descrip
 
 // ==================== STATS SECTION ====================
 const StatsSection = () => {
-  const stats = [
-    {
-      value: 50,
-      label: "Years Combined Experience",
-      suffix: "+",
-      delay: 0.1,
-      icon: Clock,
-      description: "Industry expertise across our team"
-    },
-    {
-      value: 1000,
-      label: "Homes Transformed",
-      suffix: "+",
-      delay: 0.2,
-      icon: LucideHome,
-      description: "Satisfied homeowners"
-    },
-    {
-      value: 100,
-      label: "Veteran Owned",
-      suffix: "%",
-      delay: 0.3,
-      icon: BadgeCheck,
-      description: "Proudly serving our community"
-    },
-    {
-      value: 10,
-      label: "Year Workmanship Guarantee",
-      suffix: "YR",
-      delay: 0.4,
-      icon: LucideShield,
-      description: "Peace of mind guaranteed"
-    }
-  ];
+  const { aboutPage } = useContent();
+  const { stats: statsData } = aboutPage;
+
+  const iconLookup: Record<string, any> = { Clock, Home: LucideHome, BadgeCheck, Shield: LucideShield };
 
   return (
     <section className="py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-muted/30 to-background">
@@ -244,28 +214,26 @@ const StatsSection = () => {
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
             <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
             <span className="text-[10px] sm:text-xs md:text-sm font-medium text-primary uppercase tracking-wider">
-              Our Impact
+              {statsData.badge}
             </span>
           </div>
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-4 px-2">
-            Trusted by Homeowners
-            <br className="hidden sm:block" />
-            <span className="text-primary"> Across the Region</span>
+            {statsData.headline}
           </h2>
           <p className="text-xs sm:text-sm md:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-3 sm:px-4">
-            Numbers speak louder than words. Here's what we've achieved together with our valued customers.
+            {statsData.description}
           </p>
         </div>
 
         <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-2 sm:gap-4 md:gap-6 lg:gap-8">
-          {stats.map((stat, index) => (
+          {statsData.items.map((stat: any, index: number) => (
             <StatCounter
               key={index}
               value={stat.value}
               label={stat.label}
               suffix={stat.suffix}
-              delay={stat.delay}
-              icon={stat.icon}
+              delay={0.1 + index * 0.1}
+              icon={iconLookup[stat.icon] || LucideShield}
               description={stat.description}
             />
           ))}
@@ -273,20 +241,12 @@ const StatsSection = () => {
 
         <div className="mt-8 sm:mt-12 md:mt-16 text-center">
           <div className="flex flex-wrap justify-center gap-3 sm:gap-4 md:gap-8 items-center opacity-60">
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Users className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
-              <span className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">500+ 5-Star Reviews</span>
-            </div>
-            <div className="w-px h-2 sm:h-3 bg-border rounded-full hidden sm:block" />
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <Award className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
-              <span className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">A+ BBB Rating</span>
-            </div>
-            <div className="w-px h-2 sm:h-3 bg-border rounded-full hidden sm:block" />
-            <div className="flex items-center gap-1.5 sm:gap-2">
-              <LucideStar className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
-              <span className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">Top Rated Contractor</span>
-            </div>
+            {statsData.trustBadges.map((badge: any, i: number) => (
+              <div key={i} className="flex items-center gap-1.5 sm:gap-2">
+                <Icon name={badge.icon} className="w-3 h-3 sm:w-4 sm:h-4 md:w-5 md:h-5 text-primary" />
+                <span className="text-[10px] sm:text-xs md:text-sm text-muted-foreground">{badge.text}</span>
+              </div>
+            ))}
           </div>
         </div>
       </div>
@@ -299,6 +259,9 @@ const Hero = () => {
   const { scrollY } = useScroll();
   const y1 = useTransform(scrollY, [0, 500], [0, 150]);
   const textY = useTransform(scrollY, [0, 500], [0, -50]);
+  const { aboutPage } = useContent();
+  const { hero } = aboutPage;
+  const statIconMap: Record<string, any> = { ShieldCheck, Zap, Globe };
 
   return (
     <section className="relative min-h-[85vh] sm:min-h-screen w-full bg-background overflow-hidden flex items-center justify-center py-16 sm:py-12">
@@ -336,16 +299,16 @@ const Hero = () => {
             transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
           >
             <h1 className="text-5xl xs:text-5xl sm:text-5xl md:text-7xl lg:text-[80px] xl:text-[100px] font-black leading-[1.05] sm:leading-[1.1] md:leading-[0.95] lg:leading-[0.85] tracking-tighter text-primary mb-4 sm:mb-6">
-              SOARING <br />
+              {hero.headline.line1} <br />
               <span className="relative inline-block text-transparent bg-clip-text bg-gradient-to-r from-foreground via-foreground/70 to-foreground/90">
-                BEYOND
+                {hero.headline.line2}
               </span>
               <br />
-              EXPECTATIONS.
+              {hero.headline.line3}
             </h1>
 
             <p className="text-muted-foreground text-lg sm:text-lg md:text-lg lg:text-xl xl:text-2xl max-w-xl mx-auto lg:mx-0 mb-6 sm:mb-8 font-medium leading-relaxed px-2 sm:px-0">
-              Born in O'Fallon, Missouri. Built on military precision. Driven by integrity.
+              {hero.description}
             </p>
 
             <div className="flex flex-row gap-3 sm:gap-4 justify-center lg:justify-start items-center">
@@ -355,7 +318,7 @@ const Hero = () => {
                   whileTap={{ scale: 0.98 }}
                   className="px-12 sm:px-14 md:px-16 py-3 sm:py-4 md:py-5 bg-primary text-primary-foreground font-bold text-lg rounded-xl flex items-center justify-center gap-2 sm:gap-3 group transition-all hover:text-white"
                 >
-                  Contact Now
+                  {hero.cta}
                   <ArrowUpRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 group-hover:-translate-y-1 transition-transform" />
                 </motion.div>
               </Link>
@@ -381,38 +344,37 @@ const Hero = () => {
                       <LucideStar key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                     ))}
                   </div>
-                  <p className="text-xs text-muted-foreground">Trusted by 500+ Homeowners</p>
+                  <p className="text-xs text-muted-foreground">{hero.trustLabel}</p>
                 </div>
 
                 {/* Stats - Clean & Simple */}
                 <div className="space-y-4">
-                  {[
-                    { label: 'Veteran Owned', val: 'USA', icon: <ShieldCheck className="text-primary w-5 h-5" /> },
-                    { label: 'Quality Guarantee', val: 'Lifetime', icon: <Zap className="text-primary w-5 h-5" /> },
-                    { label: 'Support', val: '24/7', icon: <Globe className="text-primary w-5 h-5" /> },
-                  ].map((stat, i) => (
-                    <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-background/40 border border-border/40">
-                      <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
-                        {stat.icon}
+                  {hero.stats.map((stat: any, i: number) => {
+                    const StatIcon = statIconMap[stat.icon] || ShieldCheck;
+                    return (
+                      <div key={i} className="flex items-center gap-4 p-3 rounded-xl bg-background/40 border border-border/40">
+                        <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+                          <StatIcon className="text-primary w-5 h-5" />
+                        </div>
+                        <div>
+                          <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">{stat.label}</p>
+                          <p className="text-xl font-black text-foreground">{stat.val}</p>
+                        </div>
                       </div>
-                      <div>
-                        <p className="text-muted-foreground text-[10px] uppercase tracking-wider font-bold">{stat.label}</p>
-                        <p className="text-xl font-black text-foreground">{stat.val}</p>
-                      </div>
-                    </div>
-                  ))}
+                    );
+                  })}
                 </div>
 
                 {/* Simple CTA */}
                 <div className="mt-6 pt-4 border-t border-border/60">
                   <div className="text-center">
                     <a
-                      href="tel:636-449-9714"
+                      href={`tel:${hero.phone.replace(/-/g, '')}`}
                       className="text-lg font-bold text-foreground hover:text-primary transition-colors"
                     >
-                      636-449-9714
+                      {hero.phone}
                     </a>
-                    <p className="text-xs text-muted-foreground mt-1">Call for Free Estimate</p>
+                    <p className="text-xs text-muted-foreground mt-1">{hero.phoneLabel}</p>
                   </div>
                 </div>
 
@@ -447,6 +409,8 @@ const FounderPortrait = () => {
   const [isHovered, setIsHovered] = useState(false);
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
+  const { aboutPage } = useContent();
+  const { story } = aboutPage;
 
   return (
     <motion.div
@@ -505,7 +469,7 @@ const FounderPortrait = () => {
           <div className="bg-card/95 backdrop-blur-sm px-2 sm:px-3 md:px-5 py-1 sm:py-2 md:py-2.5 rounded-full shadow-xl border border-border">
             <span className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-[10px] md:text-xs font-bold text-primary">
               <Icon name="Flag" className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-              VETERAN OWNED
+              {story.portrait.badgeLeft}
             </span>
           </div>
         </motion.div>
@@ -519,7 +483,7 @@ const FounderPortrait = () => {
           <div className="bg-card/95 backdrop-blur-sm px-2 sm:px-3 md:px-5 py-1 sm:py-2 md:py-2.5 rounded-full shadow-xl border border-border">
             <span className="flex items-center gap-1 sm:gap-2 text-[8px] sm:text-[10px] md:text-xs font-bold text-primary">
               <Icon name="Award" className="w-2 h-2 sm:w-3 sm:h-3 md:w-4 md:h-4" />
-              ProVia • IKO • CertainTeed • Wolf
+              {story.portrait.badgeRight}
             </span>
           </div>
         </motion.div>
@@ -532,6 +496,8 @@ const FounderPortrait = () => {
 const FounderStory = () => {
   const sectionRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
+  const { aboutPage } = useContent();
+  const { story } = aboutPage;
 
   useEffect(() => {
     setIsClient(true);
@@ -614,17 +580,17 @@ const FounderStory = () => {
           <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
             <div className="w-6 sm:w-8 h-[2px] bg-gradient-to-r from-primary/30 to-primary" />
             <span className="text-[10px] sm:text-xs font-medium tracking-[0.2em] uppercase text-primary">
-              Our Story
+              {story.badge}
             </span>
             <div className="w-6 sm:w-8 h-[2px] bg-gradient-to-r from-primary to-primary/30" />
           </div>
 
           <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-light text-foreground mb-4 sm:mb-6 leading-tight px-2">
-            Soaring Beyond <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">Expectations</span>
+            {story.headline.replace(story.highlight, '')} <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">{story.highlight}</span>
           </h2>
 
           <p className="text-muted-foreground text-sm sm:text-base md:text-lg lg:text-xl font-light max-w-2xl mx-auto px-3 sm:px-4">
-            Born in O'Fallon, Missouri. Built on military precision. Driven by integrity.
+            {story.description}
           </p>
         </div>
 
@@ -636,9 +602,9 @@ const FounderStory = () => {
           <div className="space-y-6 sm:space-y-8 md:space-y-10 founder-reveal">
             <div>
               <h3 className="text-2xl sm:text-3xl md:text-4xl font-light text-foreground mb-3 sm:mb-4 text-left">
-                Brandon Anderson
+                {story.founder.name}
                 <span className="block text-xs sm:text-sm font-mono text-primary mt-1 sm:mt-2 tracking-[0.15em] sm:tracking-[0.2em] uppercase">
-                  Founder • U.S. Army Veteran • Globally Licensed Combat Sports Official
+                  {story.founder.title}
                 </span>
               </h3>
 
@@ -647,34 +613,30 @@ const FounderStory = () => {
                   <Icon name="Quote" className="w-6 h-6 sm:w-8 sm:h-8 md:w-10 md:h-10" />
                 </div>
                 <p className="text-foreground text-base sm:text-lg md:text-xl font-medium leading-relaxed pl-4 sm:pl-6 md:pl-8">
-                  &ldquo;Eagle Revolution was built to be more than just a remodeling company. It was built to lead a movement.&rdquo;
+                  &ldquo;{story.founder.quote}&rdquo;
                 </p>
               </div>
 
               <div className="mt-6 sm:mt-8 space-y-3 sm:space-y-4 md:space-y-5">
-                <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
-                  Based in O'Fallon, Missouri, Eagle Revolution was founded by Brandon Anderson, an Army veteran and globally licensed combat sports official who brings discipline, precision, and accountability to every project. With years of leadership experience at some of the largest home improvement companies in North America, Brandon saw firsthand how the industry had shifted away from homeowners and toward profits, leaving people with high prices, poor communication, and broken trust.
-                </p>
-                <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
-                  He knew it didn't have to be that way. Eagle Revolution was created to restore what the industry lost—trust, craftsmanship, and doing the job right the first time. Today, we stand as a local company built to compete with the biggest names in the country, not through gimmicks, but through transparency, quality work, and a relentless commitment to our customers.
-                </p>
-                <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
-                  Our systems are built for precision, but our strength is our people—driven professionals who take ownership, communicate clearly, and treat every home like their own.
-                </p>
+                {story.founder.bio.map((paragraph: string, i: number) => (
+                  <p key={i} className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed">
+                    {paragraph}
+                  </p>
+                ))}
               </div>
 
               <blockquote className="border-l-4 border-primary pl-3 sm:pl-4 md:pl-6 py-2 my-6 sm:my-8">
                 <p className="text-sm sm:text-base md:text-lg font-medium text-foreground italic">
-                  "This is freedom in construction form—freedom from overpriced corporate contractors, freedom from broken promises, and freedom to expect more from your remodeler."
+                  "{story.founder.secondaryQuote}"
                 </p>
                 <footer className="mt-2 sm:mt-3 font-bold text-[10px] sm:text-xs text-primary uppercase tracking-widest">
-                  — Brandon Anderson, CEO
+                  {story.founder.footer}
                 </footer>
               </blockquote>
 
               <div className="flex flex-wrap items-center justify-start gap-3 sm:gap-4 mt-8 sm:mt-10 pt-4 border-t border-border">
                 <motion.a
-                  href="https://www.linkedin.com/company/eagle-revolution/people/"
+                  href={story.founder.social.linkedin}
                   target="_blank"
                   rel="noopener noreferrer"
                   whileHover={{ scale: 1.1 }}
@@ -685,7 +647,7 @@ const FounderStory = () => {
                   <Icon name="Linkedin" className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.a>
                 <motion.a
-                  href="mailto:banderson@eaglerevolution.com"
+                  href={`mailto:${story.founder.email}`}
                   whileHover={{ scale: 1.1 }}
                   whileTap={{ scale: 0.95 }}
                   className="p-2 sm:p-3 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
@@ -694,7 +656,7 @@ const FounderStory = () => {
                   <Icon name="Mail" className="w-4 h-4 sm:w-5 sm:h-5" />
                 </motion.a>
                 <span className="text-[10px] sm:text-xs md:text-sm text-muted-foreground break-all">
-                  banderson@eaglerevolution.com
+                  {story.founder.email}
                 </span>
               </div>
             </div>
@@ -714,32 +676,13 @@ const MissionSection = () => {
     amount: 0.1,
   });
 
-  const corePrinciples = [
-    {
-      title: "Fairness",
-      desc: "Honest pricing with zero hidden agendas. Every quote is transparent, every invoice is exact—building trust through radical transparency.",
-      val: "01",
-      icon: Scale,
-    },
-    {
-      title: "Honesty",
-      desc: "Transparent communication at every milestone. No surprises, no shortcuts—just unwavering integrity that defines our character.",
-      val: "02",
-      icon: Gem,
-    },
-    {
-      title: "Hard Work",
-      desc: "Relentless pursuit of perfection until excellence is achieved. We measure success by your satisfaction, not by the clock.",
-      val: "03",
-      icon: Zap,
-    },
-    {
-      title: "Precision",
-      desc: "Military-grade accuracy in every detail. From initial measurements to final execution—where craftsmanship meets mathematical certainty.",
-      val: "04",
-      icon: LucideTarget,
-    },
-  ];
+  const { aboutPage } = useContent();
+  const { mission } = aboutPage;
+  const principleIconMap: Record<string, any> = { Scale, Gem, Zap, Target: LucideTarget };
+  const corePrinciples = (mission.principles || []).map((p: any) => ({
+    ...p,
+    icon: principleIconMap[p.icon] || Scale,
+  }));
 
   return (
     <section
@@ -780,7 +723,7 @@ const MissionSection = () => {
           >
             <div className="mb-6 sm:mb-8">
               <h2 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold">
-                Our Mission
+                {mission.headline}
               </h2>
               <motion.div
                 initial={{ width: 0 }}
@@ -790,15 +733,11 @@ const MissionSection = () => {
             </div>
 
             <p className="text-sm sm:text-base md:text-lg text-muted-foreground mb-6 sm:mb-8 px-2 sm:px-0">
-              To revolutionize the remodeling industry by putting people first—restoring trust through transparency, exceptional craftsmanship, and an unwavering commitment to doing what’s right.
+              {mission.description}
             </p>
 
             <div className="flex gap-4 sm:gap-6 justify-center lg:justify-start">
-              {[
-                { value: "100%", label: "Customer First" },
-                { value: "0%", label: "Hidden Agendas" },
-                { value: "∞", label: "Commitment" },
-              ].map((stat, i) => (
+              {(mission.stats || []).map((stat: any, i: number) => (
                 <div key={i} className="text-center">
                   <div className="text-xl sm:text-2xl font-bold">{stat.value}</div>
                   <div className="text-[10px] sm:text-xs text-muted-foreground">
@@ -847,10 +786,8 @@ const MissionSection = () => {
 
 // ==================== PREMIUM MARQUEE ====================
 const RecognitionMarquee = () => {
-  const certs = [
-    "ProVia Certified", "IKO Pro", "Shingle Master",
-    "TimberTech", "Veteran Owned", "Contractor Excellence", "Wolf Home Products Certified"
-  ];
+  const { aboutPage } = useContent();
+  const certs = aboutPage.recognition || [];
 
   return (
     <section className="py-6 sm:py-8 md:py-12 mt-2 overflow-hidden relative bg-background">
@@ -1012,7 +949,9 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
 
 // ==================== SERVICES SECTION ====================
 const ServicesSection = () => {
-  const servicesList = (servicesData?.services || []).map(service => ({
+  const { aboutPage } = useContent();
+  const { capabilities } = aboutPage;
+  const servicesList = (servicesData?.services || []).map((service: any) => ({
     ...service,
     image: imageMap[service.title] || roofingImg
   }));
@@ -1029,14 +968,14 @@ const ServicesSection = () => {
           className="text-center mb-16"
         >
           <span className="inline-block text-primary text-xs font-black uppercase tracking-[0.5em] mb-4">
-            Eagle Revolution
+            {capabilities.badge}
           </span>
           <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground">
-            World Class <span className="text-primary">Capabilities</span>
+            {capabilities.headline.replace('Capabilities', '')} <span className="text-primary">Capabilities</span>
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6" />
           <p className="max-w-3xl mx-auto text-muted-foreground text-lg md:text-xl leading-relaxed">
-            Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area.
+            {capabilities.description}
           </p>
         </motion.div>
 
@@ -1075,6 +1014,9 @@ const ServicesSection = () => {
 };
 // ==================== CTA BANNER ====================
 const AwardCTABanner = () => {
+  const { aboutPage } = useContent();
+  const { ctaBanner } = aboutPage;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -1123,32 +1065,26 @@ const AwardCTABanner = () => {
             >
               <span className="w-4 sm:w-6 md:w-8 h-[1px] sm:h-[2px] bg-primary" />
               <span className="text-[8px] sm:text-[10px] md:text-xs font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-primary">
-                Get Preapproved
+                {ctaBanner.badge}
               </span>
             </motion.div>
 
             <h3 className="text-lg sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-bold text-foreground mb-2 sm:mb-3 md:mb-4 leading-tight">
-              Ready to Start Your{' '}
-              <span className="text-primary">Revolution?</span>
+              {ctaBanner.headline.replace(ctaBanner.highlight, '')}{' '}
+              <span className="text-primary">{ctaBanner.highlight}</span>
             </h3>
 
             <p className="text-muted-foreground text-xs sm:text-sm md:text-base lg:text-lg leading-relaxed max-w-lg mx-auto lg:mx-0 px-2 sm:px-0">
-              Get preapproved in seconds and take the first step toward transforming your home with military precision and unwavering integrity.
+              {ctaBanner.description}
             </p>
 
             <div className="flex flex-wrap justify-center lg:justify-start items-center gap-2 sm:gap-3 md:gap-4 lg:gap-6 mt-3 sm:mt-4 md:mt-6">
-              <div className="flex items-center gap-1 sm:gap-2">
-                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-primary rounded-full" />
-                <span className="text-[8px] sm:text-[10px] md:text-xs text-muted-foreground">No Obligation</span>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-2">
-                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-primary rounded-full" />
-                <span className="text-[8px] sm:text-[10px] md:text-xs text-muted-foreground">Free Estimate</span>
-              </div>
-              <div className="flex items-center gap-1 sm:gap-2">
-                <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-primary rounded-full" />
-                <span className="text-[8px] sm:text-[10px] md:text-xs text-muted-foreground">5 Year Guarantee</span>
-              </div>
+              {ctaBanner.features.map((feature: string, i: number) => (
+                <div key={i} className="flex items-center gap-1 sm:gap-2">
+                  <div className="w-1 h-1 sm:w-1.5 sm:h-1.5 bg-primary rounded-full" />
+                  <span className="text-[8px] sm:text-[10px] md:text-xs text-muted-foreground">{feature}</span>
+                </div>
+              ))}
             </div>
           </div>
 
@@ -1160,7 +1096,7 @@ const AwardCTABanner = () => {
                 className="relative h-full px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-primary text-primary-foreground font-bold rounded-full shadow-lg hover:shadow-xl hover:text-white transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2 group"
               >
                 <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
-                  Get Preapproved
+                  {ctaBanner.primaryCta}
                   <motion.svg
                     className="w-3 h-3 sm:w-3.5 sm:h-3.5 md:w-4 md:h-4 transition-transform duration-300 group-hover:translate-x-1"
                     fill="none"
@@ -1181,7 +1117,7 @@ const AwardCTABanner = () => {
                 className="relative h-full px-4 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 bg-background text-primary border-2 border-primary font-bold rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300 overflow-hidden flex items-center justify-center gap-1.5 sm:gap-2"
               >
                 <span className="relative z-10 flex items-center gap-1 sm:gap-2 text-xs sm:text-sm md:text-base whitespace-nowrap">
-                  Contact Us
+                  {ctaBanner.secondaryCta}
                 </span>
               </motion.div>
             </Link>
@@ -1196,50 +1132,17 @@ const AwardCTABanner = () => {
 const ValuesGrid = () => {
   const sectionRef = useRef<HTMLElement>(null);
   const [hoveredCard, setHoveredCard] = useState<number | null>(null);
+  const { aboutPage } = useContent();
+  const { values: valuesData } = aboutPage;
 
-  const values = [
-    {
-      title: 'Customer First',
-      description: 'Our customers always come first here at Eagle Revolution. We ensure that our customers can have complete confidence in the quality of our work, knowing that we will always act in their best interests and stand behind our products and services with unwavering dedication.',
-      icon: BadgeCheck,
-      number: '01',
-      stat: '500+',
-      statLabel: 'Happy Clients',
-    },
-    {
-      title: 'Integrity',
-      description: 'In the remodeling industry, integrity means consistently doing what is right, even when no one is watching. We believe in keeping our promises, providing accurate estimates, and delivering on our commitments without cutting corners.',
-      icon: CheckCircle,
-      number: '02',
-      stat: '0%',
-      statLabel: 'Hidden Fees',
-    },
-    {
-      title: 'Extreme Ownership',
-      description: 'By embracing this mindset, we ensure that we always act in the best interests of our clients, driving continuous improvement and achieving excellence in every project we undertake. We are not perfect by any means, but we are perfect at fixing any mistake along the way.',
-      icon: LucideShield,
-      number: '03',
-      stat: '100%',
-      statLabel: 'Accountability',
-    },
-    {
-      title: 'Gratitude',
-      description: 'By expressing gratitude, we build lasting relationships and create a positive impact, ensuring every interaction is rooted in kindness and acknowledgment. We believe that a thankful mindset inspires excellence in service and craftsmanship, making every project a shared celebration.',
-      icon: Sparkles,
-      number: '04',
-      stat: '100%',
-      statLabel: 'Grateful',
-    },
-    {
-      title: 'Growth',
-      description: 'We believe that growth is essential not only for individual team members but also for the company as a whole. This core value drives us to seek out new learning opportunities, embrace innovation, and stay up-to-date with industry trends and best practices.',
-      icon: TrendingUp,
-      number: '05',
-      stat: '∞',
-      statLabel: 'Continuous',
-    },
+  const valueIconMap: Record<string, any> = {
+    BadgeCheck, CheckCircle, Shield: LucideShield, Sparkles, TrendingUp
+  };
 
-  ];
+  const values = (valuesData?.items || []).map((v: any) => ({
+    ...v,
+    icon: valueIconMap[v.icon] || BadgeCheck,
+  }));
 
   return (
     <section className="relative py-12 sm:py-16 md:py-20 lg:py-24 bg-gradient-to-b from-background via-muted/30 to-background overflow-hidden">
@@ -1268,7 +1171,7 @@ const ValuesGrid = () => {
           >
             <div className="w-4 sm:w-6 md:w-8 h-px bg-primary" />
             <span className="text-[8px] sm:text-[10px] md:text-xs font-mono tracking-[0.2em] sm:tracking-[0.3em] text-primary uppercase">
-              Our Core Values
+              {valuesData.badge}
             </span>
             <div className="w-4 sm:w-6 md:w-8 h-px bg-primary" />
           </motion.div>
@@ -1280,10 +1183,10 @@ const ValuesGrid = () => {
             transition={{ delay: 0.1 }}
             className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl xxl:text-7xl font-bold tracking-tight px-2"
           >
-            <span className="text-foreground">Built on</span>
+            <span className="text-foreground">{valuesData.headline.replace(valuesData.highlight, '')}</span>
             <br />
             <span className="bg-gradient-to-r from-primary to-primary/95 bg-clip-text text-transparent">
-              Unshakable Principles
+              {valuesData.highlight}
             </span>
           </motion.h2>
 
@@ -1294,7 +1197,7 @@ const ValuesGrid = () => {
             transition={{ delay: 0.2 }}
             className="text-muted-foreground mt-3 sm:mt-4 md:mt-6 max-w-2xl mx-auto text-xs sm:text-sm md:text-base px-3 sm:px-4"
           >
-            Six principles that guide every decision, every interaction, and every project we undertake.
+            {valuesData.description}
           </motion.p>
 
           <motion.div
