@@ -34,196 +34,27 @@ import window2 from '../../assets/windowimage.jpg';
 
 
 
-// ============================================================================
-// PROJECT DATA - Mapped to your services
-// ============================================================================
-const CATEGORIES = [
-    "All",
-    "Custom Decks",
-    "PVC Decking",
-    "Windows & Doors",
-    "Residential Roofing",
-    "Commercial Roofing",
-    "Siding, Soffit & Fascia",
-    "Gutters & Protection"
-];
+const imageMap: Record<string, any> = {
+    commercialroof,
+    decks,
+    deck3,
+    deck2,
+    door,
+    residental1,
+    residental2,
+    siding,
+    windowImg,
+    gutter,
+    pvc,
+    window2
+};
 
-const PROJECTS = [
-    // Custom Decks Projects
-    {
-        id: 1,
-        title: "Lakeside Composite Deck",
-        subtitle: "Premium Outdoor Living",
-        category: "Custom Decks",
-        location: "Lake Ozark, MO",
-        year: "2024",
-        description: "Expansive composite deck with built-in lighting, custom pergola, and glass railings overlooking the lake. Features hidden fasteners and premium weather-resistant materials.",
-        image: decks, // Pass directly, not wrapped in object
-        featured: true,
-        size: "large",
-        specs: { sqft: "850", duration: "12 days", warranty: "25 Year" },
-    },
-    {
-        id: 2,
-        title: "Multi-Level Entertainment Deck",
-        subtitle: "Architectural Masterpiece",
-        category: "Custom Decks",
-        location: "Chesterfield, MO",
-        year: "2023",
-        description: "Three-tier deck system with integrated hot tub platform, outdoor kitchen area, and custom cable railing system for unobstructed views.",
-        image: deck2, // Pass directly
-        featured: true,
-        size: "wide",
-        specs: { sqft: "1,200", duration: "18 days", warranty: "25 Year" },
-    },
-    {
-        id: 3,
-        title: "Cedar Deck with Pergola",
-        subtitle: "Natural Wood Beauty",
-        category: "Custom Decks",
-        location: "Wildwood, MO",
-        year: "2024",
-        description: "Premium cedar deck with custom-built pergola, built-in bench seating, and ambient LED lighting throughout for evening entertaining.",
-        image: deck3, // Pass directly
-        featured: false,
-        size: "normal",
-        specs: { sqft: "450", duration: "8 days", warranty: "Lifetime" },
-    },
-
-    // PVC Decking Projects
-    {
-        id: 4,
-        title: "Poolside PVC Paradise",
-        subtitle: "Waterproof Performance",
-        category: "PVC Decking",
-        location: "Town & Country, MO",
-        year: "2024",
-        description: "100% polymer PVC decking surrounding an infinity pool. Features cool-touch technology and superior slip resistance for wet conditions.",
-        image: pvc, // Pass directly
-        featured: true,
-        size: "tall",
-        specs: { sqft: "620", duration: "10 days", warranty: "Lifetime" },
-    },
-
-    // Windows & Doors Projects
-    {
-        id: 6,
-        title: "Whole-Home Window Transformation",
-        subtitle: "Energy Efficiency Upgrade",
-        category: "Windows & Doors",
-        location: "Clayton, MO",
-        year: "2024",
-        description: "Complete window replacement with Energy Star rated vinyl windows featuring Low-E glass and argon gas fills. 35% energy savings achieved.",
-        image: windowImg, // Pass directly
-        featured: true,
-        size: "wide",
-        specs: { sqft: "N/A", duration: "5 days", warranty: "Lifetime" },
-    },
-    {
-        id: 7,
-        title: "Custom Entry Door System",
-        subtitle: "Security & Curb Appeal",
-        category: "Windows & Doors",
-        location: "Ladue, MO",
-        year: "2024",
-        description: "Premium fiberglass entry door with multi-point locking system, decorative glass inserts, and custom sidelights for maximum curb appeal.",
-        image: door, // Pass directly
-        featured: true,
-        size: "tall",
-        specs: { sqft: "N/A", duration: "2 days", warranty: "Lifetime" },
-    },
-    {
-        id: 8,
-        title: "Patio Door Installation",
-        subtitle: "Indoor-Outdoor Flow",
-        category: "Windows & Doors",
-        location: "Creve Coeur, MO",
-        year: "2023",
-        description: "Premium sliding patio door with UV protection glass and smooth-glide track system. Dramatically improves natural light and access.",
-        image: window2, // Pass directly
-        featured: false,
-        size: "normal",
-        specs: { sqft: "N/A", duration: "1 day", warranty: "20 Year" },
-    },
-
-    // Residential Roofing Projects
-    {
-        id: 9,
-        title: "Presidential TL Estate",
-        subtitle: "Luxury Asphalt Roofing",
-        category: "Residential Roofing",
-        location: "Frontenac, MO",
-        year: "2024",
-        description: "GAF Presidential TL shingles with copper flashing, premium ridge ventilation, and full ice & water shield underlayment. 50-year warranty.",
-        image: residental1, // Pass directly
-        featured: true,
-        size: "large",
-        specs: { sqft: "4,200", duration: "4 days", warranty: "50 Year" },
-    },
-    {
-        id: 10,
-        title: "Storm Damage Restoration",
-        subtitle: "Insurance Claim Specialist",
-        category: "Residential Roofing",
-        location: "O'Fallon, MO",
-        year: "2024",
-        description: "Complete roof replacement due to hail damage. We coordinated directly with insurance for full coverage. Class 4 impact-resistant shingles installed.",
-        image: residental2, // Pass directly
-        featured: true,
-        size: "normal",
-        specs: { sqft: "2,800", duration: "2 days", warranty: "Lifetime" },
-    },
-
-    // Commercial Roofing Projects
-    {
-        id: 12,
-        title: "Meridian Business Park",
-        subtitle: "TPO Commercial System",
-        category: "Commercial Roofing",
-        location: "Maryland Heights, MO",
-        year: "2024",
-        description: "80mil TPO membrane with tapered insulation system across 45,000 sq ft of commercial space. Energy-efficient white surface reduces cooling costs.",
-        image: commercialroof, // Pass directly
-        featured: true,
-        size: "wide",
-        specs: { sqft: "45,000", duration: "21 days", warranty: "20 Year NDL" },
-    },
-
-    // Siding, Soffit & Fascia Projects
-    {
-        id: 15,
-        title: "Complete Exterior Renovation",
-        subtitle: "Vinyl Siding Transformation",
-        category: "Siding, Soffit & Fascia",
-        location: "Ballwin, MO",
-        year: "2024",
-        description: "Full premium vinyl siding installation with insulated backing. Includes all new aluminum fascia wrap and vented soffit system for proper attic ventilation.",
-        image: siding, // Pass directly
-        featured: true,
-        size: "large",
-        specs: { sqft: "2,800", duration: "7 days", warranty: "Lifetime" },
-    },
-
-    // Gutters & Protection Projects
-    {
-        id: 18,
-        title: "6-Inch Seamless Gutter System",
-        subtitle: "Commercial Grade Drainage",
-        category: "Gutters & Protection",
-        location: "St. Peters, MO",
-        year: "2024",
-        description: "Complete 6-inch seamless gutter installation with micro-mesh leaf guards. Heavy-duty hidden hangers and oversized downspouts for maximum flow capacity.",
-        image: gutter, // Pass directly
-        featured: true,
-        size: "wide",
-        specs: { sqft: "N/A", duration: "2 days", warranty: "Lifetime" },
-    },
-];
+import { useContent } from "../../hooks/useContent";
 
 // ============================================================================
 // HERO SECTION
 // ============================================================================
-const Hero = () => {
+const Hero = ({ data }: { data: any }) => {
     return (
         <section className="relative pt-8 xs:pt-10 sm:pt-12 lg:pt-16 pb-8 xs:pb-10 sm:pb-12 overflow-hidden">
             <div className="absolute inset-0 bg-gradient-to-b from-primary/5 via-transparent to-transparent" />
@@ -233,15 +64,15 @@ const Hero = () => {
             <div className="relative max-w-7xl mx-auto px-3 xs:px-4 sm:px-6 lg:px-8">
                 <div className="text-center">
                     <span className="inline-block text-primary text-[8px] xs:text-[9px] sm:text-xs font-semibold uppercase tracking-[0.2em] xs:tracking-[0.25em] sm:tracking-[0.3em] mb-2 xs:mb-3 sm:mb-4">
-                        Our Portfolio
+                        {data?.badge || "Our Portfolio"}
                     </span>
 
-                    <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-2 xs:mb-3 sm:mb-4 px-2">
-                        Featured <span className="text-primary">Projects</span>
-                    </h1>
+                    <h1 className="text-2xl xs:text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-bold text-foreground tracking-tight mb-2 xs:mb-3 sm:mb-4 px-2"
+                        dangerouslySetInnerHTML={{ __html: data?.title || 'Featured <span className="text-primary">Projects</span>' }}
+                    />
 
                     <p className="text-muted-foreground text-[11px] xs:text-xs sm:text-sm md:text-base max-w-[280px] xs:max-w-sm sm:max-w-lg mx-auto px-2">
-                        A curated collection of our finest installations across Missouri
+                        {data?.description || "A curated collection of our finest installations"}
                     </p>
 
                     <div className="w-12 xs:w-14 sm:w-16 h-px bg-gradient-to-r from-transparent via-primary to-transparent mx-auto mt-4 xs:mt-5 sm:mt-6" />
@@ -256,10 +87,12 @@ const Hero = () => {
 // ============================================================================
 const Filter = ({
     categories,
+    projects,
     activeCategory,
     onSelect
 }: {
     categories: string[];
+    projects: any[];
     activeCategory: string;
     onSelect: (category: string) => void
 }) => {
@@ -267,8 +100,8 @@ const Filter = ({
         <div className="flex flex-wrap items-center justify-center gap-1 xs:gap-1.5 sm:gap-2">
             {categories.map((category) => {
                 const count = category === "All"
-                    ? PROJECTS.length
-                    : PROJECTS.filter(p => p.category === category).length;
+                    ? projects.length
+                    : projects.filter(p => p.category === category).length;
 
                 return (
                     <button
@@ -313,8 +146,10 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
     const [imageLoaded, setImageLoaded] = useState(false);
     const [imageError, setImageError] = useState(false);
 
+    const imageSrc = typeof project?.image === 'string' && imageMap[project.image] ? imageMap[project.image] : project?.image;
+
     // Validate image before rendering
-    if (!project?.image) {
+    if (!imageSrc) {
         return null;
     }
 
@@ -335,9 +170,9 @@ const MasonryCard = ({ project, index, onClick }: { project: any; index: number;
                 )}
 
                 {/* Image */}
-                {!imageError && project.image && (
+                {!imageError && imageSrc && (
                     <Image
-                        src={project.image}
+                        src={imageSrc}
                         alt={project.title || "Project image"}
                         fill
                         quality={100}
@@ -441,6 +276,8 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
     }, [isOpen, onClose]);
 
     if (!project || !isOpen) return null;
+    
+    const imageSrc = typeof project?.image === 'string' && imageMap[project.image] ? imageMap[project.image] : project?.image;
 
     return (
         <div
@@ -478,9 +315,9 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
                                 <span className="text-muted-foreground text-xs xs:text-sm">Image Unavailable</span>
                             </div>
                         ) : (
-                            project.image && (
+                            imageSrc && (
                                 <Image
-                                    src={project.image}
+                                    src={imageSrc}
                                     alt={project.title || "Project image"}
                                     fill
                                     quality={100}
@@ -532,7 +369,7 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
 
                         {/* Specs Grid */}
                         <div className="grid grid-cols-3 gap-1.5 xs:gap-2 sm:gap-3 mb-4 xs:mb-5 sm:mb-6">
-                            {Object.entries(project.specs).map(([key, value]: [string, any]) => (
+                            {Object.entries(project.specs || {}).map(([key, value]: [string, any]) => (
                                 <div key={key} className="bg-primary/5 rounded-lg xs:rounded-xl p-2 xs:p-2.5 sm:p-3 text-center border border-primary/10">
                                     <div className="text-sm xs:text-base sm:text-lg font-bold text-primary mb-0.5">
                                         {value}
@@ -568,14 +405,18 @@ const Modal = ({ project, isOpen, onClose }: { project: any; isOpen: boolean; on
 // MAIN PAGE - WITH FIXED STICKY FILTER
 // ============================================================================
 export default function GalleryPage() {
+    const { galleryPage } = useContent();
     const [activeCategory, setActiveCategory] = useState("All");
     const [selectedProject, setSelectedProject] = useState<any>(null);
     const [isFilterSticky, setIsFilterSticky] = useState(false);
 
+    const categories = galleryPage?.categories || ["All"];
+    const projects = galleryPage?.projects || [];
+
     const filteredProjects = useMemo(() => {
-        if (activeCategory === "All") return PROJECTS;
-        return PROJECTS.filter(p => p.category === activeCategory);
-    }, [activeCategory]);
+        if (activeCategory === "All") return projects;
+        return projects.filter((p: any) => p.category === activeCategory);
+    }, [activeCategory, projects]);
 
     // Handle sticky filter on scroll
     useEffect(() => {
@@ -629,7 +470,7 @@ export default function GalleryPage() {
                 }
             `}</style>
 
-            <Hero />
+            <Hero data={galleryPage?.header || {}} />
 
             {/* Filter Bar - Fixed sticky behavior */}
             <div
@@ -641,7 +482,8 @@ export default function GalleryPage() {
                 <div className="py-2 xs:py-2.5 sm:py-3 px-2 xs:px-3 sm:px-4">
                     <div className="max-w-7xl mx-auto">
                         <Filter
-                            categories={CATEGORIES}
+                            categories={categories}
+                            projects={projects}
                             activeCategory={activeCategory}
                             onSelect={setActiveCategory}
                         />
@@ -652,9 +494,9 @@ export default function GalleryPage() {
             {/* Gallery Grid */}
             <section className="px-0 pb-8 xs:pb-12 sm:pb-16">
                 <div className="grid grid-cols-1 xs:grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 lg:auto-rows-[220px] xl:auto-rows-[240px] grid-flow-dense gap-0">
-                    {filteredProjects.map((project, i) => (
+                    {filteredProjects.map((project: any, i: number) => (
                         <MasonryCard
-                            key={project.id}
+                            key={project.id || i}
                             project={project}
                             index={i}
                             onClick={() => setSelectedProject(project)}
