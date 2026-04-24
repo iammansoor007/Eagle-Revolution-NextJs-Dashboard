@@ -1,28 +1,53 @@
 "use client";
 
-import { useRef, useEffect, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
-import { Icon } from "../../config/icons";
+import { useRef, useState } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { useContent } from "../../hooks/useContent";
-import Link from "next/link";
+import { Icon } from "../../config/icons";
 
 const HolographicInput = ({ icon: IconName, label, type = "text", ...props }: any) => {
     const [isFocused, setIsFocused] = useState(false);
+    const [hasValue, setHasValue] = useState(false);
     return (
         <div className="relative group">
-            <div className={`relative flex items-center bg-card rounded-xl border transition-all ${isFocused ? 'border-primary shadow-lg' : 'border-border'}`}>
-                <div className="absolute left-4 text-muted-foreground"><Icon name={IconName} className="w-5 h-5" /></div>
-                <input type={type} placeholder={label} onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)} className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl focus:outline-none" {...props} />
+            <div className={`relative flex items-center bg-card rounded-xl border transition-all duration-300 ${isFocused ? 'border-primary shadow-lg shadow-primary/10' : hasValue ? 'border-primary/40' : 'border-border hover:border-border/80'}`}>
+                <div className={`absolute left-4 transition-colors duration-300 ${isFocused || hasValue ? 'text-primary' : 'text-muted-foreground'}`}>
+                    <Icon name={IconName} className="w-5 h-5" />
+                </div>
+                <input
+                    type={type}
+                    placeholder={label}
+                    onFocus={() => setIsFocused(true)}
+                    onBlur={() => setIsFocused(false)}
+                    onChange={(e) => {
+                        setHasValue(!!e.target.value);
+                        props.onChange?.(e);
+                    }}
+                    className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus:outline-none"
+                    {...props}
+                />
             </div>
         </div>
     );
 };
 
-export default function ContactTemplate({ pageData, params }: { pageData?: any, params?: any }) {
+export default function ContactTemplate() {
     const { contactPage: contactData } = useContent();
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccess, setShowSuccess] = useState(false);
-    const [formData, setFormData] = useState({ name: '', email: '', phone: '', subject: '', message: '' });
+    const [formData, setFormData] = useState<Record<string, string>>({});
+
+    // Fallback data if CMS has no data yet
+    const header = contactData?.header || {};
+    const badge = header.badge || "Contact Us";
+    const headline = header.headline || "Get In Touch";
+    const description = header.description || "We'd love to hear from you. Fill out the form and we'll get back to you shortly.";
+    const formFields = contactData?.formFields || [
+        { name: "name", label: "Full Name", type: "text", required: true, icon: "User" },
+        { name: "email", label: "Email Address", type: "email", required: true, icon: "Mail" },
+        { name: "phone", label: "Phone Number", type: "tel", required: false, icon: "Phone" },
+        { name: "message", label: "Your Message", type: "textarea", required: true, icon: "MessageSquare" },
+    ];
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -31,9 +56,16 @@ export default function ContactTemplate({ pageData, params }: { pageData?: any, 
             const response = await fetch('/api/send', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ ...formData, type: 'Contact Form' })
+                body: JSON.stringify({
+                    ...formData,
+                    type: 'Contact Form',
+                    subject: `New Contact Form Submission`,
+                })
             });
-            if (response.ok) setShowSuccess(true);
+            if (response.ok) {
+                setShowSuccess(true);
+                setFormData({});
+            }
         } catch (error) {
             console.error(error);
         } finally {
@@ -41,25 +73,132 @@ export default function ContactTemplate({ pageData, params }: { pageData?: any, 
         }
     };
 
+    const inlineFields = formFields.filter((f: any) => f.type !== "textarea");
+    const textareaFields = formFields.filter((f: any) => f.type === "textarea");
+
     return (
-        <main className="relative bg-background py-24 min-h-screen">
-            <div className="max-w-7xl mx-auto px-4 text-center mb-16">
-                <h1 className="text-4xl sm:text-7xl font-light mb-6">{contactData?.header?.headline}</h1>
-                <p className="text-lg text-muted-foreground max-w-2xl mx-auto">{contactData?.header?.description}</p>
+        <main className="relative bg-background py-24 min-h-screen overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 pointer-events-none">
+                <div
+                    className="absolute inset-0 opacity-[0.02]"
+                    style={{
+                        backgroundImage: `linear-gradient(to right, hsl(var(--primary)) 1px, transparent 1px), linear-gradient(to bottom, hsl(var(--primary)) 1px, transparent 1px)`,
+                        backgroundSize: '60px 60px',
+                    }}
+                />
             </div>
-            <div className="max-w-4xl mx-auto px-4">
-                <form onSubmit={handleSubmit} className="space-y-6">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                        <HolographicInput icon="User" label="Name" name="name" onChange={(e: any) => setFormData({ ...formData, name: e.target.value })} required />
-                        <HolographicInput icon="Mail" label="Email" type="email" name="email" onChange={(e: any) => setFormData({ ...formData, email: e.target.value })} required />
-                    </div>
-                    <textarea placeholder="Message" rows={6} className="w-full p-4 bg-card border rounded-xl focus:outline-none focus:border-primary" onChange={(e: any) => setFormData({ ...formData, message: e.target.value })} required />
-                    <button type="submit" disabled={isSubmitting} className="w-full py-4 bg-primary text-white rounded-full font-bold transition-all disabled:opacity-50">
-                        {isSubmitting ? 'SENDING...' : 'SEND MESSAGE'}
-                    </button>
-                </form>
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[400px] bg-gradient-to-b from-primary/5 to-transparent opacity-60 blur-3xl pointer-events-none" />
+
+            <div className="max-w-4xl mx-auto px-4 relative">
+                {/* Section Header */}
+                <div className="text-center mb-16">
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ duration: 0.6 }}
+                    >
+                        <span className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-primary/10 border border-primary/20 text-primary text-xs font-semibold tracking-widest uppercase mb-6">
+                            {badge}
+                        </span>
+                        <h1 className="text-4xl sm:text-6xl font-light text-foreground mb-6 leading-tight">
+                            {headline}
+                        </h1>
+                        <p className="text-lg text-muted-foreground max-w-2xl mx-auto leading-relaxed">
+                            {description}
+                        </p>
+                    </motion.div>
+                </div>
+
+                {/* Form Card */}
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.7, delay: 0.2 }}
+                    className="bg-card/60 backdrop-blur-sm border border-border/50 rounded-3xl p-8 sm:p-12 shadow-2xl"
+                >
+                    <form onSubmit={handleSubmit} className="space-y-6">
+                        {/* Inline fields grid */}
+                        {inlineFields.length > 0 && (
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                                {inlineFields.map((field: any, idx: number) => (
+                                    <HolographicInput
+                                        key={idx}
+                                        icon={field.icon || "User"}
+                                        label={field.label}
+                                        type={field.type}
+                                        name={field.name}
+                                        value={formData[field.name] || ""}
+                                        onChange={(e: any) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
+                                        required={field.required}
+                                    />
+                                ))}
+                            </div>
+                        )}
+
+                        {/* Textarea fields */}
+                        {textareaFields.map((field: any, idx: number) => (
+                            <div key={`ta-${idx}`} className="relative">
+                                <div className="relative flex bg-card rounded-xl border border-border focus-within:border-primary focus-within:shadow-lg focus-within:shadow-primary/10 transition-all duration-300">
+                                    <div className="absolute left-4 top-4 text-muted-foreground">
+                                        <Icon name={field.icon || "MessageSquare"} className="w-5 h-5" />
+                                    </div>
+                                    <textarea
+                                        placeholder={field.label}
+                                        name={field.name}
+                                        rows={5}
+                                        value={formData[field.name] || ""}
+                                        onChange={(e) => setFormData(prev => ({ ...prev, [field.name]: e.target.value }))}
+                                        required={field.required}
+                                        className="w-full pl-12 pr-4 py-4 bg-transparent rounded-xl text-foreground text-sm placeholder:text-muted-foreground focus:outline-none resize-none"
+                                    />
+                                </div>
+                            </div>
+                        ))}
+
+                        <motion.button
+                            type="submit"
+                            disabled={isSubmitting}
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.98 }}
+                            className="w-full py-4 bg-gradient-to-r from-primary to-primary/80 text-primary-foreground rounded-2xl font-bold text-sm tracking-widest uppercase shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all duration-500 disabled:opacity-50 disabled:cursor-not-allowed"
+                        >
+                            {isSubmitting ? 'Sending Message...' : 'Send Message'}
+                        </motion.button>
+                    </form>
+                </motion.div>
             </div>
-            {showSuccess && <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 backdrop-blur-md"><div className="bg-white p-8 rounded-2xl text-center"><h2>Sent Successfully!</h2><button onClick={() => setShowSuccess(false)} className="mt-4 px-6 py-2 bg-primary text-white rounded-full">Close</button></div></div>}
+
+            {/* Success Modal */}
+            <AnimatePresence>
+                {showSuccess && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-md p-4"
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, y: 20 }}
+                            animate={{ scale: 1, y: 0 }}
+                            exit={{ scale: 0.9, y: 20 }}
+                            className="bg-card rounded-3xl p-10 text-center max-w-md w-full shadow-2xl border border-border"
+                        >
+                            <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-r from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30">
+                                <Icon name="Check" className="w-10 h-10 text-white" />
+                            </div>
+                            <h2 className="text-2xl font-bold text-foreground mb-3">Message Sent!</h2>
+                            <p className="text-muted-foreground mb-8">Thank you for reaching out. We'll get back to you as soon as possible.</p>
+                            <button
+                                onClick={() => setShowSuccess(false)}
+                                className="px-8 py-3 bg-primary text-primary-foreground rounded-full font-bold hover:bg-primary/90 transition-colors"
+                            >
+                                Close
+                            </button>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
         </main>
     );
 }

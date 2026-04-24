@@ -228,8 +228,12 @@ const TestimonialCard = ({ testimonial, onPlayVideo, isActive }: { testimonial: 
           <div className="flex items-center gap-4 min-w-0">
             <div className="relative flex-shrink-0">
               <div className="absolute inset-0 bg-gradient-to-r from-primary to-primary/50 rounded-full blur-md opacity-50" />
-              <div className="relative w-12 h-12 lg:w-14 lg:h-14 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-semibold text-lg">
-                {testimonial.avatar}
+              <div className="relative w-12 h-12 lg:w-14 lg:h-14 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center text-primary font-semibold text-lg border border-primary/20">
+                {testimonial.avatar && (testimonial.avatar.startsWith('http') || testimonial.avatar.startsWith('/uploads')) ? (
+                  <img src={testimonial.avatar} alt={testimonial.name} className="w-full h-full object-cover" />
+                ) : (
+                  testimonial.avatar || testimonial.name.charAt(0)
+                )}
               </div>
             </div>
 
@@ -247,7 +251,7 @@ const TestimonialCard = ({ testimonial, onPlayVideo, isActive }: { testimonial: 
               </p>
               <div className="flex items-center gap-1 mt-1">
                 {[...Array(5)].map((_, i) => (
-                  <Icon key={i} name="Star" className="w-4 h-4 text-primary fill-primary" />
+                  <Icon key={i} name="Star" className={`w-4 h-4 ${i < (testimonial.rating || 5) ? "text-primary fill-primary" : "text-primary/20 fill-transparent"}`} />
                 ))}
               </div>
             </div>
@@ -603,9 +607,13 @@ const Testimonials = () => {
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: i * 0.05 }}
-                    className="w-8 h-8 rounded-full bg-gradient-to-br from-primary/20 to-primary/10 border-2 border-card flex items-center justify-center text-primary text-xs font-medium shadow-sm"
+                    className="w-8 h-8 rounded-full overflow-hidden bg-gradient-to-br from-primary/20 to-primary/10 border-2 border-card flex items-center justify-center text-primary text-xs font-medium shadow-sm"
                   >
-                    {t.avatar}
+                    {t.avatar && (t.avatar.startsWith('http') || t.avatar.startsWith('/uploads')) ? (
+                      <img src={t.avatar} alt={t.name} className="w-full h-full object-cover" />
+                    ) : (
+                      t.avatar || t.name.charAt(0)
+                    )}
                   </motion.div>
                 ))}
               </div>

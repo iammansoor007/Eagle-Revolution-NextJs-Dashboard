@@ -1,10 +1,14 @@
 import { Resend } from 'resend';
 import { NextResponse } from 'next/server';
+import connectDB from '@/lib/mongodb';
+import Submission from '@/models/Submission';
+import Content from '@/models/Content';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
 export async function POST(request: Request) {
   try {
+    await connectDB();
     const contentType = request.headers.get('content-type') || '';
     let name, email, phone, message, subject, type, extraData: any = {};
     let attachments: any[] = [];
@@ -39,8 +43,40 @@ export async function POST(request: Request) {
       ({ name, email, phone, message, subject, type, ...extraData } = body);
     }
 
-    // Default recipient
-    const to = 'banderson@eaglerevolution.com';
+    // Save to Database
+    await Submission.create({
+      name,
+      email,
+      phone,
+      subject,
+      message,
+      type: type || 'Contact Form',
+      extraData
+    });
+
+    // Fetch dynamic email from Content CMS
+    let receiverEmail = 'banderson@eaglerevolution.com';
+    try {
+      const contentDoc = await Content.findOne({ documentId: "complete_data" }).lean() as any;
+      if (contentDoc && contentDoc.data) {
+        if (type === 'Quote Request' && contentDoc.data.quote?.email) {
+          receiverEmail = contentDoc.data.quote.email;
+        } else if (contentDoc.data.contactPage?.email) {
+          receiverEmail = contentDoc.data.contactPage.email;
+        } else if (contentDoc.data.quote?.email) {
+          receiverEmail = contentDoc.data.quote.email;
+        }
+      }
+      console.log('Final receiver email:', receiverEmail);
+    } catch (e) {
+      console.error("Error fetching dynamic email", e);
+    }
+
+    if (!receiverEmail || !receiverEmail.includes('@')) {
+      receiverEmail = 'banderson@eaglerevolution.com';
+    }
+
+    const to = receiverEmail;
 
     // Construct email HTML
     let html = `
@@ -80,7 +116,12 @@ export async function POST(request: Request) {
       </div>
     `;
 
-    const data = await resend.emails.send({
+    if (!process.env.RESEND_API_KEY) {
+      console.error('RESEND_API_KEY is missing');
+      return NextResponse.json({ error: 'Mail server configuration error' }, { status: 500 });
+    }
+
+    const { data: resendData, error: resendError } = await resend.emails.send({
       from: 'Eagle Revolution <onboarding@resend.dev>',
       to: [to],
       subject: subject || `New Form Submission from ${name}`,
@@ -89,9 +130,14 @@ export async function POST(request: Request) {
       attachments: attachments.length > 0 ? attachments : undefined,
     });
 
-    return NextResponse.json(data);
+    if (resendError) {
+      console.error('Resend API Error:', resendError);
+      return NextResponse.json({ error: resendError.message }, { status: 400 });
+    }
+
+    return NextResponse.json(resendData);
   } catch (error: any) {
-    console.error('Resend Error:', error);
-    return NextResponse.json({ error: error.message }, { status: 500 });
+    console.error('Submission processing Error:', error);
+    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
   }
 }

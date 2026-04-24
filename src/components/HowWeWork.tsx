@@ -680,14 +680,14 @@ const WhyChooseUs = () => {
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 mb-24">
                     {features.map((feature: any, index: number) => (
-                        <FeatureCard key={feature.title} feature={feature} index={index} />
+                        <FeatureCard key={`feature-${index}`} feature={feature} index={index} />
                     ))}
                 </div>
 
                 <div className="grid grid-cols-2 md:grid-cols-4 gap-10 mb-24">
                     {stats.map((stat: any, index: number) => (
                         <StatCounter
-                            key={stat.label}
+                            key={`stat-${index}`}
                             value={stat.value}
                             label={stat.label}
                             suffix={stat.suffix}

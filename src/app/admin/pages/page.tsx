@@ -2,49 +2,58 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Home, Info, HelpCircle, Phone, ArrowUpRight } from "lucide-react";
+import { Home, Info, HelpCircle, Phone, ArrowRight, ChevronRight } from "lucide-react";
 
 export default function PagesDashboard() {
   const pages = [
-    { title: "Homepage", path: "/admin/pages/home", icon: Home, description: "Manage Hero, About preview, Why Choose Us, and Quote sections." },
-    { title: "About Page", path: "/admin/pages/about", icon: Info, description: "Manage the full company story, mission, and leadership." },
-    { title: "FAQ Page", path: "/admin/faq", icon: HelpCircle, description: "Manage frequently asked questions." },
-    { title: "Contact Page", path: "/admin/contact", icon: Phone, description: "Manage contact information and locations." },
+    { name: "Homepage", href: "/admin/pages/home", icon: Home, description: "Manage Hero, About preview, Why Choose Us, and Quote sections." },
+    { name: "About Page", href: "/admin/pages/about", icon: Info, description: "Manage the full company story, mission, and leadership." },
+    { name: "FAQ Page", href: "/admin/faq", icon: HelpCircle, description: "Manage frequently asked questions." },
+    { name: "Contact Page", href: "/admin/pages/contact", icon: Phone, description: "Manage contact information and header content." },
   ];
 
   return (
-    <div className="max-w-5xl mx-auto pb-20">
-      <div className="mb-8">
-        <h1 className="text-3xl font-bold text-white mb-2">Pages Management</h1>
-        <p className="text-white/50 text-sm">Select a page to edit its static content and layout data.</p>
+    <div className="max-w-4xl mx-auto pb-20">
+      <div className="mb-10">
+        <h1 className="text-4xl font-extrabold text-slate-900 mb-3 tracking-tight">Pages</h1>
+        <p className="text-slate-700 text-lg font-medium">Select a page to manage its content and settings.</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        {pages.map((page, i) => {
-          const Icon = page.icon;
-          return (
-            <motion.div
-              key={page.title}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-            >
-              <Link href={page.path} className="group block bg-white/[0.02] border border-white/[0.05] hover:border-primary/40 hover:bg-white/[0.04] p-5 rounded-2xl transition-all duration-300 relative overflow-hidden">
-                <div className="absolute inset-0 bg-gradient-to-br from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                <div className="relative z-10 flex items-start gap-4">
-                  <div className="w-12 h-12 rounded-xl bg-primary/10 flex items-center justify-center flex-shrink-0 group-hover:bg-primary transition-colors">
-                    <Icon className="w-6 h-6 text-primary group-hover:text-white transition-colors" />
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+        {pages.map((page, i) => (
+          <motion.div
+            key={page.name}
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: i * 0.1 }}
+          >
+            <Link href={page.href}>
+              <div className="group bg-white border border-slate-200 rounded-3xl p-8 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 transition-all duration-300 relative overflow-hidden h-full shadow-sm">
+                <div className="absolute top-0 right-0 w-32 h-32 bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors" />
+                
+                <div className="relative z-10 flex flex-col h-full">
+                  <div className="flex items-center justify-between mb-6">
+                    <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center group-hover:bg-primary/10 group-hover:border-primary/20 transition-all duration-300 shadow-inner">
+                      <page.icon className="w-7 h-7 text-slate-500 group-hover:text-primary transition-colors" />
+                    </div>
+                    <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
                   </div>
-                  <div className="flex-1 min-w-0">
-                    <h2 className="text-lg font-bold text-white mb-1 group-hover:text-primary transition-colors">{page.title}</h2>
-                    <p className="text-sm text-white/50 line-clamp-2">{page.description}</p>
+                  
+                  <div>
+                    <h2 className="text-2xl font-bold text-slate-900 mb-2">{page.name}</h2>
+                    <p className="text-slate-600 leading-relaxed font-medium">
+                      {page.description}
+                    </p>
                   </div>
-                  <ArrowUpRight className="w-5 h-5 text-white/20 group-hover:text-primary transition-colors" />
+                  
+                  <div className="mt-8 pt-6 border-t border-slate-100 flex items-center text-xs font-bold text-primary uppercase tracking-widest opacity-0 group-hover:opacity-100 transition-opacity">
+                    Edit Content <ArrowRight className="w-4 h-4 ml-2" />
+                  </div>
                 </div>
-              </Link>
-            </motion.div>
-          );
-        })}
+              </div>
+            </Link>
+          </motion.div>
+        ))}
       </div>
     </div>
   );
