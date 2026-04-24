@@ -421,14 +421,33 @@ const Services = () => {
                       className="absolute inset-0 w-full h-full"
                       style={{ scale: imageScale }}
                     >
-                      <Image
-                        src={serviceDetail}
-                        alt="Eagle Revolution Services"
-                        fill
-                        className="object-cover"
-                        priority
-                        quality={100}
-                      />
+                      {servicesData.image?.src ? (
+                        servicesData.image.src.startsWith('http') || servicesData.image.src.startsWith('/uploads') ? (
+                          <img
+                            src={servicesData.image.src}
+                            alt="Eagle Revolution Services"
+                            className="object-cover w-full h-full"
+                          />
+                        ) : (
+                          <Image
+                            src={servicesData.image.src}
+                            alt="Eagle Revolution Services"
+                            fill
+                            className="object-cover"
+                            priority
+                            quality={100}
+                          />
+                        )
+                      ) : (
+                        <Image
+                          src={serviceDetail}
+                          alt="Eagle Revolution Services"
+                          fill
+                          className="object-cover"
+                          priority
+                          quality={100}
+                        />
+                      )}
                     </motion.div>
 
                     <motion.div
@@ -445,7 +464,7 @@ const Services = () => {
                     >
                       <span className="text-xs font-semibold text-primary flex items-center gap-1.5">
                         <span className="w-1.5 h-1.5 bg-primary rounded-full animate-pulse" />
-                        🇺🇸 Veteran Owned & Operated
+                        {servicesData.image?.badge || "🇺🇸 Veteran Owned & Operated"}
                       </span>
                     </motion.div>
                   </div>

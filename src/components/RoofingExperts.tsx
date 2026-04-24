@@ -266,15 +266,23 @@ export default function AboutSection() {
 
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/50">
                             <div className="relative aspect-[4/5] lg:aspect-[3/4]">
-                                <Image
-                                    src={EagleAboutImg}
-                                    alt={image.alt}
-                                    className="object-cover transition-transform duration-7000 group-hover:scale-105"
-                                    fill
-                                    quality={100}
-                                    priority
-                                    loading="eager"
-                                />
+                                {image.src && (image.src.startsWith('http') || image.src.startsWith('/uploads')) ? (
+                                    <img
+                                        src={image.src}
+                                        alt={image.alt}
+                                        className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
+                                    />
+                                ) : (
+                                    <Image
+                                        src={EagleAboutImg}
+                                        alt={image.alt}
+                                        className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        fill
+                                        quality={100}
+                                        priority
+                                        loading="eager"
+                                    />
+                                )}
 
                                 <div className="absolute inset-0 bg-gradient-to-tr from-primary/20 via-transparent to-transparent" />
 
@@ -427,8 +435,8 @@ export default function AboutSection() {
                             transition={{ delay: 0.7, duration: 0.6 }}
                             className="grid grid-cols-3 gap-4 pt-8"
                         >
-                            {stats.map((stat: any) => (
-                                <StatCard key={stat.label} {...stat} />
+                            {stats.map((stat: any, idx: number) => (
+                                <StatCard key={idx} {...stat} />
                             ))}
                         </motion.div>
                     </motion.div>
