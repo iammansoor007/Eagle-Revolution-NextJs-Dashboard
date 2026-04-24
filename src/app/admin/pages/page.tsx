@@ -8,7 +8,7 @@ export default function PagesDashboard() {
   const pages = [
     { name: "Homepage", href: "/admin/pages/home", icon: Home, description: "Manage Hero, About preview, Why Choose Us, and Quote sections." },
     { name: "About Page", href: "/admin/pages/about", icon: Info, description: "Manage the full company story, mission, and leadership." },
-    { name: "FAQ Page", href: "/admin/faq", icon: HelpCircle, description: "Manage frequently asked questions." },
+    { name: "FAQ Page", href: "/admin/pages/faq", icon: HelpCircle, description: "Manage the full FAQ page header, intro text, and filtering." },
     { name: "Contact Page", href: "/admin/pages/contact", icon: Phone, description: "Manage contact information and header content." },
   ];
 

@@ -408,9 +408,15 @@ const AccordionItem = ({ item, index, isOpen, onToggle }: { item: any; index: nu
 };
 
 const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: { categories: any[]; activeCategory: string; onCategoryChange: (id: string) => void }) => {
+  // Normalize categories if they are just strings
+  const normalizedCategories = [
+    { id: 'all', label: 'All Questions', icon: 'Layers' },
+    ...categories.map(cat => (typeof cat === 'string' ? { id: cat, label: cat, icon: null } : cat))
+  ];
+
   return (
     <div className="flex flex-wrap items-center gap-2 md:gap-3">
-      {categories.map((category, index) => {
+      {normalizedCategories.map((category, index) => {
         return (
           <motion.button
             key={category.id}
@@ -420,9 +426,9 @@ const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: { cate
             transition={{ delay: index * 0.03, duration: 0.3 }}
             onClick={() => onCategoryChange(category.id)}
             className={`
-              relative px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-medium transition-all duration-200
+              relative px-4 py-2 md:px-5 md:py-2.5 rounded-full text-xs md:text-sm font-bold transition-all duration-200
               ${activeCategory === category.id
-                ? 'text-primary-foreground'
+                ? 'text-white'
                 : 'text-muted-foreground hover:text-card-foreground bg-card/50 hover:bg-primary/5'
               }
             `}
@@ -430,7 +436,7 @@ const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: { cate
             {activeCategory === category.id && (
               <motion.div
                 layoutId="activeCategory"
-                className="absolute inset-0 bg-gradient-to-r from-primary to-primary/80 rounded-full"
+                className="absolute inset-0 bg-primary rounded-full shadow-lg shadow-primary/20"
                 initial={false}
                 transition={{ type: "spring", stiffness: 500, damping: 40, duration: 0.2 }}
               />
@@ -497,7 +503,7 @@ const SearchBar = ({ onSearch }: { onSearch: (query: string) => void }) => {
   );
 };
 
-const FAQ = () => {
+const FAQ = ({ currentPage = "home" }: { currentPage?: string }) => {
   const { faq } = useContent();
   const sectionRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
@@ -507,11 +513,20 @@ const FAQ = () => {
 
   const { section, categories, items } = faq;
 
-  const filteredItems = items.filter((item: any) => {
-    const matchesCategory = activeCategory === 'all' || item.category === activeCategory;
+  const filteredItems = (items || []).filter((item: any) => {
+    // Visibility Logic
+    const isVisible = item.visibility === 'global' || (item.visibility === 'specific' && item.targetPages?.includes(currentPage));
+    if (!isVisible) return false;
+
+    // Category Logic
+    const itemCat = typeof item.category === 'string' ? item.category : item.category?.id;
+    const matchesCategory = activeCategory === 'all' || itemCat === activeCategory;
+
+    // Search Logic
     const matchesSearch = searchQuery === '' ||
       item.question.toLowerCase().includes(searchQuery.toLowerCase()) ||
       item.answer.toLowerCase().includes(searchQuery.toLowerCase());
+
     return matchesCategory && matchesSearch;
   });
 
@@ -572,7 +587,7 @@ const FAQ = () => {
             {section.badge}
           </span>
           <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
-            {section.headline}
+            {section.headline || section.title}
           </h2>
           <p className="text-muted-foreground text-base md:text-lg">
             {section.description}

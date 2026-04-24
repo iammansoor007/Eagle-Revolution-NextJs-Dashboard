@@ -26,5 +26,6 @@ export const useContent = () => {
         galleryPage: completeData?.galleryPage || {},
         brandStore: completeData?.brandStore || {},
         serviceDetailPage: completeData?.serviceDetailPage || {},
+        faqPage: completeData?.faqPage || {},
     };
 };

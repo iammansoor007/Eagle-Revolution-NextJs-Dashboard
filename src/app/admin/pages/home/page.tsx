@@ -67,6 +67,7 @@ export default function HomeEditor() {
     { id: "portfolio", label: "Portfolio Section", icon: ImageIcon },
     { id: "testimonials", label: "Testimonials", icon: Type },
     { id: "whyChooseUs", label: "Why Choose Us", icon: ImageIcon },
+    { id: "faq", label: "FAQ Section", icon: LayoutTemplate },
     { id: "quote", label: "Homepage Contact", icon: Mail },
   ];
 
@@ -1473,6 +1474,71 @@ export default function HomeEditor() {
                       placeholder="Email for submissions"
                       className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none shadow-sm transition-all"
                     />
+                  </div>
+                </div>
+              </motion.div>
+            )}
+            {activeTab === "faq" && (
+              <motion.div key="faq" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
+                <h2 className="text-2xl font-extrabold text-slate-900 mb-8 border-b border-slate-100 pb-6">FAQ Section</h2>
+
+                <div className="space-y-6">
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Section Badge</label>
+                    <input
+                      type="text"
+                      value={data.faq?.section?.badge || ""}
+                      onChange={(e) => {
+                        setData((prev: any) => ({
+                          ...prev,
+                          faq: { ...prev.faq, section: { ...prev.faq.section, badge: e.target.value } }
+                        }));
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
+                      placeholder="e.g. QUESTIONS"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Section Heading</label>
+                    <input
+                      type="text"
+                      value={data.faq?.section?.title || ""}
+                      onChange={(e) => {
+                        setData((prev: any) => ({
+                          ...prev,
+                          faq: { ...prev.faq, section: { ...prev.faq.section, title: e.target.value } }
+                        }));
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
+                      placeholder="e.g. Frequently Asked Questions"
+                    />
+                  </div>
+
+                  <div className="space-y-2">
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Section Paragraph</label>
+                    <textarea
+                      rows={4}
+                      value={data.faq?.section?.description || ""}
+                      onChange={(e) => {
+                        setData((prev: any) => ({
+                          ...prev,
+                          faq: { ...prev.faq, section: { ...prev.faq.section, description: e.target.value } }
+                        }));
+                      }}
+                      className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner leading-relaxed"
+                      placeholder="Find answers to common questions about our services..."
+                    />
+                  </div>
+                </div>
+
+                <div className="pt-6 border-t border-slate-100">
+                  <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 flex items-start gap-4">
+                    <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">!</div>
+                    <p className="text-slate-600 text-sm font-medium">
+                      Note: This tab only controls the header text on the homepage. To add or edit the actual FAQ questions, go to
+                      <Link href="/admin/faq" className="text-primary font-bold hover:underline ml-1">FAQ Management</Link> in the sidebar.
+                    </p>
                   </div>
                 </div>
               </motion.div>
