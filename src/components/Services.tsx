@@ -14,7 +14,7 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
 import serviceDetail from "@/assets/fairservice.png";
-import sharedServicesData from "../data/servicesData.json";
+// import sharedServicesData from "../data/servicesData.json";
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -32,8 +32,8 @@ const Counter = ({ value, suffix = "" }: { value: number; suffix: string }) => {
     const endValue = value;
 
     const animate = (timestamp: number) => {
-      if (!startTime) startTime = timestamp;
-      const progress = Math.min((timestamp - startTime) / duration, 1);
+      if (startTime === undefined) startTime = timestamp;
+      const progress = Math.min((timestamp - startTime!) / duration, 1);
       const eased = 1 - Math.pow(1 - progress, 3);
       const current = Math.floor(startValue + (endValue - startValue) * eased);
       setDisplay(current);
@@ -307,7 +307,8 @@ const Services = () => {
 
   const { badge, headline, description, stats, cta } = servicesData;
   
-  const servicesList = sharedServicesData.services.map((s: any, idx: number) => ({
+  const servicesListRaw = (servicesData as any).services || [];
+  const servicesList = servicesListRaw.map((s: any, idx: number) => ({
     ...s,
     number: String(idx + 1).padStart(2, '0')
   }));

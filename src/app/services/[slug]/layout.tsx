@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import servicesData from "../../../data/servicesData.json";
+import completeData from "../../../src/data/completeData.json";
 
 const BASE_URL = "https://eagle-revolution.vercel.app";
 
@@ -660,7 +660,8 @@ type Props = {
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const service = servicesData.services.find((s) => s.slug === slug);
+  const services = (completeData.services as any).services || [];
+  const service = services.find((s: any) => s.slug === slug);
 
   if (!service) {
     return {
@@ -738,7 +739,8 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 // Pre-generate all service pages at build time for optimal SEO
 export async function generateStaticParams() {
-  return servicesData.services.map((service) => ({
+  const services = (completeData.services as any).services || [];
+  return services.map((service: any) => ({
     slug: service.slug,
   }));
 }

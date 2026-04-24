@@ -24,5 +24,6 @@ export const useContent = () => {
         contactPage: completeData.contactPage || {},
         galleryPage: completeData.galleryPage || {},
         brandStore: (completeData as any).brandStore || {},
+        serviceDetailPage: (completeData as any).serviceDetailPage || {},
     };
 };

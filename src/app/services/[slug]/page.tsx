@@ -21,8 +21,7 @@ import {
 import { notFound } from 'next/navigation';
 
 import breakcrumb from '../../../assets/Breadcrumb-Image.jpeg';
-import servicesData from '../../../data/servicesData.json';
-
+import { useContent } from "../../../hooks/useContent";
 
 import roofingImg from '../../../assets/roof1.jpg.jpeg';
 import windowsImg from '../../../assets/window5.jpeg';
@@ -57,7 +56,7 @@ const Counter = ({ value, suffix = "", duration = 2, start = false }: any) => {
     if (start) {
       let startTime: number | undefined;
       const animate = (timestamp: any) => {
-        if (!startTime!) startTime = timestamp;
+        if (startTime === undefined) startTime = timestamp;
         const progress = Math.min((timestamp - startTime!) / (duration * 1000), 1);
         const easedProgress = 1 - Math.pow(1 - progress, 4);
         setCount(Math.floor(easedProgress * value));
@@ -479,6 +478,9 @@ const FAQItem = ({ faq, index, isOpen, onToggle }: { faq: any, index: number, is
 
 // --- Award CTA Banner Component ---
 const AwardCTABanner = () => {
+  const { serviceDetailPage } = useContent();
+  const { trustBanner } = serviceDetailPage as any;
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -528,22 +530,21 @@ const AwardCTABanner = () => {
               >
                 <span className="w-8 h-[2px] bg-primary" />
                 <span className="text-base sm:text-lg font-bold tracking-[0.2em] sm:tracking-[0.3em] uppercase text-primary">
-                  Why Choose Us
+                  {trustBanner?.badge || "Why Choose Us"}
                 </span>
               </motion.div>
             </div>
 
             <h3 className="text-2xl xs:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4 leading-tight">
-              America's <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">#1 Rated</span><br />
-              Home Improvement Team
+              {trustBanner?.headline || "America's #1 Rated Home Improvement Team"}
             </h3>
 
             <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-6">
-              Join thousands of satisfied homeowners who trusted us with their most valuable investment.
+              {trustBanner?.description || "Join thousands of satisfied homeowners who trusted us with their most valuable investment."}
             </p>
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-4">
-              {["A+ BBB Rating", "24/7 Support", "Free Estimates"].map((badge, i) => (
+              {(trustBanner?.badges || ["A+ BBB Rating", "24/7 Support", "Free Estimates"]).map((badge: string, i: number) => (
                 <div key={i} className="flex items-center gap-2">
                   <div className="w-1.5 h-1.5 bg-primary rounded-full" />
                   <span className="text-[10px] sm:text-xs text-muted-foreground font-medium uppercase tracking-wider">{badge}</span>
@@ -560,7 +561,7 @@ const AwardCTABanner = () => {
                 className="h-full px-8 py-4 bg-primary text-white font-bold rounded-full shadow-sm hover:text-white overflow-hidden flex items-center justify-center gap-2"
               >
                 <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
-                  Get Free Quote
+                  {trustBanner?.cta?.primary || "Get Free Quote"}
                   <ArrowRight className="w-4 h-4" />
                 </span>
                 <div className="absolute inset-0 bg-white/20 transform scale-x-0 group-hover:scale-x-100 transition-transform duration-300 origin-left" />
@@ -568,13 +569,13 @@ const AwardCTABanner = () => {
             </Link>
 
             <motion.a
-              href="tel:636-449-9714"
+              href={`tel:${trustBanner?.cta?.phone || "636-449-9714"}`}
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.98 }}
               className="relative px-8 py-4 bg-white text-primary border-2 border-primary font-bold rounded-full shadow-sm hover:bg-primary hover:text-white hover:shadow-md transition-all duration-300 overflow-hidden flex items-center justify-center gap-2 mb-4"
             >
               <span className="relative z-10 flex items-center gap-2 text-sm md:text-base">
-                Call Now: 636-449-9714
+                {trustBanner?.cta?.secondary || "Call Now: 636-449-9714"}
                 <Phone className="w-4 h-4" />
               </span>
             </motion.a>
@@ -621,7 +622,11 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [isLoading, setIsLoading] = useState(true);
 
-  const allServices = servicesData.services.map((service: any) => ({
+  const { services: servicesData, serviceDetailPage } = useContent();
+  const { methodology, faq: faqData, explore } = serviceDetailPage as any;
+  const servicesList = (servicesData as any).services || [];
+
+  const allServices = servicesList.map((service: any) => ({
     ...service,
     image: (imageMap as any)[service.title] || roofingImg
   }));
@@ -1101,12 +1106,12 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               className="mb-20"
             >
               <div className="text-center mb-12">
-                <span className="text-primary text-sm font-bold uppercase tracking-[0.3em]">Compare & Choose</span>
+                <span className="text-primary text-sm font-bold uppercase tracking-[0.3em]">{serviceDetailPage?.deckComparison?.badge || "Compare & Choose"}</span>
                 <h3 className="text-3xl sm:text-4xl font-heading font-bold text-foreground mt-3 mb-4">
-                  Find Your Perfect Material
+                  {serviceDetailPage?.deckComparison?.headline || "Find Your Perfect Material"}
                 </h3>
                 <p className="text-muted-foreground text-lg max-w-2xl mx-auto">
-                  Side-by-side comparison of our premium decking solutions
+                  {serviceDetailPage?.deckComparison?.description || "Side-by-side comparison of our premium decking solutions"}
                 </p>
               </div>
 
@@ -1128,20 +1133,20 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                         <TreePine className="w-7 h-7 text-primary" />
                       </div>
                       <div>
-                        <h4 className="text-2xl font-bold text-foreground">Capped Composite</h4>
-                        <p className="text-sm text-muted-foreground">Wood fiber + polymer blend</p>
+                        <h4 className="text-2xl font-bold text-foreground">{serviceDetailPage?.deckComparison?.composite?.title || "Capped Composite"}</h4>
+                        <p className="text-sm text-muted-foreground">{serviceDetailPage?.deckComparison?.composite?.subtitle || "Wood fiber + polymer blend"}</p>
                       </div>
                     </div>
 
                     <ul className="space-y-4 mb-8">
-                      {[
+                      {(serviceDetailPage?.deckComparison?.composite?.features || [
                         { feature: "Natural wood look and feel", highlight: true },
                         { feature: "25+ year fade and stain warranty" },
                         { feature: "Realistic wood grain patterns" },
                         { feature: "Lower cost than premium PVC" },
                         { feature: "Excellent for full sun exposure" },
                         { feature: "Scratch and stain resistant capstock" }
-                      ].map((item, idx) => (
+                      ]).map((item: any, idx: number) => (
                         <li key={idx} className="flex items-start gap-3">
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${item.highlight ? 'bg-primary/20' : 'bg-primary/10'
                             }`}>
@@ -1156,8 +1161,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
                     <div className="pt-6 border-t border-border">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Starting at</span>
-                        <span className="text-2xl font-bold text-foreground">Competitive Pricing</span>
+                        <span className="text-sm text-muted-foreground">{serviceDetailPage?.deckComparison?.composite?.priceLabel || "Starting at"}</span>
+                        <span className="text-2xl font-bold text-foreground">{serviceDetailPage?.deckComparison?.composite?.priceValue || "Competitive Pricing"}</span>
                       </div>
                     </div>
                   </div>
@@ -1193,20 +1198,20 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                         <Droplets className="w-7 h-7 text-primary" />
                       </div>
                       <div>
-                        <h4 className="text-2xl font-bold text-foreground">Cellular PVC</h4>
-                        <p className="text-sm text-muted-foreground">100% pure polymer</p>
+                        <h4 className="text-2xl font-bold text-foreground">{serviceDetailPage?.deckComparison?.pvc?.title || "Cellular PVC"}</h4>
+                        <p className="text-sm text-muted-foreground">{serviceDetailPage?.deckComparison?.pvc?.subtitle || "100% pure polymer"}</p>
                       </div>
                     </div>
 
                     <ul className="space-y-4 mb-8">
-                      {[
+                      {(serviceDetailPage?.deckComparison?.pvc?.features || [
                         { feature: "Zero organic material - never rots", highlight: true },
                         { feature: "Lifetime rot and insect warranty", highlight: true },
                         { feature: "Lighter, cooler surface in direct sun" },
                         { feature: "Ideal for pools and shaded areas" },
                         { feature: "Superior moisture resistance" },
                         { feature: "Never absorbs water or swells" }
-                      ].map((item, idx) => (
+                      ]).map((item: any, idx: number) => (
                         <li key={idx} className="flex items-start gap-3">
                           <div className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 mt-0.5 ${item.highlight ? 'bg-primary/20' : 'bg-primary/10'
                             }`}>
@@ -1221,8 +1226,8 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
 
                     <div className="pt-6 border-t border-border">
                       <div className="flex items-center justify-between">
-                        <span className="text-sm text-muted-foreground">Premium Investment</span>
-                        <span className="text-2xl font-bold text-foreground">Worth Every Penny</span>
+                        <span className="text-sm text-muted-foreground">{serviceDetailPage?.deckComparison?.pvc?.priceLabel || "Premium Investment"}</span>
+                        <span className="text-2xl font-bold text-foreground">{serviceDetailPage?.deckComparison?.pvc?.priceValue || "Worth Every Penny"}</span>
                       </div>
                     </div>
                   </div>
@@ -1238,7 +1243,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               transition={{ duration: 0.6, delay: 0.3 }}
               className="grid grid-cols-1 md:grid-cols-3 gap-6"
             >
-              {[
+              {(serviceDetailPage?.deckFeatures || [
                 {
                   icon: Zap,
                   title: "Cool-Touch Technology",
@@ -1257,22 +1262,25 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                   description: "Industry-leading warranties backed by our military-grade installation",
                   color: "from-green-500/20 to-emerald-500/10"
                 }
-              ].map((item, idx) => (
-                <motion.div
-                  key={idx}
-                  whileHover={{ scale: 1.02 }}
-                  className={`relative p-6 rounded-2xl bg-gradient-to-br ${item.color} border border-primary/10 backdrop-blur-sm overflow-hidden group`}
-                >
-                  <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <div className="relative z-10">
-                    <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
-                      <item.icon className="w-7 h-7 text-primary" />
+              ]).map((item: any, idx: number) => {
+                const FeatureIcon = (iconMap as any)[item.icon] || Zap;
+                return (
+                  <motion.div
+                    key={idx}
+                    whileHover={{ scale: 1.02 }}
+                    className={`relative p-6 rounded-2xl bg-gradient-to-br ${item.color} border border-primary/10 backdrop-blur-sm overflow-hidden group`}
+                  >
+                    <div className="absolute inset-0 bg-white/5 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+                    <div className="relative z-10">
+                      <div className="w-14 h-14 rounded-xl bg-primary/10 flex items-center justify-center mb-5 group-hover:bg-primary/20 transition-colors">
+                        <FeatureIcon className="w-7 h-7 text-primary" />
+                      </div>
+                      <h4 className="text-xl font-bold text-foreground mb-3">{item.title}</h4>
+                      <p className="text-muted-foreground leading-relaxed">{item.description}</p>
                     </div>
-                    <h4 className="text-xl font-bold text-foreground mb-3">{item.title}</h4>
-                    <p className="text-muted-foreground leading-relaxed">{item.description}</p>
-                  </div>
-                </motion.div>
-              ))}
+                  </motion.div>
+                );
+              })}
             </motion.div>
 
 
@@ -1317,18 +1325,17 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
             <div className="flex items-center justify-center gap-2 sm:gap-4 mb-3 sm:mb-6">
               <div className="w-6 sm:w-12 h-[1px] sm:h-[1.5px] bg-gradient-to-r from-transparent to-primary/40" />
               <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] sm:tracking-[0.4em] text-primary">
-                Methodology
+                {methodology?.badge || "Methodology"}
               </span>
               <div className="w-6 sm:w-12 h-[1px] sm:h-[1.5px] bg-gradient-to-l from-transparent to-primary/40" />
             </div>
 
             <h2 className="text-2xl xs:text-4xl sm:text-5xl md:text-7xl lg:text-8xl font-heading font-bold text-foreground mb-3 sm:mb-6 leading-tight sm:leading-[1.05]">
-              Precision in <br className="hidden sm:block" />
-              <span className="text-primary">every detail</span>
+              {methodology?.headline || "Precision in every detail"}
             </h2>
 
             <p className="text-sm sm:text-base lg:text-xl text-muted-foreground max-w-3xl mx-auto leading-relaxed px-2">
-              A battle-tested framework that ensures consistency, quality, and complete satisfaction—from initial consultation to final walkthrough.
+              {methodology?.description || "A battle-tested framework that ensures consistency, quality, and complete satisfaction—from initial consultation to final walkthrough."}
             </p>
           </motion.div>
 
@@ -1360,10 +1367,10 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
             className="text-center max-w-3xl mx-auto mb-8 sm:mb-16"
           >
             <span className="inline-block text-primary text-[10px] sm:text-sm font-bold uppercase tracking-[0.2em] sm:tracking-[0.3em] mb-2 sm:mb-4">
-              FAQ
+              {faqData?.badge || "FAQ"}
             </span>
             <h2 className="text-2xl xs:text-4xl sm:text-6xl lg:text-7xl font-heading font-bold text-foreground mb-3 sm:mb-6 leading-tight">
-              Your Questions, <span className="text-primary">Answered</span>
+              {faqData?.headline || "Your Questions, Answered"}
             </h2>
             <p className="text-xs sm:text-base lg:text-xl text-muted-foreground px-2">
               Everything you need to know about our {service.title.toLowerCase()} services
@@ -1401,21 +1408,21 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
             <div className="flex items-center justify-center gap-2 sm:gap-3 mb-4 sm:mb-6">
               <div className="w-8 sm:w-12 h-px bg-primary/30" />
               <span className="text-[8px] xs:text-[10px] sm:text-xs font-bold tracking-[0.2em] uppercase text-primary">
-                Our Portfolio
+                {explore?.badge || "Our Portfolio"}
               </span>
               <div className="w-8 sm:w-12 h-px bg-primary/30" />
             </div>
 
             <h2 className="text-3xl xs:text-4xl sm:text-5xl lg:text-6xl font-heading font-bold text-foreground mb-3 sm:mb-4">
-              Explore More Services
+              {explore?.headline || "Explore More Services"}
             </h2>
             <p className="text-muted-foreground text-sm sm:text-base lg:text-lg px-2">
-              Discover our full range of premium home improvement solutions
+              {explore?.description || "Discover our full range of premium home improvement solutions"}
             </p>
           </motion.div>
 
           <div className="grid grid-cols-1 xs:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-            {allServices.filter(s => s.slug !== service.slug).slice(0, 3).map((s, idx) => {
+            {allServices.filter((s: any) => s.slug !== service.slug).slice(0, 3).map((s: any, idx: number) => {
               const SIcon = (iconMap as any)[s.icon] || Home;
               return (
                 <motion.div
@@ -1461,7 +1468,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
                       </p>
 
                       <div className="flex items-center gap-2 text-primary text-sm sm:text-base font-semibold group-hover:gap-3 transition-all">
-                        <span>Learn More</span>
+                        <span>{explore?.cta || "Learn More"}</span>
                         <ArrowUpRight className="w-3 h-3 sm:w-4 sm:h-4 group-hover:translate-x-0.5 group-hover:-translate-y-0.5 transition-transform" />
                       </div>
                     </div>
@@ -1481,7 +1488,7 @@ export default function ServiceDetailPage({ params }: { params: Promise<{ slug: 
               href="/services"
               className="inline-flex items-center gap-2 px-6 py-3 sm:px-8 sm:py-4 border-2 border-primary text-primary text-sm sm:text-base font-semibold rounded-full hover:bg-primary hover:text-primary-foreground transition-all duration-300"
             >
-              View All Services
+              {explore?.viewAll || "View All Services"}
               <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5" />
             </Link>
           </motion.div>

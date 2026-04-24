@@ -4,7 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Icon } from "../config/icons";
 import { useContent } from "../hooks/useContent";
-import sharedServicesData from "../data/servicesData.json";
+// import sharedServicesData from "../data/servicesData.json";
 import logo from "../assets/eaglelogo.png";
 
 import Image from "next/image";
@@ -24,7 +24,7 @@ const Navbar = () => {
   const timeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const { companyLinks } = navbar;
-  const services = sharedServicesData.services;
+  const services = (useContent().services as any).services || [];
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10);

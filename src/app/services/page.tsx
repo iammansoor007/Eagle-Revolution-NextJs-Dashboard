@@ -19,7 +19,7 @@ import {
   ThumbsUp, FileText, ClipboardCheck, Truck, Hammer, Minus, Plus,
   TrendingUp, BadgeCheck
 } from 'lucide-react';
-import servicesData from '../../data/servicesData.json';
+// import servicesData from '../../data/servicesData.json';
 
 import breakcrumb from '@/assets/Breadcrumb-Image.jpeg';
 import roofingImg from '../../assets/roof1.jpg.jpeg';
@@ -30,13 +30,13 @@ import sidingImg from '../../assets/siding5.jpg.jpeg';
 import gutter from '../../assets/gutterinstallation.jpg.jpeg';
 import pvcdecks from '../../assets/pvcdecks.jpg.jpeg';
 
-const iconMap = {
+const iconMap: Record<string, any> = {
   Home, Layout, TreePine, Building2, Building, Droplets,
   Shield, Trophy, Users, ThumbsUp, FileText, ClipboardCheck,
-  Truck, Hammer, CheckCircle, Award, Clock
+  Truck, Hammer, CheckCircle, Award, Clock, BadgeCheck, TrendingUp, Star
 };
 
-const imageMap = {
+const imageMap: Record<string, any> = {
   'Residential Roofing': roofingImg,
   'Windows & Doors': windowsImg,
   'Custom Decks': decksImg,
@@ -47,6 +47,8 @@ const imageMap = {
 
 };
 
+import { useContent } from "../../hooks/useContent";
+
 // --- Counter Component ---
 const Counter = ({ value, suffix = "", duration = 2, start = false }: any) => {
   const [count, setCount] = useState(0);
@@ -55,7 +57,7 @@ const Counter = ({ value, suffix = "", duration = 2, start = false }: any) => {
     if (start) {
       let startTime: number | undefined;
       const animate = (timestamp: any) => {
-        if (!startTime!) startTime = timestamp;
+        if (startTime === undefined) startTime = timestamp;
         const progress = Math.min((timestamp - startTime!) / (duration * 1000), 1);
         const easedProgress = 1 - Math.pow(1 - progress, 4);
         setCount(Math.floor(easedProgress * value));
@@ -76,88 +78,6 @@ const Counter = ({ value, suffix = "", duration = 2, start = false }: any) => {
   );
 };
 
-// --- StatCard Component ---
-const StatCard = ({ stat, index }: any) => {
-  const cardRef = useRef<any>(null);
-  const inView = useInView(cardRef, { once: true, margin: "50px" });
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const rotateX = useTransform(y, [-0.5, 0.5], [10, -10]);
-  const rotateY = useTransform(x, [-0.5, 0.5], [-10, 10]);
-
-  const handleMouseMove = (e: any) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const mouseX = (e.clientX - rect.left) / rect.width - 0.5;
-    const mouseY = (e.clientY - rect.top) / rect.height - 0.5;
-    x.set(mouseX);
-    y.set(mouseY);
-  };
-
-  const handleMouseLeave = () => {
-    x.set(0);
-    y.set(0);
-  };
-
-  return (
-    <motion.div
-      ref={cardRef}
-      initial={{ opacity: 0, y: 40 }}
-      animate={inView ? { opacity: 1, y: 0 } : { opacity: 0, y: 40 }}
-      transition={{ duration: 0.8, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
-      style={{ rotateX, rotateY, transformPerspective: 1000 }}
-      className="relative group lg:px-2"
-    >
-      <div className="relative h-full bg-white/[0.03] backdrop-blur-md border border-white/10 rounded-2xl sm:rounded-3xl p-3 sm:p-8 overflow-hidden transition-all duration-500 group-hover:bg-white/[0.06] group-hover:border-primary/30 group-hover:shadow-[0_20px_50px_rgba(36,48,210,0.15)]">
-        <div className="absolute -inset-24 bg-primary/5 rounded-full blur-[80px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
-
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-4 sm:mb-6">
-            {/* Icon Container with !important to force styles */}
-            <div className="icon-container w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 group-hover:!bg-primary group-hover:!border-primary transition-all duration-300">
-              <stat.icon className="icon w-5 h-5 sm:w-6 sm:h-6 !text-primary group-hover:!text-white transition-all duration-300" />
-            </div>
-            <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary transition-colors">
-              Impact
-            </div>
-          </div>
-
-          <div className="space-y-0.5 sm:space-y-1">
-            <h3 className="text-2xl xs:text-4xl sm:text-5xl font-black text-foreground tracking-tight">
-              <Counter
-                value={parseInt(stat.value.replace(/[^0-9]/g, ''))}
-                suffix={stat.value.includes('%') ? '%' : (stat.value.includes('+') ? '+' : '')}
-                start={inView}
-              />
-            </h3>
-            <p className="text-[10px] sm:text-sm font-semibold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors duration-300">
-              {stat.label}
-            </p>
-          </div>
-
-          <div className="mt-4 sm:mt-8 flex items-center gap-2 sm:gap-4">
-            <div className="h-[1.5px] sm:h-[2px] w-6 sm:w-8 bg-primary/20 group-hover:w-full group-hover:bg-primary transition-all duration-500 rounded-full" />
-            <div className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-all duration-500" />
-          </div>
-        </div>
-      </div>
-
-      {/* Add this style tag to force the hover effect */}
-      <style jsx>{`
-        .icon-container:hover {
-          background-color: hsl(var(--primary)) !important;
-          border-color: hsl(var(--primary)) !important;
-        }
-        .icon-container:hover .icon {
-          color: white !important;
-        }
-      `}</style>
-    </motion.div>
-  );
-};
-
 // --- StatCounter Component for Stats Section ---
 const StatCounter = ({ value, label, suffix, delay, icon: Icon, description }: any) => {
   const [count, setCount] = useState(0);
@@ -168,7 +88,7 @@ const StatCounter = ({ value, label, suffix, delay, icon: Icon, description }: a
     if (inView) {
       let startTime: number | undefined;
       const animate = (timestamp: any) => {
-        if (!startTime!) startTime = timestamp;
+        if (startTime === undefined) startTime = timestamp;
         const progress = Math.min((timestamp - startTime!) / 2000, 1);
         const easedProgress = 1 - Math.pow(1 - progress, 4);
         setCount(Math.floor(easedProgress * value));
@@ -192,7 +112,7 @@ const StatCounter = ({ value, label, suffix, delay, icon: Icon, description }: a
       <div className="bg-white rounded-2xl p-6 sm:p-8 shadow-lg hover:shadow-2xl transition-all duration-500 border border-border/40 hover:border-primary/20 h-full">
         <div className="flex flex-col items-center text-center">
           <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-2xl bg-primary/10 text-primary flex items-center justify-center mb-4 sm:mb-6 group-hover:bg-primary group-hover:text-white transition-all duration-500">
-            <Icon className="w-7 h-7 sm:w-8 sm:h-8" />
+            {Icon && <Icon className="w-7 h-7 sm:w-8 sm:h-8" />}
           </div>
           <div className="space-y-2">
             <h3 className="text-3xl sm:text-4xl md:text-5xl font-black text-foreground tracking-tighter">
@@ -201,9 +121,11 @@ const StatCounter = ({ value, label, suffix, delay, icon: Icon, description }: a
             <p className="text-xs sm:text-sm font-bold uppercase tracking-wider text-muted-foreground">
               {label}
             </p>
-            <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-2">
-              {description}
-            </p>
+            {description && (
+              <p className="text-[10px] sm:text-xs text-muted-foreground/60 mt-2">
+                {description}
+              </p>
+            )}
           </div>
         </div>
       </div>
@@ -297,6 +219,8 @@ const ServiceCard = ({ service, index }: any) => {
   const SIcon = (iconMap as any)[service.icon] || Home;
   const [isHovered, setIsHovered] = useState(false);
 
+  const slug = service.title.toLowerCase().replace(/ & /g, '-').replace(/, /g, '-').replace(/ /g, '-');
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 30 }}
@@ -307,7 +231,7 @@ const ServiceCard = ({ service, index }: any) => {
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
     >
-      <Link href={`/services/${service.slug}`} className="block h-full">
+      <Link href={`/services/${slug}`} className="block h-full">
         <div className="flex flex-col h-full">
           {/* Image Container - Fixed aspect ratio */}
           <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden bg-gradient-to-br from-slate-100 to-slate-200 shadow-lg transition-all duration-700 group-hover:shadow-2xl">
@@ -331,7 +255,7 @@ const ServiceCard = ({ service, index }: any) => {
             <div className="absolute top-6 left-6 z-10">
               <div className="px-5 py-2.5 bg-white/95 backdrop-blur-md rounded-xl border border-white/30 shadow-lg">
                 <span className="text-[10px] font-black uppercase tracking-[0.2em] text-primary">
-                  {service.tag}
+                  {service.tag || "Expertise"}
                 </span>
               </div>
             </div>
@@ -367,7 +291,7 @@ const ServiceCard = ({ service, index }: any) => {
 
             {/* Tagline */}
             <p className="text-muted-foreground text-xs sm:text-sm font-medium uppercase tracking-[0.1em] opacity-60 group-hover:opacity-80 transition-opacity">
-              {service.tagline}
+              {service.tagline || service.description?.substring(0, 50) + "..."}
             </p>
 
             {/* Learn More Link */}
@@ -385,7 +309,7 @@ const ServiceCard = ({ service, index }: any) => {
 };
 
 // --- Award CTA Banner Component (Enhanced) ---
-const AwardCTABanner = () => {
+const AwardCTABanner = ({ data }: { data: any }) => {
   return (
     <motion.div
       initial={{ opacity: 0, y: 40 }}
@@ -449,16 +373,12 @@ const AwardCTABanner = () => {
 
             {/* Headline */}
             <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 xs:mb-4 leading-tight">
-              America's{" "}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/70">
-                #1 Rated
-              </span>
-              <br className="hidden xs:block" /> Home Improvement Team
+              {data?.title || "America's #1 Rated Home Improvement Team"}
             </h3>
 
             {/* Description */}
             <p className="text-muted-foreground text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-4 xs:mb-6">
-              Join thousands of satisfied homeowners who trusted us with their most valuable investment.
+              {data?.description || "Join thousands of satisfied homeowners who trusted us with their most valuable investment."}
             </p>
 
             {/* Trust Badges */}
@@ -489,14 +409,14 @@ const AwardCTABanner = () => {
 
           {/* CTA Buttons */}
           <div className="flex lg:flex-row sm:flex-col gap-3 xs:gap-4">
-            <Link href="/contact">
+            <Link href={data?.buttonLink || "/contact"}>
               <motion.div
                 whileHover={{ scale: 1.03 }}
                 whileTap={{ scale: 0.98 }}
                 className="group relative px-5 xs:px-6 sm:px-8 py-3 xs:py-3.5 sm:py-4 bg-primary text-white font-bold rounded-full shadow-lg hover:text-white transition-all duration-300 overflow-hidden cursor-pointer"
               >
                 <span className="relative z-10 flex items-center justify-center gap-2 text-xs xs:text-sm sm:text-base">
-                  Get Free Quote
+                  {data?.buttonText || "Get Free Quote"}
                   <ArrowRight className="w-3 h-3 xs:w-4 xs:h-4 group-hover:translate-x-1 transition-transform" />
                 </span>
                 <motion.div
@@ -526,8 +446,8 @@ const AwardCTABanner = () => {
 };
 
 // --- Stats Section Component ---
-const StatsSection = () => {
-  const stats = [
+const StatsSection = ({ data }: { data: any }) => {
+  const stats = data?.stats || [
     {
       value: 50,
       label: "Years Combined Experience",
@@ -571,28 +491,26 @@ const StatsSection = () => {
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
             <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
             <span className="text-[10px] sm:text-xs md:text-sm font-medium text-primary uppercase tracking-wider">
-              Our Impact
+              {data?.badge || "Our Impact"}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-4 px-2">
-            Trusted by Homeowners
-            <br className="hidden sm:block" />
-            <span className="text-primary"> Across the Region</span>
-          </h2>
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-4 px-2"
+            dangerouslySetInnerHTML={{ __html: data?.headline || 'Trusted by Homeowners <span className="text-primary"> Across the Region</span>' }}
+          />
           <p className="text-xs sm:text-sm md:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-3 sm:px-4">
-            Numbers speak louder than words. Here's what we've achieved together with our valued customers.
+            {data?.description || "Numbers speak louder than words. Here's what we've achieved together with our valued customers."}
           </p>
         </div>
 
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 md:gap-6 lg:gap-8">
-          {stats.map((stat, index) => (
+          {stats.map((stat: any, index: number) => (
             <StatCounter
               key={index}
               value={stat.value}
               label={stat.label}
               suffix={stat.suffix}
-              delay={stat.delay}
-              icon={stat.icon}
+              delay={(index + 1) * 0.1}
+              icon={stat.icon ? (iconMap as any)[stat.icon] : (index === 0 ? Clock : index === 1 ? Home : index === 2 ? BadgeCheck : Shield)}
               description={stat.description}
             />
           ))}
@@ -622,7 +540,9 @@ const StatsSection = () => {
 };
 
 export default function ServicesPage() {
-  const services = (servicesData?.services || []).map((service: any) => ({
+  const { services: data } = useContent();
+
+  const services = (data?.services || []).map((service: any) => ({
     ...service,
     image: (imageMap as any)[service.title] || roofingImg
   }));
@@ -661,7 +581,17 @@ export default function ServicesPage() {
                 transition={{ duration: 0.6 }}
                 className="text-2xl xs:text-3xl sm:text-5xl md:text-7xl font-heading font-bold text-white mb-3 sm:mb-6 leading-tight"
               >
-                Our Services
+                {typeof data?.headline === 'object' ? (
+                  <>
+                    {data.headline.prefix}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
+                      {data.headline.highlight}
+                    </span>
+                    {data.headline.suffix}
+                  </>
+                ) : (
+                  data?.headline || "Our Services"
+                )}
               </motion.h1>
 
               <motion.div
@@ -677,7 +607,7 @@ export default function ServicesPage() {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="text-white/80 text-sm xs:text-base sm:text-xl max-w-2xl"
               >
-                Comprehensive home improvement solutions with military precision and architectural excellence.
+                {data?.description || "Comprehensive home improvement solutions with military precision and architectural excellence."}
               </motion.p>
             </div>
           </div>
@@ -685,7 +615,7 @@ export default function ServicesPage() {
       </section>
 
       {/* Stats Section */}
-      <StatsSection />
+      <StatsSection data={data} />
 
       {/* Main Services Grid */}
       <section className="py-16 md:py-24 px-6 lg:px-12 bg-transparent relative">
@@ -701,18 +631,18 @@ export default function ServicesPage() {
             <span className="inline-block text-primary text-xs font-black uppercase tracking-[0.5em] mb-4">
               Eagle Revolution
             </span>
-            <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground">
-              World Class <span className="text-primary">Capabilities</span>
-            </h2>
+            <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground"
+              dangerouslySetInnerHTML={{ __html: data?.headline || 'World Class <span className="text-primary">Capabilities</span>' }}
+            />
             <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6" />
             <p className="max-w-3xl mx-auto text-muted-foreground text-lg md:text-xl leading-relaxed">
-              Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area.
+              {data?.description || "Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area."}
             </p>
           </motion.div>
 
           {/* Services Grid */}
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 relative z-30">
-            {services.map((service, index) => (
+            {services.map((service: any, index: number) => (
               <ServiceCard key={index} service={service} index={index} />
             ))}
           </div>
@@ -721,7 +651,7 @@ export default function ServicesPage() {
 
       {/* Award CTA Banner */}
       <div className="w-full max-w-7xl mx-auto px-4 py-12">
-        <AwardCTABanner />
+        <AwardCTABanner data={data?.cta} />
       </div>
     </main>
   );

@@ -17,7 +17,7 @@ import commercialImg from '../../assets/commercial-tpo.png';
 import sidingImg from '../../assets/siding5.jpg.jpeg';
 import gutter from '../../assets/gutterinstallation.jpg.jpeg';
 import pvcdecks from '../../assets/pvcdecks.jpg.jpeg';
-import servicesData from '../../data/servicesData.json';
+// import servicesData from '../../data/servicesData.json';
 
 
 
@@ -951,7 +951,8 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
 const ServicesSection = () => {
   const { aboutPage } = useContent();
   const { capabilities } = aboutPage;
-  const servicesList = (servicesData?.services || []).map((service: any) => ({
+  const { services: servicesDataBlock } = useContent();
+  const servicesList = ((servicesDataBlock as any).services || []).map((service: any) => ({
     ...service,
     image: imageMap[service.title] || roofingImg
   }));
@@ -981,7 +982,7 @@ const ServicesSection = () => {
 
         {/* Services Grid */}
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8 lg:gap-10 relative z-30">
-          {servicesList.map((service, index) => (
+          {servicesList.map((service: any, index: number) => (
             <ServiceCard key={index} service={service} index={index} />
           ))}
         </div>

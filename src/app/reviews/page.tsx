@@ -195,7 +195,7 @@ const StatCard = ({ value, label, suffix = "", index, isDecimal = false }: { val
 // ============================================================================
 // GOOGLE REVIEW BADGE
 // ============================================================================
-const GoogleReviewBadge = () => {
+const GoogleReviewBadge = ({ rating = 4.9, totalReviews = 71 }: { rating?: number; totalReviews?: number }) => {
     return (
         <a
             href={GOOGLE_MAPS_REVIEW_URL}
@@ -212,7 +212,7 @@ const GoogleReviewBadge = () => {
                 </svg>
                 <div>
                     <div className="flex items-center gap-1">
-                        <span className="font-bold text-gray-900 dark:text-foreground text-lg">4.9</span>
+                        <span className="font-bold text-gray-900 dark:text-foreground text-lg">{rating}</span>
                         <div className="flex">
                             {[...Array(5)].map((_, i) => (
                                 <svg key={i} className="w-4 h-4 text-yellow-500 fill-yellow-500" viewBox="0 0 24 24">
@@ -221,7 +221,7 @@ const GoogleReviewBadge = () => {
                             ))}
                         </div>
                     </div>
-                    <p className="text-xs text-gray-500 dark:text-muted-foreground">71 verified Google reviews</p>
+                    <p className="text-xs text-gray-500 dark:text-muted-foreground">{totalReviews} verified Google reviews</p>
                 </div>
             </div>
         </a>
@@ -466,7 +466,7 @@ export default function TestimonialsPage() {
     const [showSuccess, setShowSuccess] = useState(false);
     const [isSubmitting, setIsSubmitting] = useState(false);
 
-    const { section, testimonials = [], videos = [], stats = {} } = data || {};
+    const { section, testimonials = [], videos = [], stats = {} as any } = data || {};
 
     // Updated with actual Google Maps data: 4.9 rating, 71 reviews
     const googleStats = {
@@ -538,20 +538,17 @@ ${formData.testimonial}
                     >
                         {/* Google Review Badge */}
                         <div className="flex justify-center mb-6">
-                            <GoogleReviewBadge />
+                            <GoogleReviewBadge rating={stats?.rating || googleStats.rating} totalReviews={stats?.totalReviews || googleStats.totalReviews} />
                         </div>
 
                         {/* Main Heading */}
-                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4">
-                            <span className="text-gray-900 dark:text-foreground">What Our</span>
-                            <br className="sm:hidden" />
-                            <span className="sm:inline"> </span>
-                            <span className="text-primary"> Customers Say</span>
-                        </h1>
+                        <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-4"
+                            dangerouslySetInnerHTML={{ __html: section?.headline || '<span className="text-gray-900 dark:text-foreground">What Our</span> <span className="text-primary">Customers Say</span>' }}
+                        />
 
                         {/* Description */}
                         <p className="text-base sm:text-lg text-gray-600 dark:text-muted-foreground max-w-md sm:max-w-xl mx-auto mb-8">
-                            Real stories from homeowners who trusted us with their most valuable investment
+                            {section?.description || "Real stories from homeowners who trusted us with their most valuable investment"}
                         </p>
 
                         {/* Stats Row */}
@@ -565,12 +562,12 @@ ${formData.testimonial}
                                     ))}
                                 </div>
                                 <span className="text-sm font-medium text-gray-600 dark:text-muted-foreground">
-                                    <span className="font-bold text-gray-900 dark:text-foreground">4.9</span> • {googleStats.totalReviews} verified reviews
+                                    <span className="font-bold text-gray-900 dark:text-foreground">{stats?.rating || googleStats.rating}</span> • {stats?.totalReviews || googleStats.totalReviews} verified reviews
                                 </span>
                             </div>
                             <div className="w-px h-5 bg-gray-300 dark:bg-white/20" />
                             <div className="text-sm font-medium text-gray-600 dark:text-muted-foreground">
-                                <span className="font-bold text-gray-900 dark:text-foreground">1200+</span> happy customers
+                                <span className="font-bold text-gray-900 dark:text-foreground">{stats?.customers || googleStats.customers}+</span> happy customers
                             </div>
                         </div>
 
@@ -603,10 +600,10 @@ ${formData.testimonial}
                 <div className="max-w-4xl mx-auto">
                     <div className="grid grid-cols-2 md:grid-cols-4 gap-4 sm:gap-6">
                         {[
-                            { value: googleStats.totalReviews, label: "Google Reviews", suffix: "+" },
-                            { value: googleStats.rating, label: "Average Rating", suffix: "", isDecimal: true },
-                            { value: googleStats.customers, label: "Projects Completed", suffix: "+" },
-                            { value: googleStats.videos, label: "Video Stories", suffix: "+" },
+                            { value: stats?.totalReviews || googleStats.totalReviews, label: "Google Reviews", suffix: "+" },
+                            { value: stats?.rating || googleStats.rating, label: "Average Rating", suffix: "", isDecimal: true },
+                            { value: stats?.customers || googleStats.customers, label: "Projects Completed", suffix: "+" },
+                            { value: stats?.videos || googleStats.videos, label: "Video Stories", suffix: "+" },
                         ].map((stat, i) => (
                             <StatCard key={i} {...stat} index={i} />
                         ))}
@@ -671,7 +668,7 @@ ${formData.testimonial}
                 <div className="max-w-3xl mx-auto text-center">
                     <div className="bg-gradient-to-br from-primary/10 to-primary/5 rounded-3xl p-8 sm:p-12">
                         <h2 className="text-2xl sm:text-3xl font-bold text-gray-900 dark:text-foreground mb-3">
-                            Loved by 71+ Homeowners on Google
+                            Loved by {stats?.totalReviews || googleStats.totalReviews}+ Homeowners on Google
                         </h2>
                         <p className="text-gray-600 dark:text-muted-foreground mb-6 max-w-md mx-auto">
                             Join our growing community of satisfied customers. See what everyone's talking about!
@@ -688,7 +685,7 @@ ${formData.testimonial}
                                 <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05" />
                                 <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335" />
                             </svg>
-                            View All 71 Reviews on Google
+                            View All {stats?.totalReviews || googleStats.totalReviews} Reviews on Google
                         </a>
                     </div>
                 </div>
@@ -706,14 +703,14 @@ ${formData.testimonial}
                         <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4" />
                         </svg>
-                        Read all 71 reviews on Google Maps
+                        Read all {stats?.totalReviews || googleStats.totalReviews} reviews on Google Maps
                     </a>
                     <div className="flex items-center gap-3 text-sm text-gray-600 dark:text-muted-foreground">
                         <span>🇺🇸 Veteran Owned</span>
                         <span className="w-1 h-1 bg-gray-400 rounded-full" />
-                        <span>4.9 ★ Rating</span>
+                        <span>{stats?.rating || googleStats.rating} ★ Rating</span>
                         <span className="w-1 h-1 bg-gray-400 rounded-full" />
-                        <span>71+ Reviews</span>
+                        <span>{stats?.totalReviews || googleStats.totalReviews}+ Reviews</span>
                     </div>
                 </div>
             </footer>
