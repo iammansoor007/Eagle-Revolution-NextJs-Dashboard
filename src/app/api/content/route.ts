@@ -20,3 +20,26 @@ export async function GET() {
     return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
   }
 }
+
+export async function PUT(req: Request) {
+  try {
+    await connectToDatabase();
+    const body = await req.json();
+
+    const result = await SiteContent.updateOne(
+      { key: 'complete_data' },
+      { 
+        $set: { 
+          data: body,
+          lastUpdated: new Date()
+        } 
+      },
+      { upsert: true }
+    );
+
+    return NextResponse.json({ success: true, result });
+  } catch (error: any) {
+    console.error('Content update error:', error);
+    return NextResponse.json({ error: 'Internal Server Error', details: error.message }, { status: 500 });
+  }
+}

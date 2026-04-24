@@ -7,6 +7,7 @@ import PageTransition from "./PageTransition";
 import LoadingScreen from "./LoadingScreen";
 import { AnimatePresence, motion, easeOut } from "framer-motion";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 
 export default function SiteLayout({ children }: { children: React.ReactNode }) {
   const { hasLoaded, setHasLoaded } = useGlobalLoading();
@@ -25,6 +26,14 @@ export default function SiteLayout({ children }: { children: React.ReactNode }) 
   }, [hasLoaded, setHasLoaded]);
 
   const isSplashPhase = !hasLoaded;
+
+  const pathname = usePathname();
+  const isAdmin = pathname?.startsWith("/admin");
+
+  // If we are on an admin route, we completely bypass the standard SiteLayout wrapper (Navbar, Footer, loading screen)
+  if (isAdmin) {
+    return <div className="relative min-h-screen bg-[#080808]">{children}</div>;
+  }
 
   return (
     <div className="relative min-h-screen bg-background">

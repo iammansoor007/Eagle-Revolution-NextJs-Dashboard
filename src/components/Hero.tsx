@@ -55,14 +55,22 @@ const Hero = () => {
             maskImage: "linear-gradient(to bottom, black 60%, transparent 95%)",
           }}
         >
-          <Image
-            src={bgfair}
-            alt=""
-            className="w-full h-full object-cover scale-105"
-            fill
-            quality={100}
-            priority
-          />
+          {images?.[0]?.startsWith('http') ? (
+            <img
+              src={images[0]}
+              alt="Hero Background"
+              className="w-full h-full object-cover scale-105"
+            />
+          ) : (
+            <Image
+              src={images?.[0] || bgfair}
+              alt=""
+              className="w-full h-full object-cover scale-105"
+              fill
+              quality={100}
+              priority
+            />
+          )}
         </div>
 
         <div className="absolute inset-x-0 bottom-0 h-[40vh] bg-gradient-to-t from-slate-900 via-slate-900/80 to-transparent z-10" />
@@ -181,7 +189,7 @@ const Hero = () => {
                 transition={{ duration: 0.6, delay: 1.1 }}
               >
                 {stats.map((stat: any, idx: number) => (
-                  <div key={stat.label} className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-3 text-center sm:text-left">
+                  <div key={idx} className="flex flex-col sm:flex-row items-center sm:items-start md:items-center gap-3 text-center sm:text-left">
                     <div className="p-2 rounded-lg bg-white/5 md:bg-transparent">
                       <Icon name={stat.icon} className="w-5 h-5 md:w-6 md:h-6 text-primary/80" />
                     </div>
