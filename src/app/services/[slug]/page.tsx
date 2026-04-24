@@ -535,13 +535,13 @@ const AwardCTABanner = () => {
               </motion.div>
             </div>
 
-            <h3 className="text-2xl xs:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4 leading-tight">
-              {trustBanner?.headline || "America's #1 Rated Home Improvement Team"}
-            </h3>
+            <h3 className="text-2xl xs:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 sm:mb-4 leading-tight"
+              dangerouslySetInnerHTML={{ __html: trustBanner?.headline || "America's #1 Rated Home Improvement Team" }}
+            />
 
-            <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-6">
-              {trustBanner?.description || "Join thousands of satisfied homeowners who trusted us with their most valuable investment."}
-            </p>
+            <p className="text-muted-foreground text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-6"
+              dangerouslySetInnerHTML={{ __html: trustBanner?.description || "Join thousands of satisfied homeowners who trusted us with their most valuable investment." }}
+            />
 
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-4 sm:gap-6 mt-4">
               {(trustBanner?.badges || ["A+ BBB Rating", "24/7 Support", "Free Estimates"]).map((badge: string, i: number) => (

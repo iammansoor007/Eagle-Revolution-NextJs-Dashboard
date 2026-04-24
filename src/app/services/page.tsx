@@ -372,14 +372,14 @@ const AwardCTABanner = ({ data }: { data: any }) => {
             </motion.div>
 
             {/* Headline */}
-            <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 xs:mb-4 leading-tight">
-              {data?.title || "America's #1 Rated Home Improvement Team"}
-            </h3>
+            <h3 className="text-xl xs:text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-3 xs:mb-4 leading-tight"
+              dangerouslySetInnerHTML={{ __html: data?.title || "America's #1 Rated Home Improvement Team" }}
+            />
 
             {/* Description */}
-            <p className="text-muted-foreground text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-4 xs:mb-6">
-              {data?.description || "Join thousands of satisfied homeowners who trusted us with their most valuable investment."}
-            </p>
+            <p className="text-muted-foreground text-xs xs:text-sm sm:text-base md:text-lg leading-relaxed max-w-lg mb-4 xs:mb-6"
+              dangerouslySetInnerHTML={{ __html: data?.description || "Join thousands of satisfied homeowners who trusted us with their most valuable investment." }}
+            />
 
             {/* Trust Badges */}
             <div className="flex flex-wrap items-center justify-center lg:justify-start gap-2 xs:gap-3">
@@ -491,14 +491,26 @@ const StatsSection = ({ data }: { data: any }) => {
           <div className="inline-flex items-center gap-1.5 sm:gap-2 px-3 sm:px-4 py-1.5 sm:py-2 bg-primary/10 rounded-full mb-4 sm:mb-6">
             <TrendingUp className="w-3 h-3 sm:w-4 sm:h-4 text-primary" />
             <span className="text-[10px] sm:text-xs md:text-sm font-medium text-primary uppercase tracking-wider">
-              {data?.badge || "Our Impact"}
+              {data?.statsSection?.badge || data?.badge || "Our Impact"}
             </span>
           </div>
-          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-4 px-2"
-            dangerouslySetInnerHTML={{ __html: data?.headline || 'Trusted by Homeowners <span className="text-primary"> Across the Region</span>' }}
-          />
+          <h2 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-bold text-foreground mb-2 sm:mb-4 px-2">
+            {typeof data?.statsSection?.headline === 'object' ? (
+              <>
+                {data.statsSection.headline.prefix}{' '}
+                <span className="text-primary">{data.statsSection.headline.highlight}</span>{' '}
+                {data.statsSection.headline.suffix}
+              </>
+            ) : (
+              <span dangerouslySetInnerHTML={{ __html: data?.statsSection?.headline || data?.headline || 'Trusted by Homeowners <span className="text-primary"> Across the Region</span>' }} />
+            )}
+          </h2>
           <p className="text-xs sm:text-sm md:text-base lg:text-lg text-muted-foreground max-w-2xl mx-auto px-3 sm:px-4">
-            {data?.description || "Numbers speak louder than words. Here's what we've achieved together with our valued customers."}
+            {Array.isArray(data?.statsSection?.description) ? (
+              <span dangerouslySetInnerHTML={{ __html: data.statsSection.description.join(' ') }} />
+            ) : (
+              <span dangerouslySetInnerHTML={{ __html: data?.statsSection?.description || data?.description || "Numbers speak louder than words. Here's what we've achieved together with our valued customers." }} />
+            )}
           </p>
         </div>
 
@@ -540,7 +552,8 @@ const StatsSection = ({ data }: { data: any }) => {
 };
 
 export default function ServicesPage() {
-  const { services: data } = useContent();
+  const { services: dataRaw } = useContent();
+  const data = dataRaw as any;
 
   const services = (data?.services || []).map((service: any) => ({
     ...service,
@@ -581,16 +594,24 @@ export default function ServicesPage() {
                 transition={{ duration: 0.6 }}
                 className="text-2xl xs:text-3xl sm:text-5xl md:text-7xl font-heading font-bold text-white mb-3 sm:mb-6 leading-tight"
               >
-                {typeof data?.headline === 'object' ? (
+                {typeof data?.hero?.headline === 'object' ? (
                   <>
-                    {data.headline.prefix}
+                    {data.hero.headline.prefix}{' '}
+                    <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
+                      {data.hero.headline.highlight}
+                    </span>{' '}
+                    {data.hero.headline.suffix}
+                  </>
+                ) : typeof data?.headline === 'object' ? (
+                  <>
+                    {data.headline.prefix}{' '}
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-primary/80">
                       {data.headline.highlight}
-                    </span>
+                    </span>{' '}
                     {data.headline.suffix}
                   </>
                 ) : (
-                  data?.headline || "Our Services"
+                  data?.hero?.headline || data?.headline || "Our Services"
                 )}
               </motion.h1>
 
@@ -607,7 +628,13 @@ export default function ServicesPage() {
                 transition={{ duration: 0.6, delay: 0.3 }}
                 className="text-white/80 text-sm xs:text-base sm:text-xl max-w-2xl"
               >
-                {data?.description || "Comprehensive home improvement solutions with military precision and architectural excellence."}
+                {Array.isArray(data?.hero?.description) ? (
+                  <span dangerouslySetInnerHTML={{ __html: data.hero.description.join(' ') }} />
+                ) : Array.isArray(data?.description) ? (
+                  <span dangerouslySetInnerHTML={{ __html: data.description.join(' ') }} />
+                ) : (
+                  data?.hero?.description || data?.description || "Comprehensive home improvement solutions with military precision and architectural excellence."
+                )}
               </motion.p>
             </div>
           </div>
@@ -629,14 +656,26 @@ export default function ServicesPage() {
             className="text-center mb-16"
           >
             <span className="inline-block text-primary text-xs font-black uppercase tracking-[0.5em] mb-4">
-              Eagle Revolution
+              {data?.gridSection?.badge || data?.badge || "Expertise"}
             </span>
-            <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground"
-              dangerouslySetInnerHTML={{ __html: data?.headline || 'World Class <span className="text-primary">Capabilities</span>' }}
-            />
+            <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground">
+              {typeof data?.gridSection?.headline === 'object' ? (
+                <>
+                  {data.gridSection.headline.prefix}{' '}
+                  <span className="text-primary">{data.gridSection.headline.highlight}</span>{' '}
+                  {data.gridSection.headline.suffix}
+                </>
+              ) : (
+                <span dangerouslySetInnerHTML={{ __html: data?.gridSection?.headline || data?.headline || 'World Class <span className="text-primary">Capabilities</span>' }} />
+              )}
+            </h2>
             <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6" />
             <p className="max-w-3xl mx-auto text-muted-foreground text-lg md:text-xl leading-relaxed">
-              {data?.description || "Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area."}
+              {Array.isArray(data?.gridSection?.description) ? (
+                <span dangerouslySetInnerHTML={{ __html: data.gridSection.description.join(' ') }} />
+              ) : (
+                <span dangerouslySetInnerHTML={{ __html: data?.gridSection?.description || data?.description || "Every detail matters when it comes to structural integrity. Our team brings military-grade standards to every project across the St. Louis area." }} />
+              )}
             </p>
           </motion.div>
 

@@ -256,6 +256,11 @@
                 "value": 4.9,
                 "suffix": "",
                 "label": "Rating"
+            },
+            {
+                "value": 10,
+                "suffix": "",
+                "label": "Year Workmanship Guarantee"
             }
         ],
         "services": [
