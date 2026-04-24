@@ -1,0 +1,128 @@
+"use client";
+
+import React, { useState, useRef } from 'react';
+import { motion, useScroll, useTransform } from 'framer-motion';
+import { Upload, Send, Briefcase, FileText, User, Mail, Phone, CheckCircle, ArrowRight } from 'lucide-react';
+import { useContent } from "../../hooks/useContent";
+
+const Images = {
+  Pattern: "https://images.unsplash.com/photo-1502691876148-a84978e59af8?ixlib=rb-4.0.3&auto=format&fit=crop&w=2070&q=80",
+};
+
+const ParallaxLayer = ({ children, speed = 0.1, className = "" }: any) => {
+  const ref = useRef<any>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"]
+  });
+  const y = useTransform(scrollYProgress, [0, 1], [0, speed * 50]);
+  return (
+    <motion.div ref={ref} style={{ y }} className={`absolute inset-0 will-change-transform ${className}`}>
+      {children}
+    </motion.div>
+  );
+};
+
+export default function CareersTemplate({ pageData, params }: { pageData?: any, params?: any }) {
+  const { careers: careersData } = useContent();
+  const [fileName, setFileName] = useState<string | null>(null);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    if (e.target.files && e.target.files.length > 0) {
+      setFileName(e.target.files[0].name);
+    } else {
+      setFileName(null);
+    }
+  };
+
+  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+    const formData = new FormData(e.currentTarget);
+    formData.append("_subject", "New Job Application - Eagle Revolution");
+    formData.append("_captcha", "false");
+    formData.append("_template", "table");
+
+    try {
+      const response = await fetch("/api/send", {
+        method: "POST",
+        body: formData,
+        headers: { 'Accept': 'application/json' }
+      });
+      if (response.ok) {
+        setIsSuccess(true);
+      } else {
+        throw new Error("Form submission failed");
+      }
+    } catch (error) {
+      alert("Failed to submit your application. Please try again or contact us directly.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  return (
+    <main className="bg-white min-h-screen font-body w-full overflow-hidden">
+      <section className="relative py-16 md:py-32 overflow-hidden w-full">
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 opacity-[0.02]" style={{ backgroundImage: `linear-gradient(to right, #2563eb 1px, transparent 1px), linear-gradient(to bottom, #2563eb 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+        </div>
+        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[1000px] h-[500px] bg-gradient-to-b from-blue-50 to-transparent opacity-80 blur-[100px]" />
+        <div className="max-w-5xl mx-auto px-4 relative z-30">
+          <div className="max-w-3xl mx-auto text-center mb-12 md:mb-24">
+            <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-3 mb-6">
+              <div className="w-8 h-[2px] bg-gradient-to-r from-blue-300 to-blue-500" />
+              <span className="text-xs font-medium tracking-[0.2em] uppercase text-blue-600">{careersData?.section?.badge || "Join Eagle Revolution"}</span>
+              <div className="w-8 h-[2px] bg-gradient-to-r from-blue-500 to-blue-300" />
+            </motion.div>
+            <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-7xl font-light text-slate-900 mb-6 leading-tight">
+              {careersData?.section?.headline?.split('with')[0]} with<br />
+              <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-900">{careersData?.section?.headline?.split('with')[1]}</span>
+            </motion.h1>
+            <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-slate-600 text-lg md:text-xl font-light max-w-2xl mx-auto px-4">{careersData?.section?.description}</motion.p>
+          </div>
+          <motion.div initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.8, delay: 0.3 }}>
+            <div className="relative bg-white/80 backdrop-blur-xl rounded-[2rem] shadow-2xl overflow-hidden border border-white">
+              {isSuccess ? (
+                <div className="p-8 md:p-16 text-center flex flex-col items-center justify-center min-h-[400px]">
+                  <div className="w-20 h-20 bg-green-100 rounded-full flex items-center justify-center mb-6"><CheckCircle className="w-10 h-10 text-green-600" /></div>
+                  <h2 className="text-2xl md:text-3xl font-bold text-slate-900 mb-4">{careersData?.success?.title}</h2>
+                  <p className="text-lg text-slate-600 max-w-md mx-auto">{careersData?.success?.description}</p>
+                </div>
+              ) : (
+                <form onSubmit={handleSubmit} className="p-8 md:p-16 space-y-10">
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8 md:gap-10">
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2"><User className="w-4 h-4 text-blue-500" />{careersData?.labels?.name}</label>
+                      <input type="text" name="name" required className="w-full px-5 py-4 bg-slate-50/50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+                    </div>
+                    <div className="space-y-3">
+                      <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2"><Mail className="w-4 h-4 text-blue-500" />{careersData?.labels?.email}</label>
+                      <input type="email" name="email" required className="w-full px-5 py-4 bg-slate-50/50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all" />
+                    </div>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2"><Briefcase className="w-4 h-4 text-blue-500" />{careersData?.labels?.role}</label>
+                    <select name="role" required defaultValue="" className="w-full px-5 py-4 bg-slate-50/50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all appearance-none">
+                      <option value="" disabled>Select role...</option>
+                      {careersData?.roles?.map((role: any, index: number) => <option key={index} value={role.value}>{role.label}</option>)}
+                    </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2"><FileText className="w-4 h-4 text-blue-500" />{careersData?.labels?.summary}</label>
+                    <textarea name="message" required rows={4} className="w-full px-5 py-4 bg-slate-50/50 border rounded-xl focus:ring-2 focus:ring-blue-500 outline-none transition-all"></textarea>
+                  </div>
+                  <button type="submit" disabled={isSubmitting} className="w-full py-5 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold transition-all disabled:opacity-70">
+                    {isSubmitting ? 'SENDING...' : 'SUBMIT APPLICATION'}
+                  </button>
+                </form>
+              )}
+            </div>
+          </motion.div>
+        </div>
+      </section>
+    </main>
+  );
+}
