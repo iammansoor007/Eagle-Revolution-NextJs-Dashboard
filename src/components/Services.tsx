@@ -391,8 +391,8 @@ const Services = () => {
                 ))}
               </div>
               <div className="flex items-center justify-between gap-8 mt-8 pt-6 border-t border-border">
-                {stats.map((stat: any) => (
-                  <div key={stat.label} className="flex-1 text-center">
+                {stats.map((stat: any, idx: number) => (
+                  <div key={idx} className="flex-1 text-center">
                     <div className="text-3xl md:text-4xl font-bold text-primary whitespace-nowrap">
                       <Counter value={stat.value} suffix={stat.suffix} />
                     </div>

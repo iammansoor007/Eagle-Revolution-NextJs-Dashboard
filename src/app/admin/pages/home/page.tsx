@@ -63,6 +63,7 @@ export default function HomeEditor() {
     { id: "hero", label: "Hero Section", icon: LayoutTemplate },
     { id: "about", label: "About Section", icon: Type },
     { id: "services", label: "Services Section", icon: LayoutTemplate },
+    { id: "founder", label: "Founder Section", icon: Type },
     { id: "whyChooseUs", label: "Why Choose Us", icon: ImageIcon },
     { id: "quote", label: "Quote CTA", icon: Type },
   ];
@@ -510,121 +511,141 @@ export default function HomeEditor() {
             )}
 
             {activeTab === "services" && (
-              <motion.div key="services" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
-                <h2 className="text-xl font-bold text-white mb-6 border-b border-white/10 pb-4">Services Section</h2>
+              <motion.div key="services" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <h2 className="text-2xl font-bold text-white">Services Section</h2>
+                  <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">Section 3</span>
+                </div>
                 
-                {/* Image Upload */}
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Right Side Image</label>
-                    {data.services?.image?.src && (
-                      <div className="mb-2 relative w-full h-32 rounded-xl overflow-hidden border border-white/10">
-                        <img src={data.services.image.src} alt="Services" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
-                        try {
-                          const res = await fetch("/api/upload", { method: "POST", body: formData });
-                          if (res.ok) {
-                            const { url } = await res.json();
-                            setData((prev: any) => ({ ...prev, services: { ...prev.services, image: { ...prev.services.image, src: url } } }));
-                          } else {
-                            alert("Upload failed.");
+                {/* Image Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    Right Side Media
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Image Upload</label>
+                      {data.services?.image?.src && (
+                        <div className="mb-3 relative w-full h-40 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg group">
+                          <img src={data.services.image.src} alt="Services" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const formData = new FormData();
+                          formData.append("file", file);
+                          try {
+                            const res = await fetch("/api/upload", { method: "POST", body: formData });
+                            if (res.ok) {
+                              const { url } = await res.json();
+                              setData((prev: any) => ({ ...prev, services: { ...prev.services, image: { ...prev.services.image, src: url } } }));
+                            } else {
+                              alert("Upload failed.");
+                            }
+                          } catch (err) {
+                            alert("Error uploading image.");
                           }
-                        } catch (err) {
-                          alert("Error uploading image.");
-                        }
-                      }}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
-                    />
-                  </div>
-
-                  <div className="space-y-4">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Badge Over Image</label>
-                      <input
-                        type="text"
-                        value={data.services?.image?.badge || ""}
-                        onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, image: { ...prev.services.image, badge: e.target.value } } }))}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
-                        placeholder="e.g. 🇺🇸 Veteran Owned & Operated"
+                        }}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:tracking-wider file:bg-primary file:text-white hover:file:bg-primary/80 transition-colors"
                       />
                     </div>
+
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Floating Image Badge</label>
+                        <input
+                          type="text"
+                          value={data.services?.image?.badge || ""}
+                          onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, image: { ...prev.services.image, badge: e.target.value } } }))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none transition-colors"
+                          placeholder="e.g. 🇺🇸 Veteran Owned & Operated"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Section Top Badge</label>
+                        <input
+                          type="text"
+                          value={data.services?.badge || ""}
+                          onChange={(e) => updateSection("services", "badge", e.target.value)}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none transition-colors"
+                          placeholder="e.g. Our Expertise"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Content Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Type className="w-5 h-5 text-primary" />
+                    Text Content
+                  </h3>
+                  
+                  <div className="space-y-6">
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 bg-black/20 p-4 rounded-xl border border-white/5">
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Headline Prefix</label>
+                        <input
+                          type="text"
+                          value={data.services?.headline?.prefix || ""}
+                          onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, headline: { ...prev.services.headline, prefix: e.target.value } } }))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-widest text-primary font-bold">Highlight</label>
+                        <input
+                          type="text"
+                          value={data.services?.headline?.highlight || ""}
+                          onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, headline: { ...prev.services.headline, highlight: e.target.value } } }))}
+                          className="w-full bg-primary/10 border border-primary/30 text-primary font-bold rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none"
+                        />
+                      </div>
+                      <div className="space-y-2">
+                        <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Headline Suffix</label>
+                        <input
+                          type="text"
+                          value={data.services?.headline?.suffix || ""}
+                          onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, headline: { ...prev.services.headline, suffix: e.target.value } } }))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        />
+                      </div>
+                    </div>
+
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Section Top Badge</label>
-                      <input
-                        type="text"
-                        value={data.services?.badge || ""}
-                        onChange={(e) => updateSection("services", "badge", e.target.value)}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold flex justify-between">
+                        <span>Description Paragraphs</span>
+                        <span className="text-white/30 lowercase font-normal italic">Hit enter for a new paragraph</span>
+                      </label>
+                      <textarea
+                        rows={5}
+                        value={(data.services?.description || []).join('\n')}
+                        onChange={(e) => updateSection("services", "description", e.target.value.split('\n').filter(Boolean))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-4 text-white text-sm leading-relaxed focus:border-primary/50 focus:outline-none resize-y min-h-[120px]"
                       />
                     </div>
                   </div>
                 </div>
 
-                {/* Headline */}
-                <div className="space-y-4 pt-4 border-t border-white/10">
-                  <h3 className="text-sm font-semibold text-white">Section Headline</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Prefix</label>
-                      <input
-                        type="text"
-                        value={data.services?.headline?.prefix || ""}
-                        onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, headline: { ...prev.services.headline, prefix: e.target.value } } }))}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold text-primary">Highlight</label>
-                      <input
-                        type="text"
-                        value={data.services?.headline?.highlight || ""}
-                        onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, headline: { ...prev.services.headline, highlight: e.target.value } } }))}
-                        className="w-full bg-black/40 border border-primary/30 text-primary font-bold rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Suffix</label>
-                      <input
-                        type="text"
-                        value={data.services?.headline?.suffix || ""}
-                        onChange={(e) => setData((prev: any) => ({ ...prev, services: { ...prev.services, headline: { ...prev.services.headline, suffix: e.target.value } } }))}
-                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
-                      />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Description Array */}
-                <div className="space-y-4 pt-4 border-t border-white/10">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Description (Separate paragraphs with new lines)</label>
-                    <textarea
-                      rows={5}
-                      value={(data.services?.description || []).join('\n')}
-                      onChange={(e) => updateSection("services", "description", e.target.value.split('\n').filter(Boolean))}
-                      className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
-                    />
-                  </div>
-                </div>
-
-                {/* Stats */}
-                <div className="space-y-4 pt-4 border-t border-white/10">
-                  <h3 className="text-sm font-semibold text-white">Stats Cards</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Stats Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <LayoutTemplate className="w-5 h-5 text-primary" />
+                    Stats Indicators
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     {(data.services?.stats || []).map((stat: any, idx: number) => (
-                      <div key={idx} className="bg-white/5 p-4 rounded-xl border border-white/10 space-y-3">
+                      <div key={idx} className="bg-black/20 p-5 rounded-xl border border-white/5 space-y-4">
+                        <p className="text-xs font-bold text-primary uppercase tracking-widest border-b border-white/10 pb-2">Stat #{idx + 1}</p>
                         <div className="grid grid-cols-2 gap-4">
                           <div className="space-y-2">
-                            <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Value</label>
+                            <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Value</label>
                             <input
                               type="number"
                               value={stat.value || 0}
@@ -633,11 +654,11 @@ export default function HomeEditor() {
                                 newStats[idx].value = parseInt(e.target.value) || 0;
                                 updateSection("services", "stats", newStats);
                               }}
-                              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm font-bold focus:border-primary/50 focus:outline-none"
+                              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-lg font-bold focus:border-primary/50 focus:outline-none"
                             />
                           </div>
                           <div className="space-y-2">
-                            <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Suffix (e.g. +)</label>
+                            <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Suffix</label>
                             <input
                               type="text"
                               value={stat.suffix || ""}
@@ -646,12 +667,13 @@ export default function HomeEditor() {
                                 newStats[idx].suffix = e.target.value;
                                 updateSection("services", "stats", newStats);
                               }}
-                              className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-primary/50 focus:outline-none"
+                              className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary/50 focus:outline-none"
+                              placeholder="e.g. +"
                             />
                           </div>
                         </div>
                         <div className="space-y-2">
-                          <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Label</label>
+                          <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Label</label>
                           <input
                             type="text"
                             value={stat.label || ""}
@@ -660,7 +682,7 @@ export default function HomeEditor() {
                               newStats[idx].label = e.target.value;
                               updateSection("services", "stats", newStats);
                             }}
-                            className="w-full bg-black/40 border border-white/10 rounded-xl px-3 py-2 text-white text-sm focus:border-primary/50 focus:outline-none"
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-2.5 text-white text-sm focus:border-primary/50 focus:outline-none"
                           />
                         </div>
                       </div>
@@ -668,12 +690,16 @@ export default function HomeEditor() {
                   </div>
                 </div>
 
-                {/* Bottom CTA */}
-                <div className="space-y-4 pt-4 border-t border-white/10">
-                  <h3 className="text-sm font-semibold text-white">Bottom CTA Section</h3>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                {/* Bottom CTA Panel */}
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 shadow-xl relative overflow-hidden">
+                  <div className="absolute top-0 right-0 w-32 h-32 bg-primary/10 rounded-full blur-3xl" />
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2 relative z-10">
+                    <ChevronRight className="w-5 h-5 text-primary" />
+                    Bottom Call to Action
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 relative z-10">
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Heading</label>
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Heading</label>
                       <input
                         type="text"
                         value={data.services?.cta?.title || ""}
@@ -682,7 +708,7 @@ export default function HomeEditor() {
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Button Label</label>
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Button Label</label>
                       <input
                         type="text"
                         value={data.services?.cta?.buttonText || ""}
@@ -691,7 +717,7 @@ export default function HomeEditor() {
                       />
                     </div>
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Description</label>
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Description Text</label>
                       <textarea
                         rows={2}
                         value={data.services?.cta?.description || ""}
@@ -700,7 +726,7 @@ export default function HomeEditor() {
                       />
                     </div>
                     <div className="space-y-2 md:col-span-2">
-                      <label className="text-xs uppercase tracking-wider text-white/50 font-semibold">Button Link</label>
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Destination Link</label>
                       <input
                         type="text"
                         value={data.services?.cta?.buttonLink || ""}
@@ -708,6 +734,261 @@ export default function HomeEditor() {
                         className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
                       />
                     </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+
+            {activeTab === "founder" && (
+              <motion.div key="founder" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
+                <div className="flex items-center justify-between border-b border-white/10 pb-4">
+                  <h2 className="text-2xl font-bold text-white">Founder Section</h2>
+                  <span className="text-sm font-medium text-primary bg-primary/10 px-3 py-1 rounded-full">Section 4</span>
+                </div>
+                
+                {/* Intro Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <Type className="w-5 h-5 text-primary" />
+                    Section Intro Header
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Section Badge</label>
+                      <input
+                        type="text"
+                        value={data.leadership?.section?.badge || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, section: { ...prev.leadership.section, badge: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                        placeholder="e.g. OUR LEADERSHIP"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Section Heading</label>
+                      <input
+                        type="text"
+                        value={data.leadership?.section?.headline || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, section: { ...prev.leadership.section, headline: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                      />
+                    </div>
+                    <div className="space-y-2 md:col-span-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Section Paragraph</label>
+                      <textarea
+                        rows={2}
+                        value={data.leadership?.section?.description || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, section: { ...prev.leadership.section, description: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Left Side Panel (Portrait & Badges) */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <ImageIcon className="w-5 h-5 text-primary" />
+                    Left Side: Founder Portrait
+                  </h3>
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div className="space-y-3">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Image Upload</label>
+                      {data.leadership?.ceo?.image?.src && (
+                        <div className="mb-3 relative w-full h-40 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg group">
+                          <img src={data.leadership.ceo.image.src} alt="CEO" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
+                        </div>
+                      )}
+                      <input
+                        type="file"
+                        accept="image/*"
+                        onChange={async (e) => {
+                          const file = e.target.files?.[0];
+                          if (!file) return;
+                          const formData = new FormData();
+                          formData.append("file", file);
+                          try {
+                            const res = await fetch("/api/upload", { method: "POST", body: formData });
+                            if (res.ok) {
+                              const { url } = await res.json();
+                              setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, image: { ...prev.leadership.ceo.image, src: url } } } }));
+                            } else {
+                              alert("Upload failed.");
+                            }
+                          } catch (err) {
+                            alert("Error uploading image.");
+                          }
+                        }}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:tracking-wider file:bg-primary file:text-white hover:file:bg-primary/80 transition-colors"
+                      />
+                    </div>
+
+                    <div className="space-y-6">
+                      <div className="space-y-3">
+                        <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Top Image Badge</label>
+                        <input
+                          type="text"
+                          value={data.leadership?.ceo?.badges?.top || ""}
+                          onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, badges: { ...prev.leadership.ceo.badges, top: e.target.value } } } }))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none transition-colors"
+                          placeholder="e.g. Founder & CEO"
+                        />
+                      </div>
+                      <div className="space-y-3">
+                        <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Bottom Image Badge</label>
+                        <input
+                          type="text"
+                          value={data.leadership?.ceo?.badges?.bottom || ""}
+                          onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, badges: { ...prev.leadership.ceo.badges, bottom: e.target.value } } } }))}
+                          className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none transition-colors"
+                          placeholder="e.g. 15+ Years Experience"
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Right Side Content Panel */}
+                <div className="bg-white/[0.03] border border-white/10 rounded-2xl p-6 shadow-xl">
+                  <h3 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
+                    <LayoutTemplate className="w-5 h-5 text-primary" />
+                    Right Side: Founder Details
+                  </h3>
+                  
+                  <div className="grid grid-cols-1 md:grid-cols-2 gap-5 mb-6">
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Founder Name</label>
+                      <input
+                        type="text"
+                        value={data.leadership?.ceo?.name || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, name: e.target.value } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm font-bold focus:border-primary/50 focus:outline-none"
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-primary font-bold">Founder Title / Keypoint</label>
+                      <input
+                        type="text"
+                        value={data.leadership?.ceo?.title || ""}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, title: e.target.value } } }))}
+                        className="w-full bg-primary/10 border border-primary/30 text-primary font-bold rounded-xl px-4 py-3 text-sm focus:border-primary focus:outline-none"
+                      />
+                    </div>
+                  </div>
+
+                  <div className="space-y-6">
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold flex justify-between">
+                        <span>Founder Quotes</span>
+                        <span className="text-white/30 lowercase font-normal italic">Hit enter for a new quote</span>
+                      </label>
+                      <textarea
+                        rows={3}
+                        value={(data.leadership?.ceo?.quotes || []).join('\n')}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, quotes: e.target.value.split('\n').filter(Boolean) } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-lg font-medium leading-relaxed focus:border-primary/50 focus:outline-none"
+                      />
+                    </div>
+
+                    <div className="space-y-2">
+                      <label className="text-xs uppercase tracking-widest text-white/50 font-bold flex justify-between">
+                        <span>Complete Description</span>
+                        <span className="text-white/30 lowercase font-normal italic">Hit enter for a new paragraph</span>
+                      </label>
+                      <textarea
+                        rows={5}
+                        value={(data.leadership?.ceo?.description || []).join('\n')}
+                        onChange={(e) => setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, description: e.target.value.split('\n').filter(Boolean) } } }))}
+                        className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-4 text-white text-sm leading-relaxed focus:border-primary/50 focus:outline-none"
+                      />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Socials Panel */}
+                <div className="bg-primary/5 border border-primary/20 rounded-2xl p-6 shadow-xl">
+                  <div className="flex items-center justify-between mb-4">
+                    <h3 className="text-lg font-bold text-white flex items-center gap-2">
+                      <ChevronRight className="w-5 h-5 text-primary" />
+                      Founder Social Links
+                    </h3>
+                    <button
+                      onClick={() => {
+                        const newSocials = [...(data.leadership?.ceo?.socials || [])];
+                        newSocials.push({ icon: "Linkedin", url: "", label: "" });
+                        setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, socials: newSocials } } }));
+                      }}
+                      className="bg-primary text-white text-xs font-bold uppercase tracking-wider px-4 py-2 rounded-lg hover:bg-primary/90 transition-colors"
+                    >
+                      + Add Social Link
+                    </button>
+                  </div>
+                  
+                  <div className="space-y-4">
+                    {(data.leadership?.ceo?.socials || []).map((social: any, idx: number) => (
+                      <div key={idx} className="flex flex-wrap md:flex-nowrap gap-4 bg-black/20 p-4 rounded-xl border border-white/5 items-end">
+                        <div className="space-y-2 flex-shrink-0 w-full md:w-auto">
+                          <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Icon</label>
+                          <select
+                            value={social.icon}
+                            onChange={(e) => {
+                              const newSocials = [...data.leadership.ceo.socials];
+                              newSocials[idx].icon = e.target.value;
+                              setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, socials: newSocials } } }));
+                            }}
+                            className="bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none appearance-none"
+                          >
+                            <option value="Linkedin">LinkedIn</option>
+                            <option value="Facebook">Facebook</option>
+                            <option value="Twitter">Twitter</option>
+                            <option value="Instagram">Instagram</option>
+                            <option value="Youtube">YouTube</option>
+                            <option value="Mail">Email (Mail)</option>
+                            <option value="Phone">Phone</option>
+                            <option value="Globe">Website (Globe)</option>
+                          </select>
+                        </div>
+                        <div className="space-y-2 flex-grow">
+                          <label className="text-xs uppercase tracking-widest text-white/50 font-bold">URL / Link</label>
+                          <input
+                            type="text"
+                            value={social.url || ""}
+                            onChange={(e) => {
+                              const newSocials = [...data.leadership.ceo.socials];
+                              newSocials[idx].url = e.target.value;
+                              setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, socials: newSocials } } }));
+                            }}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                            placeholder="e.g. https://linkedin.com/in/... or mailto:ceo@..."
+                          />
+                        </div>
+                        <div className="space-y-2 flex-grow">
+                          <label className="text-xs uppercase tracking-widest text-white/50 font-bold">Label (Optional)</label>
+                          <input
+                            type="text"
+                            value={social.label || ""}
+                            onChange={(e) => {
+                              const newSocials = [...data.leadership.ceo.socials];
+                              newSocials[idx].label = e.target.value;
+                              setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, socials: newSocials } } }));
+                            }}
+                            className="w-full bg-black/40 border border-white/10 rounded-xl px-4 py-3 text-white text-sm focus:border-primary/50 focus:outline-none"
+                            placeholder="e.g. admin@example.com"
+                          />
+                        </div>
+                        <button
+                          onClick={() => {
+                            const newSocials = data.leadership.ceo.socials.filter((_: any, i: number) => i !== idx);
+                            setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, socials: newSocials } } }));
+                          }}
+                          className="p-3 text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-xl transition-colors"
+                        >
+                          ✕
+                        </button>
+                      </div>
+                    ))}
+                    {(!data.leadership?.ceo?.socials || data.leadership.ceo.socials.length === 0) && (
+                      <p className="text-white/40 text-sm text-center py-4 italic">No social links added yet.</p>
+                    )}
                   </div>
                 </div>
               </motion.div>

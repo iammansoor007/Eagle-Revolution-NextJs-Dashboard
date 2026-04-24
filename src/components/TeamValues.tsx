@@ -53,13 +53,31 @@ const CeoPortrait = () => {
         <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-primary/20 to-primary/20 rounded-3xl blur-lg group-hover:blur-xl transition-all duration-700" />
 
         <div className="relative rounded-2xl overflow-hidden shadow-2xl shadow-gray-300/50 h-[500px] md:h-[600px]">
-          <Image
-            src={brandonImg}
-            alt={ceo.alt}
-            className="object-cover"
-            fill
-            quality={100}
-          />
+          {ceo.image?.src ? (
+            ceo.image.src.startsWith('http') || ceo.image.src.startsWith('/uploads') ? (
+              <img
+                src={ceo.image.src}
+                alt={ceo.alt || "CEO"}
+                className="w-full h-full object-cover"
+              />
+            ) : (
+              <Image
+                src={ceo.image.src}
+                alt={ceo.alt || "CEO"}
+                className="object-cover"
+                fill
+                quality={100}
+              />
+            )
+          ) : (
+            <Image
+              src={brandonImg}
+              alt={ceo.alt || "CEO"}
+              className="object-cover"
+              fill
+              quality={100}
+            />
+          )}
 
           <div className="absolute inset-0 bg-gradient-to-t from-secondary/80 via-secondary/20 to-transparent" />
 
@@ -252,33 +270,27 @@ const Leadership = () => {
               </div>
 
               <div className="flex flex-wrap items-center gap-4 mt-10 pt-4 border-t border-border">
-                <Link
-                  href={ceo.social.linkedin}
-                  className="p-3 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
-                  aria-label="LinkedIn"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon name="Linkedin" className="w-5 h-5" />
-                  </motion.div>
-                </Link>
-                <Link
-                  href={`mailto:${ceo.social.email}`}
-                  className="p-3 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
-                  aria-label="Email"
-                >
-                  <motion.div
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <Icon name="Mail" className="w-5 h-5" />
-                  </motion.div>
-                </Link>
-                <span className="text-sm text-muted-foreground break-all">
-                  {ceo.social.email}
-                </span>
+                {(ceo.socials || []).map((social: any, idx: number) => (
+                  <div key={idx} className="flex items-center gap-2">
+                    <Link
+                      href={social.url}
+                      className="p-3 rounded-full bg-primary/5 text-primary hover:bg-primary/10 transition-colors"
+                      aria-label={social.icon}
+                    >
+                      <motion.div
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.95 }}
+                      >
+                        <Icon name={social.icon} className="w-5 h-5" />
+                      </motion.div>
+                    </Link>
+                    {social.label && (
+                      <span className="text-sm text-muted-foreground break-all">
+                        {social.label}
+                      </span>
+                    )}
+                  </div>
+                ))}
               </div>
             </div>
           </div>
