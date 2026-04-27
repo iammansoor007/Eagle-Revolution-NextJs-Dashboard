@@ -32,7 +32,7 @@ function IconPicker({ value, onChange }: { value: string, onChange: (val: string
         className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm hover:border-primary transition-colors min-w-[140px]"
       >
         <CurrentIcon className="w-4 h-4 text-primary" />
-        <span className="font-bold">{value || "Select Icon"}</span>
+        <span className="font-medium">{value || "Select Icon"}</span>
       </button>
 
       {open && (
@@ -96,7 +96,7 @@ function ImageUpload({ value, onChange, label, placeholder }: { value: string, o
 
   return (
     <div className="space-y-2">
-      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">{label}</label>
+      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">{label}</label>
       <div className="flex items-center gap-4">
         <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
           {value ? <img src={value} className="w-full h-full object-contain" /> : <ImageIcon className="w-6 h-6 text-slate-300" />}
@@ -120,7 +120,7 @@ function ImageUpload({ value, onChange, label, placeholder }: { value: string, o
               />
               <label
                 htmlFor={`upload-${label.replace(/\s+/g, "-")}`}
-                className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-bold hover:bg-slate-50 cursor-pointer h-full whitespace-nowrap"
+                className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-50 cursor-pointer h-full whitespace-nowrap"
               >
                 {uploading ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Upload className="w-4 h-4 text-primary" />}
                 <span>{uploading ? "..." : "Upload"}</span>
@@ -133,13 +133,38 @@ function ImageUpload({ value, onChange, label, placeholder }: { value: string, o
   );
 }
 
+function PageSelector({ value, pages, onChange }: { value: string, pages: any[], onChange: (page: any) => void }) {
+  const selectedPage = pages.find(p => p._id === value);
+
+  return (
+    <div className="space-y-1">
+      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Link to CMS Page</label>
+      <select 
+        value={value || ""} 
+        onChange={(e) => {
+          const page = pages.find(p => p._id === e.target.value);
+          onChange(page);
+        }}
+        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none"
+      >
+        <option value="">-- Custom Link (No Page) --</option>
+        {pages.map(page => (
+          <option key={page._id} value={page._id}>{page.title} ({page.slug})</option>
+        ))}
+      </select>
+    </div>
+  );
+}
+
 export default function SettingsEditor() {
   const [data, setData] = useState<any>(null);
+  const [pages, setPages] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState("general");
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
   useEffect(() => {
+    // Fetch settings
     fetch("/api/content")
       .then((res) => res.json())
       .then((json) => {
@@ -147,31 +172,46 @@ export default function SettingsEditor() {
         // Ensure structure
         if (!d.settings) d.settings = { siteTitle: "Eagle Revolution", siteTemplate: "%s | Eagle Revolution", favicon: "/eagle-logo.png" };
         if (!d.navbar) d.navbar = { companyLinks: [], ctaText: "Book Now", ctaLink: "/contact", logo: "/eagle-logo.png" };
-        if (!d.footer) d.footer = {
-          company: { name: "Eagle Revolution", tagline: "Precision. Protection. Pride.", description: "" },
-          contact: { email: "", phone: "", address: "", emergency: "", areas: "" },
-          social: [],
-          marquee: { texts: [], speed: 30 },
-          bottom: { copyright: "", rights: "", tagline: "", links: [] },
-          services: { title: "Our Services", materials: { title: "Materials", items: [] } },
-          certifications: []
-        };
         setData(d);
-      })
-      .catch((err) => console.error("Failed to load content:", err));
+      });
+
+    // Fetch pages for dropdown
+    fetch("/api/admin/pages")
+      .then(res => res.json())
+      .then(setPages)
+      .catch(err => console.error("Failed to load pages:", err));
   }, []);
 
   const handleSave = async () => {
     setSaving(true);
     setMessage("");
     try {
+      // 1. Update Content JSON
       const res = await fetch("/api/content", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(data),
       });
+
+      // 2. Sync Page Slugs for mapped links
+      const allLinks = [
+        ...data.navbar.companyLinks,
+        ...data.navbar.companyLinks.flatMap((l: any) => l.subLinks || [])
+      ];
+
+      for (const link of allLinks) {
+        if (link.pageId) {
+          const path = link.href.startsWith("/") ? link.href.substring(1) : link.href;
+          await fetch(`/api/admin/pages/${link.pageId}`, {
+            method: "PATCH",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ slug: path, title: link.label })
+          });
+        }
+      }
+
       if (res.ok) {
-        setMessage("Settings saved successfully!");
+        setMessage("Settings and Page Mappings saved successfully!");
         setTimeout(() => setMessage(""), 3000);
       } else {
         setMessage("Failed to save settings.");
@@ -212,23 +252,23 @@ export default function SettingsEditor() {
   return (
     <div className="max-w-6xl mx-auto pb-20">
       {/* Header */}
-      <div className="flex items-center justify-between mb-8">
+      <div className="flex items-center justify-between mb-12">
         <div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Site Settings</h1>
-          <p className="text-slate-500 mt-1 italic font-medium">Manage global configuration, header, and footer.</p>
+          <h1 className="text-3xl font-medium text-slate-900 tracking-tight">Site Settings</h1>
+          <p className="text-slate-400 mt-2 text-sm font-normal">Manage global configuration, header, and footer.</p>
         </div>
         <button
           onClick={handleSave}
           disabled={saving}
-          className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] disabled:opacity-50"
+          className="flex items-center gap-2 bg-slate-900 text-white px-8 py-3 rounded-2xl font-normal transition-all shadow-xl shadow-slate-900/10 hover:bg-slate-800 disabled:opacity-50"
         >
-          {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
+          {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
           {saving ? "Saving..." : "Save Changes"}
         </button>
       </div>
 
       {message && (
-        <div className={`p-4 rounded-xl mb-6 text-sm font-bold ${message.includes("success") ? "bg-green-500/10 text-green-600 border border-green-500/20" : "bg-red-500/10 text-red-600 border border-red-500/20"}`}>
+        <div className={`p-4 rounded-xl mb-6 text-sm font-medium ${message.includes("success") ? "bg-green-500/10 text-green-600 border border-green-500/20" : "bg-red-500/10 text-red-600 border border-red-500/20"}`}>
           {message}
         </div>
       )}
@@ -242,13 +282,13 @@ export default function SettingsEditor() {
               <button
                 key={tab.id}
                 onClick={() => setActiveTab(tab.id)}
-                className={`w-full flex items-center gap-3 px-5 py-4 rounded-2xl text-sm font-bold transition-all ${activeTab === tab.id
-                  ? "bg-primary text-white shadow-lg shadow-primary/20"
-                  : "text-slate-500 hover:bg-slate-100 hover:text-slate-900"
+                className={`w-full flex items-center gap-3 px-6 py-4 rounded-2xl text-sm transition-all ${activeTab === tab.id
+                  ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10"
+                  : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                   }`}
               >
                 <Icon className="w-4 h-4" />
-                {tab.label}
+                <span className={activeTab === tab.id ? "font-medium" : "font-normal"}>{tab.label}</span>
               </button>
             );
           })}
@@ -258,26 +298,26 @@ export default function SettingsEditor() {
         <div className="lg:col-span-3 bg-white shadow-xl shadow-slate-200/50 border border-slate-200 rounded-3xl p-8">
           <AnimatePresence mode="wait">
             {activeTab === "general" && (
-              <motion.div key="general" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                <h2 className="text-2xl font-black text-slate-900 border-b border-slate-100 pb-6">General Settings</h2>
+              <motion.div key="general" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-10">
+                <h2 className="text-xl font-medium text-slate-900 border-b border-slate-50 pb-6">General Settings</h2>
 
                 <div className="space-y-6">
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Site Default Title</label>
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Site Default Title</label>
                     <input
                       type="text"
                       value={data.settings?.siteTitle || ""}
                       onChange={(e) => updateData("settings", "siteTitle", e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium"
                     />
                   </div>
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Site Title Template (%s is page name)</label>
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Site Title Template (%s is page name)</label>
                     <input
                       type="text"
                       value={data.settings?.siteTemplate || ""}
                       onChange={(e) => updateData("settings", "siteTemplate", e.target.value)}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium"
                     />
                   </div>
                   <ImageUpload
@@ -291,8 +331,8 @@ export default function SettingsEditor() {
             )}
 
             {activeTab === "header" && (
-              <motion.div key="header" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                <h2 className="text-2xl font-black text-slate-900 border-b border-slate-100 pb-6">Header & Navigation</h2>
+              <motion.div key="header" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+                <h2 className="text-xl font-medium text-slate-900 border-b border-slate-50 pb-6">Header & Navigation</h2>
 
                 <div className="space-y-6">
                   <ImageUpload
@@ -304,16 +344,16 @@ export default function SettingsEditor() {
 
                   <div className="grid grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">CTA Button Text</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">CTA Button Text</label>
                       <input
                         type="text"
                         value={data.navbar?.ctaText || ""}
                         onChange={(e) => updateData("navbar", "ctaText", e.target.value)}
-                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold"
+                        className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium"
                       />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">CTA Link</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">CTA Link</label>
                       <input
                         type="text"
                         value={data.navbar?.ctaLink || ""}
@@ -323,55 +363,70 @@ export default function SettingsEditor() {
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-100">
-                    <div className="flex items-center justify-between mb-4">
+                  <div className="pt-10 border-t border-slate-50">
+                    <div className="flex items-center justify-between mb-8">
                       <div>
-                        <h3 className="text-lg font-black text-slate-800">Navigation Menu</h3>
-                        <p className="text-xs text-slate-500 font-medium italic">Manage top-level links and their sub-menus.</p>
+                        <h3 className="text-base font-medium text-slate-900">Navigation Menu</h3>
+                        <p className="text-xs text-slate-400 mt-1 font-normal">Manage top-level links and their sub-menus.</p>
                       </div>
                       <button
                         onClick={() => {
                           const newLinks = [...(data.navbar?.companyLinks || []), { label: "New Link", href: "/", icon: "Info", subLinks: [] }];
                           updateData("navbar", "companyLinks", newLinks);
                         }}
-                        className="bg-primary text-white px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 hover:scale-105 transition-all"
+                        className="text-slate-900 border border-slate-200 px-4 py-2 rounded-xl font-normal text-xs flex items-center gap-2 hover:bg-slate-50 transition-all"
                       >
                         <Plus className="w-3 h-3" /> Add Main Link
                       </button>
                     </div>
 
-                    <div className="space-y-4">
+                    <div className="space-y-6">
                       {(data.navbar?.companyLinks || []).map((link: any, idx: number) => (
-                        <div key={idx} className="bg-slate-50 p-5 rounded-2xl border border-slate-200 space-y-4 relative group">
+                        <div key={idx} className="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 relative group hover:border-slate-200 transition-colors">
                           <button
                             onClick={() => {
                               const newLinks = data.navbar.companyLinks.filter((_: any, i: number) => i !== idx);
                               updateData("navbar", "companyLinks", newLinks);
                             }}
-                            className="absolute top-4 right-4 p-1 text-slate-300 hover:text-red-500 transition-colors"
+                            className="absolute top-6 right-6 p-1 text-slate-300 hover:text-red-500 transition-colors"
                           >
                             <Trash2 className="w-4 h-4" />
                           </button>
 
-                          <div className="grid grid-cols-1 md:grid-cols-3 gap-3">
-                            <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Label</label>
+                          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                            <div className="space-y-1.5">
+                              <PageSelector 
+                                value={link.pageId} 
+                                pages={pages} 
+                                onChange={(page) => {
+                                  const newLinks = [...data.navbar.companyLinks];
+                                  newLinks[idx].pageId = page?._id || "";
+                                  if (page) {
+                                    newLinks[idx].label = page.title;
+                                    newLinks[idx].href = "/" + page.slug;
+                                  }
+                                  updateData("navbar", "companyLinks", newLinks);
+                                }} 
+                              />
+                            </div>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Label</label>
                               <input type="text" value={link.label} onChange={(e) => {
                                 const newLinks = [...data.navbar.companyLinks];
                                 newLinks[idx].label = e.target.value;
                                 updateData("navbar", "companyLinks", newLinks);
-                              }} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold" />
+                              }} className="w-full bg-slate-50/50 border border-slate-100 rounded-lg px-3 py-2 text-sm font-normal focus:bg-white transition-colors" />
                             </div>
-                            <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">URL</label>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Custom Path</label>
                               <input type="text" value={link.href} onChange={(e) => {
                                 const newLinks = [...data.navbar.companyLinks];
                                 newLinks[idx].href = e.target.value;
                                 updateData("navbar", "companyLinks", newLinks);
-                              }} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm" />
+                              }} className="w-full bg-slate-50/50 border border-slate-100 rounded-lg px-3 py-2 text-sm font-normal focus:bg-white transition-colors" />
                             </div>
-                            <div className="space-y-1">
-                              <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Icon</label>
+                            <div className="space-y-1.5">
+                              <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Icon</label>
                               <IconPicker value={link.icon} onChange={(val) => {
                                 const newLinks = [...data.navbar.companyLinks];
                                 newLinks[idx].icon = val;
@@ -383,7 +438,7 @@ export default function SettingsEditor() {
                           {/* Sublinks Section */}
                           <div className="pl-6 border-l-2 border-slate-200 space-y-3">
                             <div className="flex items-center justify-between">
-                              <h4 className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Sub-Menu Links</h4>
+                              <h4 className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Sub-Menu Links</h4>
                               <button
                                 onClick={() => {
                                   const newLinks = [...data.navbar.companyLinks];
@@ -391,29 +446,49 @@ export default function SettingsEditor() {
                                   newLinks[idx].subLinks.push({ label: "Sub Link", href: "/", icon: "" });
                                   updateData("navbar", "companyLinks", newLinks);
                                 }}
-                                className="text-[10px] font-bold text-primary hover:underline flex items-center gap-1"
+                                className="text-[10px] font-medium text-primary hover:underline flex items-center gap-1"
                               >
                                 <Plus className="w-2 h-2" /> Add Sub-Link
                               </button>
                             </div>
 
                             {(link.subLinks || []).map((sub: any, sIdx: number) => (
-                              <div key={sIdx} className="flex gap-2 items-center bg-white/50 p-2 rounded-lg border border-slate-100">
+                              <div key={sIdx} className="grid grid-cols-1 md:grid-cols-4 gap-2 items-center bg-white/50 p-2 rounded-lg border border-slate-100">
+                                <PageSelector 
+                                  value={sub.pageId} 
+                                  pages={pages} 
+                                  onChange={(page) => {
+                                    const newLinks = [...data.navbar.companyLinks];
+                                    newLinks[idx].subLinks[sIdx].pageId = page?._id || "";
+                                    if (page) {
+                                      newLinks[idx].subLinks[sIdx].label = page.title;
+                                      newLinks[idx].subLinks[sIdx].href = "/" + page.slug;
+                                    }
+                                    updateData("navbar", "companyLinks", newLinks);
+                                  }} 
+                                />
                                 <input type="text" value={sub.label} onChange={(e) => {
                                   const newLinks = [...data.navbar.companyLinks];
                                   newLinks[idx].subLinks[sIdx].label = e.target.value;
                                   updateData("navbar", "companyLinks", newLinks);
-                                }} placeholder="Label" className="flex-1 bg-white border border-slate-200 rounded-md px-2 py-1 text-xs font-bold" />
-                                <IconPicker value={sub.icon} onChange={(val) => {
+                                }} placeholder="Label" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs font-medium" />
+                                <input type="text" value={sub.href} onChange={(e) => {
                                   const newLinks = [...data.navbar.companyLinks];
-                                  newLinks[idx].subLinks[sIdx].icon = val;
+                                  newLinks[idx].subLinks[sIdx].href = e.target.value;
                                   updateData("navbar", "companyLinks", newLinks);
-                                }} />
-                                <button onClick={() => {
-                                  const newLinks = [...data.navbar.companyLinks];
-                                  newLinks[idx].subLinks = newLinks[idx].subLinks.filter((_: any, i: number) => i !== sIdx);
-                                  updateData("navbar", "companyLinks", newLinks);
-                                }} className="text-slate-300 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                                }} placeholder="Path" className="w-full bg-white border border-slate-200 rounded-md px-2 py-1 text-xs" />
+                                <div className="flex items-center gap-2">
+                                  <IconPicker value={sub.icon} onChange={(val) => {
+                                    const newLinks = [...data.navbar.companyLinks];
+                                    newLinks[idx].subLinks[sIdx].icon = val;
+                                    updateData("navbar", "companyLinks", newLinks);
+                                  }} />
+                                  <button onClick={() => {
+                                    const newLinks = [...data.navbar.companyLinks];
+                                    newLinks[idx].subLinks = newLinks[idx].subLinks.filter((_: any, i: number) => i !== sIdx);
+                                    updateData("navbar", "companyLinks", newLinks);
+                                  }} className="text-slate-300 hover:text-red-500"><Trash2 className="w-3 h-3" /></button>
+                                </div>
                               </div>
                             ))}
                           </div>
@@ -426,17 +501,17 @@ export default function SettingsEditor() {
             )}
 
             {activeTab === "footer" && (
-              <motion.div key="footer" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                <h2 className="text-2xl font-black text-slate-900 border-b border-slate-100 pb-6">Footer Management</h2>
+              <motion.div key="footer" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+                <h2 className="text-xl font-medium text-slate-900 border-b border-slate-50 pb-6">Footer Management</h2>
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Company Name</label>
-                      <input type="text" value={data.footer?.company?.name || ""} onChange={(e) => updateData("footer", "company", { ...data.footer.company, name: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold" />
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Company Name</label>
+                      <input type="text" value={data.footer?.company?.name || ""} onChange={(e) => updateData("footer", "company", { ...data.footer.company, name: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Company Tagline</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Company Tagline</label>
                       <input type="text" value={data.footer?.company?.tagline || ""} onChange={(e) => updateData("footer", "company", { ...data.footer.company, tagline: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
                     </div>
                   </div>
@@ -447,51 +522,53 @@ export default function SettingsEditor() {
                     placeholder="/footer-logo.png"
                   />
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Footer Description</label>
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Footer Description</label>
                     <textarea rows={3} value={data.footer?.company?.description || ""} onChange={(e) => updateData("footer", "company", { ...data.footer.company, description: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
                   </div>
 
-                  <div className="pt-6 border-t border-slate-100 space-y-4">
-                    <h3 className="text-lg font-black text-slate-800">Footer Marquee</h3>
-                    <div className="flex items-center justify-between">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Marquee Texts (Animated)</label>
-                      <button onClick={() => updateData("footer", "marquee", { ...data.footer.marquee, texts: [...(data.footer.marquee?.texts || []), "New Marquee Text"] })} className="text-xs font-bold text-primary">+ Add</button>
+                  <div className="pt-10 border-t border-slate-50 space-y-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <h3 className="text-base font-medium text-slate-900">Footer Marquee</h3>
+                        <p className="text-xs text-slate-400 mt-1 font-normal">Animated scrolling text at the very bottom.</p>
+                      </div>
+                      <button onClick={() => updateData("footer", "marquee", { ...data.footer.marquee, texts: [...(data.footer.marquee?.texts || []), "New Marquee Text"] })} className="text-slate-900 border border-slate-200 px-4 py-2 rounded-xl font-normal text-xs flex items-center gap-2 hover:bg-slate-50 transition-all">+ Add Text</button>
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-3">
                       {(data.footer?.marquee?.texts || []).map((t: string, i: number) => (
-                        <div key={i} className="flex gap-2">
+                        <div key={i} className="flex gap-2 items-center bg-white border border-slate-100 p-2 rounded-xl">
                           <input type="text" value={t} onChange={(e) => {
                             const nt = [...data.footer.marquee.texts];
                             nt[i] = e.target.value;
                             updateData("footer", "marquee", { ...data.footer.marquee, texts: nt });
-                          }} className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
+                          }} className="flex-1 bg-transparent px-2 py-1 text-sm font-normal outline-none" />
                           <button onClick={() => {
                             const nt = data.footer.marquee.texts.filter((_: any, idx: number) => idx !== i);
                             updateData("footer", "marquee", { ...data.footer.marquee, texts: nt });
-                          }} className="text-red-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                          }} className="p-2 text-slate-300 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                         </div>
                       ))}
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-slate-100 space-y-4">
-                    <h3 className="text-lg font-black text-slate-800">Newsletter Settings</h3>
+                    <h3 className="text-lg font-medium text-slate-800">Newsletter Settings</h3>
                     <div className="grid grid-cols-2 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Input Placeholder</label>
+                        <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Input Placeholder</label>
                         <input type="text" value={data.footer?.newsletter?.placeholder || ""} onChange={(e) => updateData("footer", "newsletter", { ...data.footer.newsletter, placeholder: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Button Text</label>
-                        <input type="text" value={data.footer?.newsletter?.buttonText || ""} onChange={(e) => updateData("footer", "newsletter", { ...data.footer.newsletter, buttonText: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold" />
+                        <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Button Text</label>
+                        <input type="text" value={data.footer?.newsletter?.buttonText || ""} onChange={(e) => updateData("footer", "newsletter", { ...data.footer.newsletter, buttonText: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium" />
                       </div>
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-slate-100 space-y-4">
                     <div className="flex items-center justify-between">
-                      <h3 className="text-lg font-black text-slate-800">Certifications</h3>
-                      <button onClick={() => updateData("footer", "certifications", [...(data.footer?.certifications || []), { cert: "New Cert", number: "12345", icon: "ShieldCheck" }])} className="text-xs font-bold text-primary">+ Add Cert</button>
+                      <h3 className="text-lg font-medium text-slate-800">Certifications</h3>
+                      <button onClick={() => updateData("footer", "certifications", [...(data.footer?.certifications || []), { cert: "New Cert", number: "12345", icon: "ShieldCheck" }])} className="text-xs font-medium text-primary">+ Add Cert</button>
                     </div>
                     <div className="grid grid-cols-2 gap-3">
                       {(data.footer?.certifications || []).map((c: any, i: number) => (
@@ -502,7 +579,7 @@ export default function SettingsEditor() {
                               const nc = [...data.footer.certifications];
                               nc[i].cert = e.target.value;
                               updateData("footer", "certifications", nc);
-                            }} placeholder="Cert Name" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs font-bold" />
+                            }} placeholder="Cert Name" className="w-full bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs font-medium" />
                             <div className="flex gap-2">
                               <input type="text" value={c.number} onChange={(e) => {
                                 const nc = [...data.footer.certifications];
@@ -521,44 +598,49 @@ export default function SettingsEditor() {
                     </div>
                   </div>
 
-                  <div className="pt-6 border-t border-slate-100 space-y-4">
-                    <h3 className="text-lg font-black text-slate-800">Copyright & Bottom Bar</h3>
-                    <div className="grid grid-cols-2 gap-4">
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Copyright Text</label>
-                        <input type="text" value={data.footer?.bottom?.copyright || ""} onChange={(e) => updateData("footer", "bottom", { ...data.footer.bottom, copyright: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold" />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Rights Text</label>
-                        <input type="text" value={data.footer?.bottom?.rights || ""} onChange={(e) => updateData("footer", "bottom", { ...data.footer.bottom, rights: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
+                  <div className="pt-10 border-t border-slate-50 space-y-6">
+                    <div className="flex items-center justify-between mb-2">
+                      <div>
+                        <h3 className="text-base font-medium text-slate-900">Copyright & Bottom Bar</h3>
+                        <p className="text-xs text-slate-400 mt-1 font-normal">Legal links and copyright information.</p>
                       </div>
                     </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Bottom Tagline</label>
-                      <input type="text" value={data.footer?.bottom?.tagline || ""} onChange={(e) => updateData("footer", "bottom", { ...data.footer.bottom, tagline: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
+                    <div className="grid grid-cols-2 gap-4">
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Copyright Text</label>
+                        <input type="text" value={data.footer?.bottom?.copyright || ""} onChange={(e) => updateData("footer", "bottom", { ...data.footer.bottom, copyright: e.target.value })} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-normal" />
+                      </div>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Rights Text</label>
+                        <input type="text" value={data.footer?.bottom?.rights || ""} onChange={(e) => updateData("footer", "bottom", { ...data.footer.bottom, rights: e.target.value })} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-normal" />
+                      </div>
+                    </div>
+                    <div className="space-y-1.5">
+                      <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Bottom Tagline</label>
+                      <input type="text" value={data.footer?.bottom?.tagline || ""} onChange={(e) => updateData("footer", "bottom", { ...data.footer.bottom, tagline: e.target.value })} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-4 py-2.5 text-sm font-normal" />
                     </div>
                     <div className="space-y-4">
                       <div className="flex items-center justify-between">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Bottom Bar Links (Privacy, Terms, etc.)</label>
-                        <button onClick={() => updateData("footer", "bottom", { ...data.footer.bottom, links: [...(data.footer.bottom?.links || []), { label: "New Link", href: "/" }] })} className="text-xs font-bold text-primary">+ Add Link</button>
+                        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Bottom Bar Links</label>
+                        <button onClick={() => updateData("footer", "bottom", { ...data.footer.bottom, links: [...(data.footer.bottom?.links || []), { label: "New Link", href: "/" }] })} className="text-xs font-normal text-slate-400 hover:text-slate-900">+ Add Link</button>
                       </div>
-                      <div className="grid grid-cols-2 gap-2">
+                      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                         {(data.footer?.bottom?.links || []).map((l: any, i: number) => (
-                          <div key={i} className="flex gap-2 bg-slate-50 p-2 rounded-xl border border-slate-200 items-center">
+                          <div key={i} className="flex gap-2 bg-white border border-slate-100 p-2 rounded-xl items-center group">
                             <input type="text" value={l.label} onChange={(e) => {
                               const nl = [...data.footer.bottom.links];
                               nl[i].label = e.target.value;
                               updateData("footer", "bottom", { ...data.footer.bottom, links: nl });
-                            }} className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs font-bold" placeholder="Label" />
+                            }} className="flex-1 bg-transparent px-2 py-1 text-xs font-normal outline-none" placeholder="Label" />
                             <input type="text" value={l.href} onChange={(e) => {
                               const nl = [...data.footer.bottom.links];
                               nl[i].href = e.target.value;
                               updateData("footer", "bottom", { ...data.footer.bottom, links: nl });
-                            }} className="flex-1 bg-white border border-slate-200 rounded-lg px-3 py-1 text-xs" placeholder="URL" />
+                            }} className="flex-1 bg-transparent px-2 py-1 text-xs font-normal border-l border-slate-100 outline-none" placeholder="URL" />
                             <button onClick={() => {
                               const nl = data.footer.bottom.links.filter((_: any, idx: number) => idx !== i);
                               updateData("footer", "bottom", { ...data.footer.bottom, links: nl });
-                            }} className="text-red-400 hover:text-red-600"><Trash2 className="w-4 h-4" /></button>
+                            }} className="p-1 text-slate-300 hover:text-red-500 transition-colors opacity-0 group-hover:opacity-100"><Trash2 className="w-3.5 h-3.5" /></button>
                           </div>
                         ))}
                       </div>
@@ -569,60 +651,60 @@ export default function SettingsEditor() {
             )}
 
             {activeTab === "contact" && (
-              <motion.div key="contact" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                <h2 className="text-2xl font-black text-slate-900 border-b border-slate-100 pb-6">Global Contact Info</h2>
+              <motion.div key="contact" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+                <h2 className="text-xl font-medium text-slate-900 border-b border-slate-50 pb-6">Global Contact Info</h2>
 
                 <div className="space-y-6">
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Public Email</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Public Email</label>
                       <div className="relative">
                         <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input type="email" value={data.footer?.contact?.email || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, email: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-bold" />
+                        <input type="email" value={data.footer?.contact?.email || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, email: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium" />
                       </div>
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Public Phone</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Public Phone</label>
                       <div className="relative">
                         <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                        <input type="text" value={data.footer?.contact?.phone || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, phone: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-bold" />
+                        <input type="text" value={data.footer?.contact?.phone || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, phone: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium" />
                       </div>
                     </div>
                   </div>
 
                   <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Full Address</label>
+                    <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Full Address</label>
                     <div className="relative">
                       <MapPin className="absolute left-4 top-4 w-4 h-4 text-slate-400" />
-                      <textarea rows={2} value={data.footer?.contact?.address || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, address: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-bold" />
+                      <textarea rows={2} value={data.footer?.contact?.address || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, address: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl pl-12 pr-4 py-3 text-slate-900 font-medium" />
                     </div>
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Emergency Line Text</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Emergency Line Text</label>
                       <input type="text" value={data.footer?.contact?.emergency || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, emergency: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
                     </div>
                     <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Service Areas Summary</label>
+                      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Service Areas Summary</label>
                       <input type="text" value={data.footer?.contact?.areas || ""} onChange={(e) => updateData("footer", "contact", { ...data.footer.contact, areas: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
                     </div>
                   </div>
 
                   <div className="pt-6 border-t border-slate-100 space-y-4">
-                    <h3 className="text-lg font-black text-slate-800">Office Hours</h3>
+                    <h3 className="text-lg font-medium text-slate-800">Office Hours</h3>
                     <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400">Monday - Friday</label>
-                        <input type="text" value={data.hours?.monday || ""} onChange={(e) => updateData("hours", "monday", e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
+                        <label className="text-xs font-medium text-slate-400">Monday - Friday</label>
+                        <input type="text" value={data.hours?.monday || ""} onChange={(e) => updateData("hours", "monday", e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400">Saturday</label>
-                        <input type="text" value={data.hours?.saturday || ""} onChange={(e) => updateData("hours", "saturday", e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
+                        <label className="text-xs font-medium text-slate-400">Saturday</label>
+                        <input type="text" value={data.hours?.saturday || ""} onChange={(e) => updateData("hours", "saturday", e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium" />
                       </div>
                       <div className="space-y-2">
-                        <label className="text-xs font-bold text-slate-400">Sunday</label>
-                        <input type="text" value={data.hours?.sunday || ""} onChange={(e) => updateData("hours", "sunday", e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-bold" />
+                        <label className="text-xs font-medium text-slate-400">Sunday</label>
+                        <input type="text" value={data.hours?.sunday || ""} onChange={(e) => updateData("hours", "sunday", e.target.value)} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm font-medium" />
                       </div>
                     </div>
                   </div>
@@ -631,43 +713,43 @@ export default function SettingsEditor() {
             )}
 
             {activeTab === "social" && (
-              <motion.div key="social" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
-                <div className="flex items-center justify-between border-b border-slate-100 pb-6">
-                  <h2 className="text-2xl font-black text-slate-900">Social Media Links</h2>
+              <motion.div key="social" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+                <div className="flex items-center justify-between border-b border-slate-50 pb-6">
+                  <h2 className="text-xl font-medium text-slate-900">Social Media Links</h2>
                   <button
                     onClick={() => {
                       const newSocial = [...(data.footer?.social || []), { platform: "Facebook", href: "", icon: "Facebook" }];
                       updateData("footer", "social", newSocial);
                     }}
-                    className="bg-primary/10 text-primary px-4 py-2 rounded-xl font-bold text-xs flex items-center gap-2 hover:bg-primary/20 transition-colors"
+                    className="text-slate-900 border border-slate-200 px-4 py-2 rounded-xl font-normal text-xs flex items-center gap-2 hover:bg-slate-50 transition-all"
                   >
-                    <Plus className="w-4 h-4" /> Add Social Profile
+                    <Plus className="w-4 h-4" /> Add Profile
                   </button>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   {(data.footer?.social || []).map((s: any, i: number) => (
-                    <div key={i} className="bg-slate-50 p-6 rounded-2xl border border-slate-200 space-y-4 relative group">
+                    <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 space-y-6 relative group hover:border-slate-200 transition-colors">
                       <button
                         onClick={() => {
                           const newSocial = data.footer.social.filter((_: any, idx: number) => idx !== i);
                           updateData("footer", "social", newSocial);
                         }}
-                        className="absolute top-4 right-4 p-1 text-slate-300 hover:text-red-500 transition-colors"
+                        className="absolute top-6 right-6 p-1 text-slate-300 hover:text-red-500 transition-colors"
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
-                      <div className="grid grid-cols-2 gap-3">
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Platform</label>
+                      <div className="grid grid-cols-2 gap-4">
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Platform</label>
                           <input type="text" value={s.platform} onChange={(e) => {
                             const ns = [...data.footer.social];
                             ns[i].platform = e.target.value;
                             updateData("footer", "social", ns);
-                          }} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-bold" />
+                          }} className="w-full bg-slate-50/50 border border-slate-100 rounded-lg px-3 py-2 text-sm font-normal focus:bg-white transition-colors" />
                         </div>
-                        <div className="space-y-1">
-                          <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Icon</label>
+                        <div className="space-y-1.5">
+                          <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Icon</label>
                           <IconPicker value={s.icon} onChange={(val) => {
                             const ns = [...data.footer.social];
                             ns[i].icon = val;
@@ -675,13 +757,13 @@ export default function SettingsEditor() {
                           }} />
                         </div>
                       </div>
-                      <div className="space-y-1">
-                        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">Profile URL</label>
+                      <div className="space-y-1.5">
+                        <label className="text-[10px] font-normal text-slate-400 uppercase tracking-widest">Profile URL</label>
                         <input type="text" value={s.href} onChange={(e) => {
                           const ns = [...data.footer.social];
                           ns[i].href = e.target.value;
                           updateData("footer", "social", ns);
-                        }} className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm" placeholder="https://..." />
+                        }} className="w-full bg-slate-50/50 border border-slate-100 rounded-lg px-3 py-2 text-sm font-normal focus:bg-white transition-colors" placeholder="https://..." />
                       </div>
                     </div>
                   ))}
