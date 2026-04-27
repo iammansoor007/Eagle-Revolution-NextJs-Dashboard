@@ -6,32 +6,29 @@ import { motion } from "framer-motion";
 import {
   FileText, Briefcase, Users, Star, HelpCircle,
   ImageIcon, Phone, ArrowUpRight, Activity,
-  TrendingUp, Eye, Clock, CheckCircle2, ChevronRight, Shield
+  TrendingUp, Eye, Clock, CheckCircle2, ChevronRight, Shield,
+  LayoutDashboard, Settings
 } from "lucide-react";
 import { useContent } from "@/hooks/useContent";
 
 // ---- Stat Card ----
 const StatCard = ({ label, value, icon: Icon, href, color, delay }: any) => (
   <motion.div
-    initial={{ opacity: 0, y: 20 }}
+    initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4, delay }}
+    transition={{ duration: 0.3, delay }}
   >
     <Link href={href} className="block group">
-      <div className="bg-white border border-slate-200 rounded-3xl p-6 hover:shadow-xl hover:shadow-primary/5 hover:border-primary/30 transition-all duration-300 shadow-sm relative overflow-hidden h-full">
-        <div className="absolute top-0 right-0 w-24 h-24 bg-primary/5 blur-3xl group-hover:bg-primary/10 transition-colors" />
-
-        <div className="relative z-10">
-          <div className="flex items-center justify-between mb-6">
-            <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${color}`}>
-              <Icon className="w-6 h-6 text-white" />
-            </div>
-            <div className="w-8 h-8 rounded-full bg-slate-50 border border-slate-100 flex items-center justify-center group-hover:bg-primary group-hover:border-primary transition-all duration-300">
-              <ArrowUpRight className="w-4 h-4 text-slate-400 group-hover:text-white" />
-            </div>
+      <div className="bg-white border border-slate-200 rounded-2xl p-6 hover:border-black transition-all duration-300 relative overflow-hidden">
+        <div className="flex items-center justify-between mb-4">
+          <div className="w-10 h-10 rounded-xl bg-black/[0.03] flex items-center justify-center text-black transition-colors group-hover:bg-black group-hover:text-white">
+            <Icon className="w-4 h-4" />
           </div>
-          <p className="text-4xl font-extrabold text-slate-900 mb-1 tracking-tight group-hover:scale-105 transition-transform origin-left">{value}</p>
-          <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{label}</p>
+          <ArrowUpRight className="w-3 h-3 text-black/20 group-hover:text-black transition-colors" />
+        </div>
+        <div className="space-y-1">
+          <p className="text-3xl font-normal text-black tracking-tight">{value}</p>
+          <p className="text-black font-normal text-[10px] uppercase tracking-widest">{label}</p>
         </div>
       </div>
     </Link>
@@ -41,20 +38,19 @@ const StatCard = ({ label, value, icon: Icon, href, color, delay }: any) => (
 // ---- Quick Action ----
 const QuickAction = ({ label, desc, href, icon: Icon, delay }: any) => (
   <motion.div
-    initial={{ opacity: 0, x: -10 }}
+    initial={{ opacity: 0, x: -5 }}
     animate={{ opacity: 1, x: 0 }}
-    transition={{ duration: 0.4, delay }}
+    transition={{ duration: 0.3, delay }}
   >
-    <Link href={href} className="flex items-center gap-5 p-5 rounded-2xl bg-white border border-slate-200 hover:border-primary/40 hover:shadow-lg hover:shadow-primary/5 transition-all group relative overflow-hidden">
-      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-      <div className="w-12 h-12 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center flex-shrink-0 group-hover:bg-primary group-hover:border-primary transition-all duration-300 shadow-inner relative z-10">
-        <Icon className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
+    <Link href={href} className="group flex items-center gap-4 p-5 rounded-2xl bg-white border border-slate-200 hover:border-black transition-all h-full">
+      <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-black/40 transition-colors group-hover:bg-black group-hover:text-white">
+        <Icon className="w-4 h-4" />
       </div>
-      <div className="min-w-0 flex-1 relative z-10">
-        <p className="text-slate-900 text-base font-bold group-hover:text-primary transition-colors">{label}</p>
-        <p className="text-slate-500 text-xs font-medium truncate">{desc}</p>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-black mb-0.5">{label}</p>
+        <p className="text-[11px] text-black/60 font-normal line-clamp-1">{desc}</p>
       </div>
-      <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all relative z-10" />
+      <ChevronRight className="w-3 h-3 text-black/20 group-hover:text-black group-hover:translate-x-0.5 transition-all" />
     </Link>
   </motion.div>
 );
@@ -101,12 +97,21 @@ export default function AdminDashboard() {
   ];
 
   const quickActions = [
-    { label: "Edit Homepage", desc: "Update Hero, About & Contact", href: "/admin/pages/home", icon: Briefcase, delay: 0.05 },
-    { label: "Manage Services", desc: "Edit service details & content", href: "/admin/services", icon: Briefcase, delay: 0.1 },
-    { label: "Manage Team", desc: "Update team members & bios", href: "/admin/pages/team", icon: Users, delay: 0.15 },
-    { label: "Client Reviews", desc: "Moderate customer testimonials", href: "/admin/reviews", icon: Star, delay: 0.2 },
-    { label: "Manage Gallery", desc: "Upload project photography", href: "/admin/projects", icon: ImageIcon, delay: 0.25 },
-    { label: "Submissions", desc: "View form leads & inquiries", href: "/admin/submissions", icon: Phone, delay: 0.3 },
+    { label: "Edit Website Home", desc: "Hero, About & Contact sections", href: "/admin/pages/home", icon: LayoutDashboard, delay: 0.05 },
+    { label: "Manage All Pages", desc: "List of all dynamic CMS pages", href: "/admin/pages", icon: FileText, delay: 0.1 },
+    { label: "Settings & SEO", desc: "Title, Favicon & Meta Data", href: "/admin/settings", icon: Settings, delay: 0.15 },
+  ];
+
+  const tools = [
+    { label: "Header & Nav", desc: "Manage logo and navbar links", href: "/admin/settings?tab=header", icon: LayoutDashboard },
+    { label: "Footer Info", desc: "Update footer text and links", href: "/admin/settings?tab=footer", icon: LayoutDashboard },
+    { label: "Social Media", desc: "Connect your social profiles", href: "/admin/settings?tab=social", icon: Users },
+    { label: "Services Bank", desc: "Edit your service offerings", href: "/admin/services", icon: Briefcase },
+    { label: "Project Gallery", desc: "Manage project photography", href: "/admin/projects", icon: ImageIcon },
+    { label: "Client Reviews", desc: "Moderate customer testimonials", href: "/admin/reviews", icon: Star },
+    { label: "FAQ Builder", desc: "Build & edit question banks", href: "/admin/faq", icon: HelpCircle },
+    { label: "Team Directory", desc: "Update team profiles & bios", href: "/admin/team", icon: Users },
+    { label: "Job Postings", desc: "Manage career opportunities", href: "/admin/submissions", icon: Phone },
   ];
 
   const sitePages = [
@@ -127,157 +132,73 @@ export default function AdminDashboard() {
   return (
     <div className="min-h-full space-y-10 max-w-7xl mx-auto">
       {/* Header */}
-      <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
-        <div className="flex items-end justify-between gap-6 flex-wrap">
-          <div>
-            <div className="flex items-center gap-3 mb-3">
-              <div className="px-3 py-1 bg-primary/10 text-primary border border-primary/20 rounded-full text-[10px] font-bold uppercase tracking-widest shadow-sm">
-                System Status: Active
-              </div>
-            </div>
-            <h1 className="text-4xl sm:text-5xl font-extrabold text-slate-900 mb-2 tracking-tight">
-              {greeting()}, <span className="text-primary">Admin</span> 👋
+      <motion.div initial={{ opacity: 0, y: -5 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.4 }}>
+        <div className="flex items-center justify-between pb-8 border-b border-slate-200 mb-10">
+          <div className="space-y-1">
+            <h1 className="text-2xl font-normal text-black tracking-tight">
+              {greeting()}, <span className="text-black font-medium">Admin</span>
             </h1>
-            <p className="text-slate-500 font-bold text-base tracking-wide flex items-center gap-2">
-              <Clock className="w-4 h-4 text-primary" />
-              {time.toLocaleDateString("en-US", { weekday: "long", year: "numeric", month: "long", day: "numeric" })}
+            <p className="text-black font-normal text-xs uppercase tracking-[0.2em]">
+              Dashboard Control &bull; {time.toLocaleDateString("en-US", { month: "short", day: "numeric" })}
             </p>
           </div>
-          <div className="flex items-center gap-4">
-            <Link
-              href="/"
-              target="_blank"
-              className="flex items-center gap-2 bg-white border border-slate-200 text-slate-600 hover:text-primary hover:border-primary/50 px-6 py-3 rounded-2xl text-sm font-bold transition-all shadow-sm group"
-            >
-              <Eye className="w-5 h-5 group-hover:scale-110 transition-transform" />
-              Preview Live Site
-            </Link>
-          </div>
+          <Link
+            href="/"
+            target="_blank"
+            className="text-[11px] font-medium uppercase tracking-widest text-black hover:opacity-70 transition-colors flex items-center gap-2 border border-black px-4 py-2 rounded-full"
+          >
+            Preview Site <ArrowUpRight className="w-3 h-3" />
+          </Link>
         </div>
       </motion.div>
 
-      {/* Stats List */}
-      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-        <div className="divide-y divide-slate-100">
+      {/* Main Grid */}
+      <div className="space-y-12">
+        {/* Stats Row */}
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
           {stats.map((s, i) => (
-            <Link key={s.label} href={s.href} className="group block">
-              <div className="px-8 py-6 flex items-center justify-between hover:bg-slate-50 transition-all">
-                <div className="flex items-center gap-6">
-                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${s.color}`}>
-                    <s.icon className="w-6 h-6 text-white" />
-                  </div>
-                  <div>
-                    <p className="text-3xl font-extrabold text-slate-900 tracking-tight group-hover:text-primary transition-colors">{s.value}</p>
-                    <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{s.label}</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-4">
-                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">Manage {s.label}</div>
-                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </div>
-              </div>
-            </Link>
+            <StatCard key={s.label} {...s} />
           ))}
         </div>
-      </div>
 
-      {/* Two-column layout */}
-      <div className="grid lg:grid-cols-3 gap-8">
-        {/* Quick Actions (2/3) */}
-        <div className="lg:col-span-2 space-y-6">
-          <div className="flex items-center justify-between border-b border-slate-100 pb-4">
-            <div className="flex items-center gap-3">
-              <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-                <TrendingUp className="w-4 h-4 text-primary" />
-              </div>
-              <h2 className="text-slate-900 font-extrabold text-lg tracking-tight uppercase tracking-widest text-xs">Quick Management</h2>
-            </div>
-            <Link href="/admin/pages" className="text-primary text-xs font-bold hover:underline">View All Pages</Link>
-          </div>
-          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-            <div className="divide-y divide-slate-100">
-              {quickActions.map((a, i) => (
-                <Link key={a.href} href={a.href} className="group block">
-                  <div className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all">
-                    <div className="flex items-center gap-4">
-                      <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
-                        <a.icon className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
-                      </div>
-                      <div>
-                        <p className="text-slate-900 text-sm font-bold group-hover:text-primary transition-colors">{a.label}</p>
-                        <p className="text-slate-500 text-xs font-medium">{a.desc}</p>
-                      </div>
-                    </div>
-                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                  </div>
-                </Link>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {/* Site Pages (1/3) */}
+        {/* Actions Section */}
         <div className="space-y-6">
-          <div className="flex items-center gap-3 border-b border-slate-100 pb-4">
-            <div className="w-8 h-8 rounded-xl bg-primary/10 flex items-center justify-center">
-              <FileText className="w-4 h-4 text-primary" />
-            </div>
-            <h2 className="text-slate-900 font-extrabold text-lg tracking-tight uppercase tracking-widest text-xs">Live Status</h2>
+          <div className="flex items-center gap-4">
+            <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Core Actions</span>
+            <div className="h-[1px] bg-slate-100 flex-1" />
           </div>
-          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
-            {sitePages.map((page, i) => (
-              <div
-                key={page.path}
-                className={`flex items-center justify-between px-6 py-4 group hover:bg-slate-50 transition-colors ${i !== sitePages.length - 1 ? "border-b border-slate-100" : ""}`}
-              >
-                <div className="min-w-0">
-                  <p className="text-slate-900 text-sm font-bold group-hover:text-primary transition-colors">{page.name}</p>
-                  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-tighter">{page.path}</p>
-                </div>
-                <div className="flex items-center gap-3 flex-shrink-0 ml-3">
-                  <StatusBadge label="Live" status={page.status} />
-                  <Link href={page.path} target="_blank" className="w-8 h-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 hover:bg-primary hover:text-white hover:border-primary transition-all">
-                    <ArrowUpRight className="w-4 h-4" />
-                  </Link>
-                </div>
-              </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {quickActions.map((a, i) => (
+              <QuickAction key={a.href} {...a} />
             ))}
           </div>
         </div>
       </div>
 
-      {/* System info */}
-      <motion.div
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ delay: 0.5 }}
-        className="bg-white border border-slate-200 rounded-3xl p-8 flex flex-wrap gap-12 items-center shadow-sm relative overflow-hidden"
-      >
-        <div className="absolute top-0 left-0 w-1 h-full bg-primary" />
+      {/* Additional Tools Section */}
+      <div className="space-y-6 pt-12 border-t border-slate-200">
         <div className="flex items-center gap-4">
-          <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center border border-slate-100 shadow-inner">
-            <Shield className="w-6 h-6 text-primary" />
-          </div>
-          <div>
-            <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Security Status</p>
-            <StatusBadge label="All Systems Operational" status="live" />
-          </div>
+          <span className="text-[10px] font-medium text-black uppercase tracking-widest">Site Management Toolbox</span>
+          <div className="h-[1px] bg-slate-200 flex-1" />
         </div>
-        <div>
-          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">CMS Engine</p>
-          <p className="text-slate-900 text-sm font-extrabold">Eagle Revolution v2.4</p>
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 pb-20">
+          {tools.map((tool, i) => (
+            <Link 
+              key={tool.label} 
+              href={tool.href}
+              className="flex items-center gap-3 p-4 rounded-xl border border-slate-200 hover:border-black hover:bg-slate-50 transition-all group"
+            >
+              <div className="w-8 h-8 rounded-lg bg-white border border-slate-100 flex items-center justify-center text-black/40 group-hover:text-black transition-colors">
+                <tool.icon className="w-4 h-4" />
+              </div>
+              <div className="min-w-0">
+                <p className="text-xs font-medium text-black">{tool.label}</p>
+                <p className="text-[10px] text-black/60 truncate">{tool.desc}</p>
+              </div>
+            </Link>
+          ))}
         </div>
-        <div>
-          <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1">Architecture</p>
-          <p className="text-slate-900 text-sm font-extrabold">Next.js 16 (App Router)</p>
-        </div>
-        <div className="ml-auto">
-          <div className="text-slate-400 text-[10px] font-bold uppercase tracking-widest mb-1 flex items-center gap-2">
-            <div className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" /> Connected to Database
-          </div>
-          <p className="text-slate-900 text-sm font-extrabold">MongoDB Atlas (Live)</p>
-        </div>
-      </motion.div>
+      </div>
     </div>
   );
 }

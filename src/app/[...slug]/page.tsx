@@ -14,15 +14,18 @@ export default async function DynamicPage({ params }: PageProps) {
   await connectToDatabase();
   
   // Find the page in MongoDB
-  const page = await Page.findOne({ 
+  const pageDoc = await Page.findOne({ 
     slug: slug, 
     status: 'published' 
-  });
+  }).lean();
 
-  if (!page) {
+  if (!pageDoc) {
     // If no page found in DB, 404
     notFound();
   }
+
+  // Convert to plain object to avoid Mongoose serialization issues in Client Components
+  const page = JSON.parse(JSON.stringify(pageDoc));
 
   // Get the registered component for this template name
   const Template = getTemplate(page.template);
