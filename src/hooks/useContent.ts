@@ -26,6 +26,7 @@ export const useContent = () => {
         galleryPage: completeData?.galleryPage || {},
         brandStore: completeData?.brandStore || {},
         serviceDetailPage: completeData?.serviceDetailPage || {},
+        settings: completeData?.settings || { siteTitle: "Eagle Revolution", siteTemplate: "%s | Eagle Revolution", favicon: "/eagle-logo.png" },
         faqPage: completeData?.faqPage || {},
     };
 };

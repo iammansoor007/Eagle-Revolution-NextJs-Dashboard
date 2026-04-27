@@ -494,9 +494,15 @@ const Footer = () => {
               className="space-y-4"
             >
               <div className="flex items-center gap-3">
-                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30">
-                  <span className="text-primary-foreground font-bold text-sm text-center leading-tight">ER</span>
-                </div>
+                {footer.company?.logo ? (
+                  <div className="relative w-12 h-12 rounded-xl overflow-hidden">
+                    <Image src={footer.company.logo} alt={footer.company.name} fill className="object-contain" />
+                  </div>
+                ) : (
+                  <div className="w-12 h-12 rounded-full bg-gradient-to-br from-primary to-primary/80 flex items-center justify-center shadow-2xl shadow-primary/30">
+                    <span className="text-primary-foreground font-bold text-sm text-center leading-tight">ER</span>
+                  </div>
+                )}
                 <div>
                   <span className="text-foreground font-light text-lg block">{company.name}</span>
                   <span className="text-[10px] text-primary/60 font-mono tracking-wider">{company.tagline}</span>

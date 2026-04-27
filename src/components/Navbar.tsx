@@ -11,7 +11,7 @@ import Image from "next/image";
 import Link from "next/link";
 
 const Navbar = () => {
-  const { navbar } = useContent();
+  const { navbar, settings } = useContent();
   const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [activeMegaMenu, setActiveMegaMenu] = useState<string | null>(null);
   const [scrolled, setScrolled] = useState(false);
@@ -87,8 +87,8 @@ const Navbar = () => {
             >
               <div className="h-12 sm:h-14 md:h-16 lg:h-18 w-24 sm:w-28 md:w-32 lg:w-36 flex items-center justify-center overflow-hidden relative">
                 <Image
-                  src={logo}
-                  alt="Eagle Revolution Logo"
+                  src={navbar.logo || logo}
+                  alt={navbar.siteTitle || "Eagle Revolution Logo"}
                   className="object-contain"
                   fill
                   priority
@@ -170,7 +170,7 @@ const Navbar = () => {
               </div>
 
               <div className="flex items-center space-x-1 ml-2">
-                {companyLinks.slice(1).map((link: any) => {
+                {(companyLinks || []).slice(1).map((link: any) => {
                   if (link.subLinks) {
                     return (
                       <div key={link.label} className="relative group">
@@ -225,11 +225,11 @@ const Navbar = () => {
 
             <motion.div className="hidden lg:flex items-center" whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
               <Link
-                href="/contact"
+                href={navbar.ctaLink || "/contact"}
                 className="flex items-center space-x-2 px-7 py-3.5 rounded-xl font-bold transition-all duration-300 bg-primary text-white shadow-lg shadow-primary/20 hover:text-white"
               >
                 <Icon name="Calendar" className="h-4 w-4" />
-                <span>Book Now</span>
+                <span>{navbar.ctaText || "Book Now"}</span>
               </Link>
             </motion.div>
 
@@ -272,7 +272,7 @@ const Navbar = () => {
             >
               <div className="p-6 border-b border-border flex items-center justify-between">
                 <div className="relative h-10 w-24">
-                  <Image src={logo} alt="Logo" className="object-contain" fill quality={100} />
+                  <Image src={navbar.logo || logo} alt="Logo" className="object-contain" fill quality={100} />
                 </div>
                 <button onClick={() => setIsMenuOpen(false)} className="p-2 text-foreground">
                   <Icon name="X" />
@@ -366,11 +366,11 @@ const Navbar = () => {
 
               <div className="p-6 bg-muted/30">
                 <Link
-                  href="/contact"
+                  href={navbar.ctaLink || "/contact"}
                   onClick={handleLinkClick}
                   className="block w-full py-4 bg-primary text-white font-bold rounded-xl text-center shadow-lg shadow-primary/20"
                 >
-                  Book Now
+                  {navbar.ctaText || "Book Now"}
                 </Link>
               </div>
             </motion.div>
