@@ -10,6 +10,8 @@ import ContactTemplate from './ContactTemplate';
 import GalleryTemplate from './GalleryTemplate';
 import ServicesTemplate from './ServicesTemplate';
 
+import { ContentProvider } from "@/context/ContentContext";
+
 export const TEMPLATE_MAP: Record<string, React.ComponentType<any>> = {
   'home': HomeTemplate,
   'about': AboutTemplate,
@@ -25,4 +27,13 @@ export const TEMPLATE_MAP: Record<string, React.ComponentType<any>> = {
 
 export const getTemplate = (name: string) => {
   return TEMPLATE_MAP[name] || HomeTemplate;
+};
+
+export const TemplateWrapper = ({ templateName, pageData, params }: any) => {
+  const Template = getTemplate(templateName);
+  return (
+    <ContentProvider initialData={pageData.content}>
+       <Template pageData={pageData} params={params} />
+    </ContentProvider>
+  );
 };

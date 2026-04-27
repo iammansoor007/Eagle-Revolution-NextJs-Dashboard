@@ -29,10 +29,10 @@ function IconPicker({ value, onChange }: { value: string, onChange: (val: string
     <div className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm hover:border-primary transition-colors min-w-[140px]"
+        className="flex items-center gap-2 bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm hover:border-black transition-colors min-w-[140px]"
       >
-        <CurrentIcon className="w-4 h-4 text-primary" />
-        <span className="font-medium">{value || "Select Icon"}</span>
+        <CurrentIcon className="w-4 h-4 text-black" />
+        <span className="font-bold text-black">{value || "Select Icon"}</span>
       </button>
 
       {open && (
@@ -58,10 +58,10 @@ function IconPicker({ value, onChange }: { value: string, onChange: (val: string
                     onChange(iconName);
                     setOpen(false);
                   }}
-                  className={`p-3 rounded-xl flex flex-col items-center justify-center gap-1 transition-all hover:bg-primary/10 group ${value === iconName ? "bg-primary/20 ring-1 ring-primary" : ""}`}
+                  className={`p-3 rounded-xl flex flex-col items-center justify-center gap-1 transition-all hover:bg-black/5 group ${value === iconName ? "bg-black text-white" : ""}`}
                   title={iconName}
                 >
-                  {Icon && <Icon className={`w-5 h-5 ${value === iconName ? "text-primary" : "text-slate-500 group-hover:text-primary"}`} />}
+                  {Icon && <Icon className={`w-5 h-5 ${value === iconName ? "text-white" : "text-black group-hover:text-black"}`} />}
                 </button>
               );
             })}
@@ -138,14 +138,14 @@ function PageSelector({ value, pages, onChange }: { value: string, pages: any[],
 
   return (
     <div className="space-y-1">
-      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Link to CMS Page</label>
+      <label className="text-[10px] font-bold text-black uppercase tracking-widest">Link to CMS Page</label>
       <select 
         value={value || ""} 
         onChange={(e) => {
           const page = pages.find(p => p._id === e.target.value);
           onChange(page);
         }}
-        className="w-full bg-white border border-slate-200 rounded-lg px-3 py-2 text-sm font-medium focus:ring-2 focus:ring-primary/20 outline-none"
+        className="w-full bg-slate-50 border border-slate-100 rounded-lg px-3 py-2.5 text-xs font-bold text-black focus:bg-white focus:border-black outline-none transition-all appearance-none"
       >
         <option value="">-- Custom Link (No Page) --</option>
         {pages.map(page => (

@@ -27,12 +27,16 @@ export default async function DynamicPage({ params }: PageProps) {
   // Convert to plain object to avoid Mongoose serialization issues in Client Components
   const page = JSON.parse(JSON.stringify(pageDoc));
 
-  // Get the registered component for this template name
-  const Template = getTemplate(page.template);
+  // Use TemplateWrapper to handle local content context overrides
+  const { TemplateWrapper } = await import('@/components/templates/TemplateRegistry');
 
   return (
     <main>
-      <Template pageData={page} params={resolvedParams} />
+      <TemplateWrapper 
+        templateName={page.template} 
+        pageData={page} 
+        params={resolvedParams} 
+      />
     </main>
   );
 }
