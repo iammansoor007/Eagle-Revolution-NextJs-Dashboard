@@ -2,7 +2,70 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, Award, Target, Heart, Plus, Trash2 } from "lucide-react";
+import { 
+  Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, 
+  ChevronRight, Star, Phone, Plus, Trash2, Mail, Upload, 
+  List, Heart, HelpCircle, Check, Target, Award, Shield, 
+  ArrowRight, Users, Zap
+} from "lucide-react";
+
+// Shared Reusable Image Upload Component
+const ImageUpload = ({ label, value, onChange, description }: any) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploading(true);
+    const formData = new FormData();
+    formData.append("file", file);
+    try {
+      const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (res.ok) {
+        const { url } = await res.json();
+        onChange(url);
+      }
+    } catch (err) {
+      console.error("Upload failed:", err);
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-3">
+      <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{label}</label>
+      <div className="group relative">
+        <div className="aspect-video w-full bg-slate-50/50 border border-slate-200 rounded-2xl overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/30">
+          {value ? (
+            <>
+              <img src={value} alt="Preview" className="w-full h-full object-cover" />
+              <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
+                <label className="cursor-pointer bg-primary text-white px-5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-widest hover:scale-105 transition-all">
+                  Update Photo
+                  <input type="file" className="hidden" onChange={handleUpload} accept="image/*" />
+                </label>
+                <button onClick={() => onChange("")} className="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition-all">
+                  Remove
+                </button>
+              </div>
+            </>
+          ) : (
+            <label className="flex flex-col items-center gap-3 cursor-pointer">
+              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
+                {uploading ? <Loader2 className="w-5 h-5 animate-spin text-primary" /> : <Upload className="w-5 h-5 text-slate-300" />}
+              </div>
+              <div className="text-center">
+                <p className="text-[10px] font-medium text-slate-400">Click to upload media</p>
+              </div>
+              <input type="file" className="hidden" onChange={handleUpload} accept="image/*" />
+            </label>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
 
 export default function AboutEditor({ pageId, data, setData }: { pageId: string, data: any, setData: (d: any) => void }) {
   const [activeTab, setActiveTab] = useState("hero");
@@ -11,154 +74,179 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
     if (data && Object.keys(data).length === 0) {
       fetch("/api/content")
         .then(res => res.json())
-        .then(json => {
-          const d = { ...json };
-          if (!d.aboutPage) d.aboutPage = {};
-          if (!d.aboutPage.hero) d.aboutPage.hero = { headline: {}, stats: [] };
-          if (!d.aboutPage.story) d.aboutPage.story = { portrait: {}, founder: { bio: [], social: {} } };
-          if (!d.aboutPage.stats) d.aboutPage.stats = { items: [], trustBadges: [] };
-          if (!d.aboutPage.mission) d.aboutPage.mission = { principles: [], stats: [] };
-          setData(d);
-        })
+        .then(json => setData(json))
         .catch(err => console.error("Failed to seed content:", err));
     }
   }, [data, setData]);
 
-  if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-black animate-spin" /></div>;
+  if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
 
   const updateAbout = (section: string, field: string | null, value: any) => {
-    setData((prev: any) => ({
-      ...prev,
+    const currentAbout = data.aboutPage || {
+      hero: { badge: "", headline: "", description: [], images: { main: "" } },
+      story: { title: "", content: [] },
+      mission: { badge: "", title: "", items: [] }
+    };
+
+    const targetSectionData = currentAbout[section as keyof typeof currentAbout] || {};
+
+    setData({
+      ...data,
       aboutPage: {
-        ...prev.aboutPage,
+        ...currentAbout,
         [section]: field ? {
-          ...prev.aboutPage[section],
+          ...targetSectionData,
           [field]: value,
         } : value,
       },
-    }));
+    });
   };
 
-  const { aboutPage } = data;
   const tabs = [
-    { id: "hero", label: "Hero Section", icon: LayoutTemplate },
-    { id: "story", label: "Founder Story", icon: Type },
-    { id: "stats", label: "Company Stats", icon: Award },
-    { id: "mission", label: "Mission & Values", icon: Target },
-    { id: "cta", label: "Awards & CTA", icon: Heart },
+    { id: "hero", label: "Hero Canvas", icon: LayoutTemplate, title: "About Hero Identity" },
+    { id: "story", label: "Founder Story", icon: Users, title: "The Narrative & History" },
+    { id: "mission", label: "Mission & Values", icon: Target, title: "Principles & Commitments" },
   ];
+
+  const activeTabTitle = tabs.find(t => t.id === activeTab)?.title;
 
   return (
     <div className="bg-white min-h-[600px] flex flex-col">
-
-      {/* Horizontal Section Navigation */}
+      {/* Tab Navigation */}
       <div className="border-b border-slate-100 bg-white sticky top-0 z-10">
-        <div className="flex items-center gap-2 p-6 overflow-x-auto no-scrollbar">
+        <div className="flex items-center gap-1 p-4 overflow-x-auto no-scrollbar scroll-smooth">
           {tabs.map((tab: any) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-2xl text-[10px] font-extrabold uppercase tracking-widest whitespace-nowrap transition-all ${
+              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all ${
                 activeTab === tab.id
-                ? "bg-black text-white shadow-lg shadow-black/10 scale-[1.02]"
-                : "text-slate-400 hover:bg-slate-50 hover:text-black"
+                ? "bg-primary/5 text-primary"
+                : "text-slate-400 hover:text-slate-600"
               }`}
             >
-              <tab.icon className="w-3 h-3" />
+              <tab.icon className="w-3.5 h-3.5" />
               {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Editor Area (Full Width) */}
-      <div className="flex-1 p-12 overflow-y-auto max-h-[900px] custom-scrollbar space-y-12">
-          <AnimatePresence mode="wait">
-             <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-10">
-               
-               {/* HERO SECTION */}
-               {activeTab === "hero" && (
-                 <div className="space-y-8">
-                    <div className="space-y-4">
-                       <label className="text-[10px] font-bold text-black uppercase tracking-widest">Hero Background Image URL</label>
-                       <input 
-                         type="text" 
-                         value={aboutPage.hero?.bgImage || ""} 
-                         onChange={(e) => updateAbout("hero", "bgImage", e.target.value)}
-                         className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-black font-bold focus:bg-white focus:border-black outline-none transition-all"
-                       />
-                    </div>
-                    <div className="grid grid-cols-3 gap-6">
-                       {["line1", "line2", "line3"].map((line) => (
-                         <div key={line} className="space-y-2">
-                           <label className="text-[10px] font-bold text-slate-400 uppercase">Headline {line}</label>
-                           <input 
-                             type="text" 
-                             value={aboutPage.hero?.headline?.[line] || ""} 
-                             onChange={(e) => {
-                                const newH = { ...aboutPage.hero?.headline, [line]: e.target.value };
-                                updateAbout("hero", "headline", newH);
-                             }}
-                             className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-black font-bold outline-none"
-                           />
-                         </div>
-                       ))}
-                    </div>
-                    <div className="space-y-4">
-                       <label className="text-[10px] font-bold text-black uppercase tracking-widest">Hero Description</label>
-                       <textarea 
-                         rows={3} 
-                         value={aboutPage.hero?.description || ""} 
-                         onChange={(e) => updateAbout("hero", "description", e.target.value)}
-                         className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-black font-medium focus:bg-white focus:border-black outline-none transition-all"
-                       />
-                    </div>
-                 </div>
-               )}
+      <div className="flex-1 p-10 overflow-y-auto max-h-[800px] custom-scrollbar">
+        <div className="mb-10 pb-6 border-b border-slate-50">
+           <h2 className="text-2xl font-normal text-slate-900 tracking-tight">{activeTabTitle}</h2>
+           <p className="text-xs text-slate-400 mt-1">Configure the visual and textual content for the About page.</p>
+        </div>
 
-               {/* STORY SECTION */}
-               {activeTab === "story" && (
-                 <div className="space-y-10">
-                    <div className="grid grid-cols-2 gap-8">
-                       <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-black uppercase tracking-widest">Section Badge</label>
-                          <input type="text" value={aboutPage.story?.badge || ""} onChange={(e) => updateAbout("story", "badge", e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-black font-bold outline-none" />
-                       </div>
-                       <div className="space-y-3">
-                          <label className="text-[10px] font-bold text-black uppercase tracking-widest">Main Headline</label>
-                          <input type="text" value={aboutPage.story?.headline || ""} onChange={(e) => updateAbout("story", "headline", e.target.value)} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-black font-bold outline-none" />
-                       </div>
-                    </div>
-                    <div className="space-y-6 pt-8 border-t border-slate-100">
-                       <h3 className="text-xs font-bold text-black uppercase tracking-widest">Founder Details</h3>
-                       <div className="grid grid-cols-2 gap-6">
-                          <div className="space-y-2">
-                             <label className="text-[9px] font-bold text-slate-400 uppercase">Founder Name</label>
-                             <input type="text" value={aboutPage.story?.founder?.name || ""} onChange={(e) => updateAbout("story", "founder", { ...aboutPage.story.founder, name: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-black font-bold outline-none" />
-                          </div>
-                          <div className="space-y-2">
-                             <label className="text-[9px] font-bold text-slate-400 uppercase">Founder Title</label>
-                             <input type="text" value={aboutPage.story?.founder?.title || ""} onChange={(e) => updateAbout("story", "founder", { ...aboutPage.story.founder, title: e.target.value })} className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-black font-bold outline-none" />
-                          </div>
-                       </div>
-                       <div className="space-y-2">
-                          <label className="text-[9px] font-bold text-slate-400 uppercase">Founder Biography</label>
-                          <textarea rows={6} value={(aboutPage.story?.founder?.bio || []).join("\n\n")} onChange={(e) => updateAbout("story", "founder", { ...aboutPage.story.founder, bio: e.target.value.split("\n\n").filter(Boolean) })} className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-black font-medium outline-none text-sm leading-relaxed" />
-                       </div>
-                    </div>
-                 </div>
-               )}
+        <AnimatePresence mode="wait">
+          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+            
+            {/* HERO SECTION */}
+            {activeTab === "hero" && (
+              <div className="grid grid-cols-12 gap-10">
+                <div className="col-span-7 space-y-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Section Badge</label>
+                    <input type="text" value={data.aboutPage?.hero?.badge || ""} onChange={(e) => updateAbout("hero", "badge", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30 transition-all" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Main Headline</label>
+                    <input type="text" value={data.aboutPage?.hero?.headline || ""} onChange={(e) => updateAbout("hero", "headline", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30 transition-all" />
+                  </div>
+                </div>
+                <div className="col-span-5">
+                   <ImageUpload label="Hero Main Image" value={data.aboutPage?.hero?.images?.main} onChange={(url: string) => updateAbout("hero", "images", { ...data.aboutPage.hero.images, main: url })} />
+                </div>
+                <div className="col-span-12 space-y-4">
+                   <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Hero Narrative Paragraphs</label>
+                   {(data.aboutPage?.hero?.description || []).map((p: string, i: number) => (
+                     <div key={i} className="flex gap-4">
+                       <textarea value={p} onChange={(e) => {
+                         const newD = [...data.aboutPage.hero.description];
+                         newD[i] = e.target.value;
+                         updateAbout("hero", "description", newD);
+                       }} className="flex-1 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 py-4 text-xs text-slate-600 outline-none focus:border-primary/30" rows={3} />
+                       <button onClick={() => {
+                         const newD = data.aboutPage.hero.description.filter((_: any, idx: number) => idx !== i);
+                         updateAbout("hero", "description", newD);
+                       }} className="text-slate-200 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                     </div>
+                   ))}
+                   <button onClick={() => updateAbout("hero", "description", [...(data.aboutPage?.hero?.description || []), ""])} className="text-[10px] font-medium text-primary uppercase tracking-widest">+ Add Paragraph</button>
+                </div>
+              </div>
+            )}
 
-               {/* FALLBACK */}
-               {!["hero", "story"].includes(activeTab) && (
-                 <div className="p-20 text-center bg-slate-50 rounded-[2.5rem] border-2 border-dashed border-slate-100">
-                    <p className="text-slate-400 font-bold uppercase tracking-widest text-xs">{activeTab} section active</p>
-                    <p className="text-slate-300 font-medium text-sm mt-2">Section fields are synced with your global content store.</p>
-                 </div>
-               )}
+            {/* STORY SECTION */}
+            {activeTab === "story" && (
+              <div className="max-w-4xl space-y-8">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Founder Title</label>
+                  <input type="text" value={data.aboutPage?.story?.title || ""} onChange={(e) => updateAbout("story", "title", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30" />
+                </div>
+                <div className="space-y-4">
+                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Story Content</label>
+                  {(data.aboutPage?.story?.content || []).map((p: string, i: number) => (
+                    <div key={i} className="flex gap-4">
+                      <textarea value={p} onChange={(e) => {
+                        const newC = [...data.aboutPage.story.content];
+                        newC[i] = e.target.value;
+                        updateAbout("story", "content", newC);
+                      }} className="flex-1 bg-slate-50/50 border border-slate-100 rounded-2xl px-6 py-4 text-xs text-slate-600 outline-none focus:border-primary/30" rows={4} />
+                      <button onClick={() => {
+                        const newC = data.aboutPage.story.content.filter((_: any, idx: number) => idx !== i);
+                        updateAbout("story", "content", newC);
+                      }} className="text-slate-200 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                    </div>
+                  ))}
+                  <button onClick={() => updateAbout("story", "content", [...(data.aboutPage?.story?.content || []), ""])} className="text-[10px] font-medium text-primary uppercase tracking-widest">+ Add Story Segment</button>
+                </div>
+              </div>
+            )}
 
-             </motion.div>
-          </AnimatePresence>
+            {/* MISSION SECTION */}
+            {activeTab === "mission" && (
+              <div className="space-y-10">
+                <div className="grid grid-cols-2 gap-8">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Mission Badge</label>
+                    <input type="text" value={data.aboutPage?.mission?.badge || ""} onChange={(e) => updateAbout("mission", "badge", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30" />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Mission Title</label>
+                    <input type="text" value={data.aboutPage?.mission?.title || ""} onChange={(e) => updateAbout("mission", "title", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30" />
+                  </div>
+                </div>
+                <div className="grid grid-cols-1 gap-4">
+                   {(data.aboutPage?.mission?.items || []).map((item: any, i: number) => (
+                     <div key={i} className="flex gap-6 p-6 bg-slate-50/30 rounded-2xl border border-slate-100 items-start">
+                        <div className="w-10 h-10 rounded-xl bg-white border border-slate-100 flex items-center justify-center shrink-0">
+                           <Shield className="w-4 h-4 text-primary" />
+                        </div>
+                        <div className="flex-1 space-y-2">
+                           <input type="text" value={item.title} onChange={(e) => {
+                             const newI = [...data.aboutPage.mission.items];
+                             newI[i].title = e.target.value;
+                             updateAbout("mission", "items", newI);
+                           }} className="w-full bg-transparent text-sm text-slate-800 font-medium outline-none" />
+                           <textarea value={item.description} onChange={(e) => {
+                             const newI = [...data.aboutPage.mission.items];
+                             newI[i].description = e.target.value;
+                             updateAbout("mission", "items", newI);
+                           }} className="w-full bg-transparent text-xs text-slate-500 outline-none" rows={2} />
+                        </div>
+                        <button onClick={() => {
+                           const newI = data.aboutPage.mission.items.filter((_: any, idx: number) => idx !== i);
+                           updateAbout("mission", "items", newI);
+                        }} className="text-slate-200 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                     </div>
+                   ))}
+                </div>
+              </div>
+            )}
+
+          </motion.div>
+        </AnimatePresence>
       </div>
     </div>
   );
