@@ -72,13 +72,13 @@ const Lightbox = ({ project, onClose }: { project: any; onClose: () => void }) =
         <div className="flex items-start justify-between mb-3">
           <div>
             <h3 className="text-xl font-bold text-foreground">{project.title}</h3>
-            <p className="text-primary text-sm font-semibold">{project.subtitle}</p>
+            <p className="text-primary text-sm font-semibold">{project.category}</p>
           </div>
           <span className="bg-primary/10 text-primary text-xs font-bold px-3 py-1 rounded-full border border-primary/20">
             {project.category}
           </span>
         </div>
-        <p className="text-muted-foreground text-sm leading-relaxed mb-4">{project.description}</p>
+        <p className="text-muted-foreground text-sm leading-relaxed mb-4">{project.desc}</p>
         <div className="flex items-center gap-4 text-sm text-muted-foreground">
           {project.location && (
             <span className="flex items-center gap-1"><MapPin className="w-3.5 h-3.5" /> {project.location}</span>
@@ -128,12 +128,23 @@ const MasonryCard = ({ project, onClick }: any) => {
 
 // ---------- Template ----------
 export default function GalleryTemplate({ pageData, params }: { pageData?: any; params?: any }) {
-  const { galleryPage } = useContent();
+  const { galleryPage, portfolio } = useContent();
   const [activeCategory, setActiveCategory] = useState("All");
   const [lightboxProject, setLightboxProject] = useState<any>(null);
 
-  const categories: string[] = galleryPage?.categories || ["All"];
-  const projects: any[] = galleryPage?.projects || [];
+  // Projects now come from the portfolio managed in the dashboard
+  const projects: any[] = portfolio?.projects || [];
+
+  // Dynamically generate categories from the projects
+  const categories: string[] = useMemo(() => {
+    const cats = ["All"];
+    projects.forEach((p: any) => {
+      if (p.category && !cats.includes(p.category)) {
+        cats.push(p.category);
+      }
+    });
+    return cats;
+  }, [projects]);
 
   const filteredProjects = useMemo(
     () => (activeCategory === "All" ? projects : projects.filter((p) => p.category === activeCategory)),
@@ -150,7 +161,9 @@ export default function GalleryTemplate({ pageData, params }: { pageData?: any; 
           className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 mb-6"
         >
           <Star className="w-4 h-4 fill-primary" />
-          <span className="text-xs font-bold uppercase tracking-widest">Our Work</span>
+          <span className="text-xs font-bold uppercase tracking-widest">
+            {galleryPage?.header?.badge || "Our Work"}
+          </span>
         </motion.div>
         <motion.h1
           initial={{ opacity: 0, y: 20 }}

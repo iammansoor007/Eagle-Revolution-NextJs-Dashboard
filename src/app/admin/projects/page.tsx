@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { Plus, Pencil, Trash2, Loader2, Folder, Image as ImageIcon, ChevronRight, Save, X, Calendar, MapPin } from "lucide-react";
+import { Plus, Pencil, Trash2, Loader2, Folder, Image as ImageIcon, ChevronRight, Save, X, Calendar, MapPin, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 
@@ -21,7 +21,8 @@ export default function ProjectsAdminPage() {
     number: "",
     location: "",
     architect: "",
-    accent: "from-primary to-primary/80"
+    accent: "from-primary to-primary/80",
+    featured: false
   });
 
   useEffect(() => {
@@ -52,7 +53,7 @@ export default function ProjectsAdminPage() {
       if (res.ok) {
         setData(updatedData);
         setProjects(newProjects);
-        setForm({ title: "", category: "", year: "", desc: "", image: "", number: "", location: "", architect: "", accent: "from-primary to-primary/80" });
+        setForm({ title: "", category: "", year: "", desc: "", image: "", number: "", location: "", architect: "", accent: "from-primary to-primary/80", featured: false });
         setIsEditing(null);
       } else {
         alert("Failed to save projects");
@@ -228,6 +229,20 @@ export default function ProjectsAdminPage() {
                   </div>
                 </div>
 
+                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
+                  <input
+                    type="checkbox"
+                    id="featured-project"
+                    checked={form.featured || false}
+                    onChange={(e) => setForm({ ...form, featured: e.target.checked })}
+                    className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
+                  />
+                  <label htmlFor="featured-project" className="text-sm font-bold text-slate-700 cursor-pointer">
+                    Feature this project
+                    <span className="block text-xs font-medium text-slate-500 font-normal">Featured projects get a special badge in the gallery.</span>
+                  </label>
+                </div>
+
                 <div className="space-y-2">
                   <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Description</label>
                   <textarea
@@ -284,6 +299,11 @@ export default function ProjectsAdminPage() {
               <div className="flex items-center gap-3 mb-1">
                 <h3 className="text-lg font-bold text-slate-900 truncate">{project.title}</h3>
                 <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase tracking-widest">{project.category || "Project"}</span>
+                {project.featured && (
+                  <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 rounded text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
+                    <Star className="w-2.5 h-2.5 fill-amber-500" /> Featured
+                  </span>
+                )}
               </div>
               <p className="text-slate-500 text-sm font-medium line-clamp-1">{project.desc || "No description provided."}</p>
               <div className="flex items-center gap-4 mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">

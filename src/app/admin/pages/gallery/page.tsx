@@ -102,6 +102,17 @@ export default function GalleryPageEditor() {
           </div>
 
           <div className="space-y-2">
+            <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Page Badge</label>
+            <input
+              type="text"
+              value={data.galleryPage?.header?.badge || ""}
+              onChange={(e) => updateHeader("badge", e.target.value)}
+              className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
+              placeholder="e.g. Our Portfolio"
+            />
+          </div>
+
+          <div className="space-y-2">
             <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Page Title</label>
             <input
               type="text"
