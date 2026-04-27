@@ -616,78 +616,58 @@ ${formData.message}
     `;
 
     try {
-      try {
-        console.log('Attempting Resend submission...', {
-          name: formData.name,
-          email: formData.email,
-          services: serviceNames
-        });
+      const payload = {
+        type: 'Quote Request',
+        subject: `🦅 Quote Request - ${formData.name}`,
+        name: formData.name,
+        email: formData.email,
+        phone: formData.phone,
+        zipCode: formData.zipCode,
+        timeline: timelines.find((t: any) => t.value === formData.timeline)?.label || 'Not specified',
+        services: serviceNames || 'None selected',
+        message: formData.message || "New Quote Request from Homepage",
+        sms_consent: 'Yes'
+      };
 
-        const response = await fetch('/api/send', {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json'
-          },
-          body: JSON.stringify({
-            type: 'Quote Request',
-            subject: `🦅 Eagle Revolution Quote Request - ${formData.name}`,
-            name: formData.name,
-            email: formData.email,
-            phone: formData.phone,
-            zipCode: formData.zipCode,
-            timeline: timelines?.find((t: any) => t.value === formData.timeline)?.label || 'Not specified',
-            services: serviceNames || 'None selected',
-            message: formData.message,
-            sms_consent: 'Yes'
-          })
-        });
+      console.log('Sending submission:', payload);
 
-        if (response.ok) {
-          console.log('Resend submission successful');
-          setShowSuccess(true);
-          setFormStep(1);
-          setSelectedServices([]);
-          setSmsConsent(false);
-          setShowSmsError(false);
-          setFormData({
-            name: '',
-            email: '',
-            phone: '',
-            zipCode: '',
-            projectType: '',
-            timeline: '',
-            message: ''
-          });
-          setIsSubmitting(false);
-          return;
-        } else {
-          const errorData = await response.json().catch(() => ({}));
-          console.error('Resend submission failed with status:', response.status, errorData);
-        }
-      } catch (fetchError) {
-        console.error('Network error during Resend submission:', fetchError);
-      }
-
-      console.log('Falling back to mailto link');
-      window.location.href = `mailto:${email || 'banderson@eaglerevolution.com'}?subject=🦅 Eagle Revolution Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
-      setShowSuccess(true);
-      setFormStep(1);
-      setSelectedServices([]);
-      setSmsConsent(false);
-      setShowSmsError(false);
-      setFormData({
-        name: '',
-        email: '',
-        phone: '',
-        zipCode: '',
-        projectType: '',
-        timeline: '',
-        message: ''
+      const response = await fetch('/api/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(payload)
       });
 
+      const result = await response.json().catch(() => ({}));
+      console.log('API Response Status:', response.status);
+      console.log('API Response Body:', result);
+
+      if (response.ok) {
+        setShowSuccess(true);
+        setFormStep(1);
+        setSelectedServices([]);
+        setSmsConsent(false);
+        setShowSmsError(false);
+        setFormData({
+          name: '',
+          email: '',
+          phone: '',
+          zipCode: '',
+          projectType: '',
+          timeline: '',
+          message: ''
+        });
+        return;
+      } else {
+        console.error('API submission failed, falling back to mailto');
+        const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🦅 Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
+        window.location.href = mailtoLink;
+        setShowSuccess(true);
+      }
     } catch (error) {
       console.error('Final submission error:', error);
-      alert(`There was an issue sending your request. Please email us directly at ${email || 'banderson@eaglerevolution.com'}`);
+      const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🦅 Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
+      window.location.href = mailtoLink;
+      setShowSuccess(true);
     } finally {
       setIsSubmitting(false);
     }

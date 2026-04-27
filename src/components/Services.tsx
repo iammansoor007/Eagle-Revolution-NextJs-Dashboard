@@ -253,10 +253,10 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
             animate={{ opacity: isHovered ? 1 : 0.7 }}
             className="space-y-1.5 mt-2"
           >
-            {service.features?.slice(0, 4).map((feature: string, i: number) => (
+            {service.features?.slice(0, 4).map((feature: any, i: number) => (
               <div key={i} className="flex items-center gap-2 text-xs text-muted-foreground">
                 <span className="w-1 h-1 bg-primary rounded-full flex-shrink-0" />
-                <span className="truncate">{feature}</span>
+                <span className="truncate">{typeof feature === 'string' ? feature : feature.text}</span>
               </div>
             ))}
           </motion.div>

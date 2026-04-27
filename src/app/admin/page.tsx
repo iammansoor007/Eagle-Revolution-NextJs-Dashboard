@@ -156,9 +156,29 @@ export default function AdminDashboard() {
         </div>
       </motion.div>
 
-      {/* Stat Cards */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {stats.map((s) => <StatCard key={s.label} {...s} />)}
+      {/* Stats List */}
+      <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+        <div className="divide-y divide-slate-100">
+          {stats.map((s, i) => (
+            <Link key={s.label} href={s.href} className="group block">
+              <div className="px-8 py-6 flex items-center justify-between hover:bg-slate-50 transition-all">
+                <div className="flex items-center gap-6">
+                  <div className={`w-12 h-12 rounded-2xl flex items-center justify-center shadow-inner ${s.color}`}>
+                    <s.icon className="w-6 h-6 text-white" />
+                  </div>
+                  <div>
+                    <p className="text-3xl font-extrabold text-slate-900 tracking-tight group-hover:text-primary transition-colors">{s.value}</p>
+                    <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">{s.label}</p>
+                  </div>
+                </div>
+                <div className="flex items-center gap-4">
+                  <div className="text-[10px] font-bold text-slate-400 uppercase tracking-widest group-hover:text-primary transition-colors">Manage {s.label}</div>
+                  <ChevronRight className="w-5 h-5 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                </div>
+              </div>
+            </Link>
+          ))}
+        </div>
       </div>
 
       {/* Two-column layout */}
@@ -174,8 +194,25 @@ export default function AdminDashboard() {
             </div>
             <Link href="/admin/pages" className="text-primary text-xs font-bold hover:underline">View All Pages</Link>
           </div>
-          <div className="grid sm:grid-cols-2 gap-4">
-            {quickActions.map((a) => <QuickAction key={a.href} {...a} />)}
+          <div className="bg-white border border-slate-200 rounded-3xl overflow-hidden shadow-sm">
+            <div className="divide-y divide-slate-100">
+              {quickActions.map((a, i) => (
+                <Link key={a.href} href={a.href} className="group block">
+                  <div className="px-6 py-4 flex items-center justify-between hover:bg-slate-50 transition-all">
+                    <div className="flex items-center gap-4">
+                      <div className="w-10 h-10 bg-slate-50 border border-slate-100 rounded-xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all shadow-inner">
+                        <a.icon className="w-5 h-5 text-slate-400 group-hover:text-white transition-colors" />
+                      </div>
+                      <div>
+                        <p className="text-slate-900 text-sm font-bold group-hover:text-primary transition-colors">{a.label}</p>
+                        <p className="text-slate-500 text-xs font-medium">{a.desc}</p>
+                      </div>
+                    </div>
+                    <ChevronRight className="w-4 h-4 text-slate-300 group-hover:text-primary group-hover:translate-x-1 transition-all" />
+                  </div>
+                </Link>
+              ))}
+            </div>
           </div>
         </div>
 

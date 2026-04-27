@@ -8,7 +8,7 @@ import Link from "next/link";
 export default function FAQAdminPage() {
   const [data, setData] = useState<any>(null);
   const [faqs, setFaqs] = useState<any[]>([]);
-  const [categories, setCategories] = useState<string[]>([]);
+  const [categories, setCategories] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState<number | null>(null);
   const [showCategoryManager, setShowCategoryManager] = useState(false);
   const [saving, setSaving] = useState(false);
@@ -40,7 +40,10 @@ export default function FAQAdminPage() {
       .then(json => {
         setData(json);
         setFaqs(json.faq?.items || []);
-        setCategories(json.faq?.categories || ["General", "Services", "Pricing"]);
+        // Normalize categories: if they are objects, take the label or id
+        const rawCats = json.faq?.categories || ["General", "Services", "Pricing"];
+        const normalizedCats = rawCats.map((cat: any) => typeof cat === 'string' ? cat : (cat.label || cat.id));
+        setCategories(normalizedCats);
       });
   }, []);
 
@@ -101,10 +104,13 @@ export default function FAQAdminPage() {
 
   const handleEdit = (idx: number) => {
     const faq = faqs[idx];
+    // Normalize category if it's an object
+    const normalizedCategory = typeof faq.category === 'string' ? faq.category : (faq.category?.label || faq.category?.id || categories[0]);
+    
     setForm({
       question: faq.question || "",
       answer: faq.answer || "",
-      category: faq.category || categories[0],
+      category: normalizedCategory,
       visibility: faq.visibility || "global",
       targetPages: faq.targetPages || []
     });
@@ -207,9 +213,11 @@ export default function FAQAdminPage() {
             </div>
             <div className="flex flex-wrap gap-3">
               {categories.map(cat => (
-                <div key={cat} className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-full group">
-                  <span className="text-slate-700 font-bold text-sm">{cat}</span>
-                  <button onClick={() => handleDeleteCategory(cat)} className="text-slate-300 hover:text-red-500 transition-colors">
+                <div key={typeof cat === 'string' ? cat : (cat.id || String(cat))} className="flex items-center gap-2 bg-slate-50 border border-slate-200 px-4 py-2 rounded-full group">
+                  <span className="text-slate-700 font-bold text-sm">
+                    {typeof cat === 'string' ? cat : (cat.label || cat.id || "Category")}
+                  </span>
+                  <button onClick={() => handleDeleteCategory(typeof cat === 'string' ? cat : cat.id)} className="text-slate-300 hover:text-red-500 transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </div>
@@ -268,15 +276,15 @@ export default function FAQAdminPage() {
                   <div className="flex flex-wrap gap-2">
                     {categories.map(cat => (
                       <button
-                        key={cat}
-                        onClick={() => setForm({ ...form, category: cat })}
+                        key={typeof cat === 'string' ? cat : cat.id}
+                        onClick={() => setForm({ ...form, category: typeof cat === 'string' ? cat : cat.id })}
                         className={`px-4 py-2 rounded-full text-xs font-bold transition-all border ${
-                          form.category === cat 
+                          form.category === (typeof cat === 'string' ? cat : cat.id) 
                           ? "bg-primary text-white border-primary shadow-lg shadow-primary/20" 
                           : "bg-slate-50 text-slate-500 border-slate-200 hover:border-slate-300"
                         }`}
                       >
-                        {cat}
+                        {typeof cat === 'string' ? cat : cat.label}
                       </button>
                     ))}
                   </div>
@@ -373,7 +381,7 @@ export default function FAQAdminPage() {
               <div className="flex-1">
                 <div className="flex items-center gap-3 mb-3">
                   <span className="bg-primary/10 text-primary text-[10px] font-extrabold uppercase tracking-widest px-3 py-1 rounded-full border border-primary/20">
-                    {faq.category}
+                    {typeof faq.category === 'string' ? faq.category : (faq.category?.label || faq.category?.id || "Uncategorized")}
                   </span>
                   <span className={`flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border ${
                     faq.visibility === 'global' ? 'bg-emerald-50 text-emerald-600 border-emerald-100' : 'bg-blue-50 text-blue-600 border-blue-100'

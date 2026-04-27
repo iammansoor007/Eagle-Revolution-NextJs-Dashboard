@@ -15,10 +15,6 @@ const navItems = [
   { label: "Pages",       href: "/admin/pages",     icon: FileText },
   { label: "Projects",    href: "/admin/projects",  icon: Folder },
   { label: "Services",    href: "/admin/services",  icon: Briefcase },
-  { label: "Team",        href: "/admin/team",       icon: Users },
-  { label: "Reviews",     href: "/admin/reviews",   icon: Star },
-  { label: "FAQ",         href: "/admin/faq",        icon: HelpCircle },
-  { label: "Gallery",     href: "/admin/gallery",   icon: ImageIcon },
   { label: "Submissions", href: "/admin/submissions", icon: Phone },
   { label: "Settings",    href: "/admin/settings",  icon: Settings },
 ];

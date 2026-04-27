@@ -3,6 +3,9 @@ import { NextResponse } from 'next/server';
 import connectDB from '@/lib/mongodb';
 import Submission from '@/models/Submission';
 import Content from '@/models/Content';
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
+import { existsSync } from "fs";
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
@@ -10,11 +13,12 @@ export async function POST(request: Request) {
   try {
     await connectDB();
     const contentType = request.headers.get('content-type') || '';
-    let name, email, phone, message, subject, type, extraData: any = {};
+    let name, email, phone, message, subject, type, attachmentUrl: string | undefined, extraData: any = {};
     let attachments: any[] = [];
 
     if (contentType.includes('multipart/form-data')) {
       const formData = await request.formData();
+      console.log('Received Form Keys:', Array.from(formData.keys()));
       name = formData.get('name') as string;
       email = formData.get('email') as string;
       phone = formData.get('phone') as string;
@@ -26,10 +30,26 @@ export async function POST(request: Request) {
       const file = formData.get('attachment') as File;
       if (file && file.size > 0) {
         const buffer = Buffer.from(await file.arrayBuffer());
+        
+        // Save file to public/uploads
+        const filename = Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_");
+        const uploadDir = path.join(process.cwd(), "public", "uploads");
+        if (!existsSync(uploadDir)) {
+          await mkdir(uploadDir, { recursive: true });
+        }
+        const filePath = path.join(uploadDir, filename);
+        await writeFile(filePath, buffer);
+        
+        attachmentUrl = `/uploads/${filename}`;
+        console.log('File saved to:', filePath);
+        console.log('Attachment URL set to:', attachmentUrl);
+        
         attachments.push({
           filename: file.name,
           content: buffer,
         });
+      } else {
+        console.log('No file attachment found in multipart data');
       }
 
       // Collect other fields
@@ -44,15 +64,24 @@ export async function POST(request: Request) {
     }
 
     // Save to Database
-    await Submission.create({
-      name,
-      email,
-      phone,
-      subject,
-      message,
-      type: type || 'Contact Form',
-      extraData
-    });
+    console.log('Saving submission with data:', { name, email, type, attachmentUrl });
+    let submission;
+    try {
+      submission = await Submission.create({
+        name,
+        email,
+        phone,
+        subject,
+        message,
+        type: type || 'Contact Form',
+        attachmentUrl,
+        extraData
+      });
+      console.log('Submission saved successfully:', submission._id);
+    } catch (dbError: any) {
+      console.error('DATABASE SAVE ERROR:', dbError);
+      // We still try to send the email even if DB save fails, but we want to know why it failed
+    }
 
     // Fetch dynamic email from Content CMS
     let receiverEmail = 'banderson@eaglerevolution.com';
@@ -67,7 +96,6 @@ export async function POST(request: Request) {
           receiverEmail = contentDoc.data.quote.email;
         }
       }
-      console.log('Final receiver email:', receiverEmail);
     } catch (e) {
       console.error("Error fetching dynamic email", e);
     }
@@ -93,6 +121,12 @@ export async function POST(request: Request) {
         </div>
     `;
 
+    // Add attachment link if present
+    if (attachmentUrl) {
+      const fullUrl = `${process.env.NEXT_PUBLIC_APP_URL || ''}${attachmentUrl}`;
+      html += `<p style="margin-top: 20px;"><strong>📎 Attachment:</strong> <a href="${fullUrl}">Download File</a></p>`;
+    }
+
     // Add extra data if any
     if (Object.keys(extraData).length > 0) {
       html += `<div style="margin-top: 20px; border-top: 1px solid #eee; pt-10px;">
@@ -112,32 +146,104 @@ export async function POST(request: Request) {
         <p style="font-size: 12px; color: #666; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
           ⏱️ Submitted: ${new Date().toLocaleString()}<br>
           🇺🇸 Veteran Owned & Operated
-        </p>
-      </div>
-    `;
-
-    if (!process.env.RESEND_API_KEY) {
-      console.error('RESEND_API_KEY is missing');
-      return NextResponse.json({ error: 'Mail server configuration error' }, { status: 500 });
+      // We continue to send email even if DB fails, but we'll return an error later
+      return NextResponse.json({ 
+        error: 'Database save failed', 
+        details: dbError.message,
+        stack: dbError.stack
+      }, { status: 500 });
     }
 
+    // Prepare email content
+    const emailContent = `
+🔨 NEW SUBMISSION - EAGLE REVOLUTION
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📋 CUSTOMER INFORMATION
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Name: ${name}
+Email: ${email}
+Phone: ${phone || 'Not provided'}
+Type: ${type || 'Contact Form'}
+Subject: ${subject || 'No Subject'}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+📝 DETAILS
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Message: ${message || 'No message provided'}
+
+${Object.entries(extraData).length > 0 ? `
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ℹ️ ADDITIONAL DATA
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+${Object.entries(extraData).map(([key, value]) => `${key}: ${value}`).join('\n')}
+` : ''}
+
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+⏱️ Submitted: ${new Date().toLocaleString()}
+🌐 Source: Website
+🇺🇸 Veteran Owned & Operated
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+    `;
+
+    // Send email using Resend
     const { data: resendData, error: resendError } = await resend.emails.send({
       from: 'Eagle Revolution <onboarding@resend.dev>',
-      to: [to],
-      subject: subject || `New Form Submission from ${name}`,
-      html: html,
-      replyTo: email,
-      attachments: attachments.length > 0 ? attachments : undefined,
+      to: ['banderson@eaglerevolution.com'],
+      subject: subject || `New Lead: ${name}`,
+      html: `
+        <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
+          <div style="background-color: #2430d2; padding: 20px; text-align: center;">
+            <h1 style="color: white; margin: 0; font-size: 20px;">New Submission</h1>
+          </div>
+          <div style="padding: 30px;">
+            <p style="margin-top: 0; color: #64748b; font-size: 14px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em;">Customer Info</p>
+            <table style="width: 100%; border-collapse: collapse; margin-bottom: 30px;">
+              <tr>
+                <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Name:</td>
+                <td style="padding: 8px 0; color: #0f172a; font-weight: 500; font-size: 14px;">${name}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Email:</td>
+                <td style="padding: 8px 0; color: #0f172a; font-weight: 500; font-size: 14px;">${email}</td>
+              </tr>
+              <tr>
+                <td style="padding: 8px 0; color: #64748b; font-size: 14px;">Phone:</td>
+                <td style="padding: 8px 0; color: #0f172a; font-weight: 500; font-size: 14px;">${phone || 'Not provided'}</td>
+              </tr>
+            </table>
+
+            <p style="margin-top: 0; color: #64748b; font-size: 14px; text-transform: uppercase; font-weight: bold; letter-spacing: 0.05em;">Message</p>
+            <div style="background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 8px; padding: 20px; color: #0f172a; font-style: italic; line-height: 1.6;">
+              "${message || 'No message provided'}"
+            </div>
+          </div>
+        </div>
+      `,
+      attachments: attachmentUrl ? [{ filename: 'CV_Document', path: attachmentUrl }] : []
     });
 
     if (resendError) {
       console.error('Resend API Error:', resendError);
-      return NextResponse.json({ error: resendError.message }, { status: 400 });
+      return NextResponse.json({ 
+        error: 'Email failed but DB saved', 
+        details: resendError.message,
+        submissionId: submission?._id 
+      }, { status: 200 }); // Return 200 so UI doesn't show error if DB saved
     }
 
-    return NextResponse.json(resendData);
+    return NextResponse.json({ 
+      success: true, 
+      message: 'Submission saved and email sent',
+      submissionId: submission?._id 
+    });
+
   } catch (error: any) {
-    console.error('Submission processing Error:', error);
-    return NextResponse.json({ error: error.message || 'Internal server error' }, { status: 500 });
+    console.error('CRITICAL API ERROR:', error);
+    return NextResponse.json({ 
+      error: 'Critical server error', 
+      details: error.message,
+      stack: error.stack
+    }, { status: 500 });
   }
 }

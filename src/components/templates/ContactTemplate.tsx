@@ -59,15 +59,24 @@ export default function ContactTemplate() {
                 body: JSON.stringify({
                     ...formData,
                     type: 'Contact Form',
-                    subject: `New Contact Form Submission`,
+                    subject: `New Contact Form Submission - ${formData.name || 'Unknown'}`,
                 })
             });
+
+            const result = await response.json().catch(() => ({}));
+            console.log('Contact Form API Status:', response.status);
+            console.log('Contact Form API Body:', result);
+
             if (response.ok) {
                 setShowSuccess(true);
                 setFormData({});
+            } else {
+                console.error('Submission failed:', response.status, result);
+                alert(`Error: ${result.error || 'Submission failed'}`);
             }
         } catch (error) {
-            console.error(error);
+            console.error('Contact form error:', error);
+            alert('Failed to send message. Please try again.');
         } finally {
             setIsSubmitting(false);
         }

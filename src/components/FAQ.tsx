@@ -348,7 +348,7 @@ const AccordionItem = ({ item, index, isOpen, onToggle }: { item: any; index: nu
                       className="flex flex-wrap items-center gap-4 pt-4 border-t border-primary/10"
                     >
                       {item.links.map((link: any, i: number) => (
-                        <Link key={i} href={link.url}>
+                        <Link key={`${link.url}-${i}`} href={link.url}>
                           <motion.div
                             whileHover={{ x: 5 }}
                             className="inline-flex items-center gap-1.5 text-xs font-medium text-primary hover:text-primary/80 transition-colors group cursor-pointer"
@@ -503,7 +503,7 @@ const SearchBar = ({ onSearch }: { onSearch: (query: string) => void }) => {
   );
 };
 
-const FAQ = ({ currentPage = "home" }: { currentPage?: string }) => {
+const FAQ = ({ currentPage = "home", hideHeader = false }: { currentPage?: string, hideHeader?: boolean }) => {
   const { faq } = useContent();
   const sectionRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
@@ -514,8 +514,9 @@ const FAQ = ({ currentPage = "home" }: { currentPage?: string }) => {
   const { section, categories, items } = faq;
 
   const filteredItems = (items || []).filter((item: any) => {
-    // Visibility Logic
-    const isVisible = item.visibility === 'global' || (item.visibility === 'specific' && item.targetPages?.includes(currentPage));
+    // Visibility Logic - default to 'global' if not specified
+    const visibility = item.visibility || 'global';
+    const isVisible = visibility === 'global' || (visibility === 'specific' && item.targetPages?.includes(currentPage));
     if (!isVisible) return false;
 
     // Category Logic
@@ -582,18 +583,20 @@ const FAQ = ({ currentPage = "home" }: { currentPage?: string }) => {
       <FloatingParticles />
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6 md:px-8 relative z-10">
-        <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16 faq-reveal">
-          <span className="text-xs font-medium tracking-[0.2em] uppercase text-primary mb-3 block">
-            {section.badge}
-          </span>
-          <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
-            {section.headline || section.title}
-          </h2>
-          <p className="text-muted-foreground text-base md:text-lg">
-            {section.description}
-          </p>
-          <div className="w-16 h-0.5 bg-gradient-to-r from-primary to-primary/60 mx-auto mt-6 rounded-full" />
-        </div>
+        {!hideHeader && (
+          <div className="max-w-3xl mx-auto text-center mb-12 md:mb-16 faq-reveal">
+            <span className="text-xs font-medium tracking-[0.2em] uppercase text-primary mb-3 block">
+              {section.badge}
+            </span>
+            <h2 className="text-3xl sm:text-4xl md:text-5xl font-medium text-foreground mb-4">
+              {section.title || section.headline}
+            </h2>
+            <p className="text-muted-foreground text-base md:text-lg">
+              {section.description}
+            </p>
+            <div className="w-16 h-0.5 bg-gradient-to-r from-primary to-primary/60 mx-auto mt-6 rounded-full" />
+          </div>
+        )}
 
         <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6 mb-10 md:mb-12 faq-reveal">
           <CategoryFilter
@@ -608,7 +611,7 @@ const FAQ = ({ currentPage = "home" }: { currentPage?: string }) => {
           {filteredItems.length > 0 ? (
             filteredItems.map((item: any, index: number) => (
               <AccordionItem
-                key={item.id}
+                key={item.id || `faq-item-${index}`}
                 item={item}
                 index={index}
                 isOpen={openItems.includes(index)}

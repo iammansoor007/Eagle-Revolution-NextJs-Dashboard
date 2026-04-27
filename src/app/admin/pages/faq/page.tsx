@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Save, Loader2, Type, ChevronRight, HelpCircle } from "lucide-react";
+import { Save, Loader2, Type, ChevronRight, HelpCircle, Plus } from "lucide-react";
 import Link from "next/link";
 
 export default function FAQPageEditor() {
@@ -129,11 +129,63 @@ export default function FAQPageEditor() {
           </div>
         </div>
 
+        <div className="space-y-8 pt-10 border-t border-slate-100">
+          <div className="flex items-center gap-3">
+            <div className="w-10 h-10 bg-primary/10 rounded-xl flex items-center justify-center">
+              <Plus className="w-5 h-5 text-primary" />
+            </div>
+            <h2 className="text-xl font-extrabold text-slate-900 uppercase tracking-tight">CTA Section</h2>
+          </div>
+
+          <div className="space-y-6">
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">CTA Title</label>
+              <input
+                type="text"
+                value={data.faqPage?.ctaTitle || ""}
+                onChange={(e) => updatePage("ctaTitle", e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
+                placeholder="e.g. Still have questions?"
+              />
+            </div>
+            <div className="space-y-2">
+              <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">CTA Description</label>
+              <textarea
+                rows={2}
+                value={data.faqPage?.ctaDescription || ""}
+                onChange={(e) => updatePage("ctaDescription", e.target.value)}
+                className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner leading-relaxed"
+                placeholder="e.g. Our team is ready to provide the detailed answers you need..."
+              />
+            </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Primary Button Text</label>
+                <input
+                  type="text"
+                  value={data.faqPage?.ctaPrimaryText || ""}
+                  onChange={(e) => updatePage("ctaPrimaryText", e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+                />
+              </div>
+              <div className="space-y-2">
+                <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Primary Button Link</label>
+                <input
+                  type="text"
+                  value={data.faqPage?.ctaPrimaryLink || ""}
+                  onChange={(e) => updatePage("ctaPrimaryLink", e.target.value)}
+                  className="w-full bg-slate-50 border border-slate-200 rounded-2xl px-6 py-4 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
         <div className="pt-6 border-t border-slate-100">
           <div className="bg-primary/5 p-6 rounded-2xl border border-primary/10 flex items-start gap-4">
             <div className="w-8 h-8 bg-primary rounded-full flex items-center justify-center flex-shrink-0 text-white font-bold text-sm">!</div>
             <p className="text-slate-600 text-sm font-medium">
-              Note: This page only controls the header text. To manage the actual questions and categories, visit the 
+              Note: This page only controls the header and CTA text. To manage the actual questions and categories, visit the
               <Link href="/admin/faq" className="text-primary font-bold hover:underline ml-1">FAQ Management</Link> section.
             </p>
           </div>

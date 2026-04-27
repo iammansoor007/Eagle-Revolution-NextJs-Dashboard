@@ -542,7 +542,7 @@ const Testimonials = () => {
                 <div className="flex gap-1 justify-center">
                   {(testimonials as any[]).map((_: any, idx: number) => (
                     <motion.button
-                      key={idx}
+                      key={`dot-${idx}`}
                       onClick={() => setActiveIndex(idx)}
                       className="group cursor-pointer"
                     >
@@ -575,7 +575,7 @@ const Testimonials = () => {
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-4 md:gap-5">
                 {videos.map((video: any, idx: number) => (
                   <VideoThumbnailCard
-                    key={video.id}
+                    key={video.id || `video-${idx}`}
                     video={video}
                     index={idx}
                     onClick={() => handlePlayVideo(video.videoId, video.title)}
@@ -603,7 +603,7 @@ const Testimonials = () => {
               <div className="flex -space-x-2">
                 {testimonials.slice(0, 5).map((t: any, i: number) => (
                   <motion.div
-                    key={i}
+                    key={`avatar-${i}`}
                     initial={{ scale: 0 }}
                     animate={{ scale: 1 }}
                     transition={{ delay: i * 0.05 }}

@@ -41,6 +41,7 @@ export default function CareersTemplate({ pageData, params }: { pageData?: any, 
     e.preventDefault();
     setIsSubmitting(true);
     const formData = new FormData(e.currentTarget);
+    formData.append("type", "Job Application");
     formData.append("_subject", "New Job Application - Eagle Revolution");
     formData.append("_captcha", "false");
     formData.append("_template", "table");
@@ -78,7 +79,7 @@ export default function CareersTemplate({ pageData, params }: { pageData?: any, 
               <div className="w-8 h-[2px] bg-gradient-to-r from-blue-500 to-blue-300" />
             </motion.div>
             <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }} className="text-4xl md:text-7xl font-light text-slate-900 mb-6 leading-tight">
-              {careersData?.section?.headline?.split('with')[0]} with<br />
+              {careersData?.section?.headline?.split('with')[0]} <br />
               <span className="font-semibold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-900">{careersData?.section?.headline?.split('with')[1]}</span>
             </motion.h1>
             <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }} className="text-slate-600 text-lg md:text-xl font-light max-w-2xl mx-auto px-4">{careersData?.section?.description}</motion.p>
@@ -109,6 +110,25 @@ export default function CareersTemplate({ pageData, params }: { pageData?: any, 
                       <option value="" disabled>Select role...</option>
                       {careersData?.roles?.map((role: any, index: number) => <option key={index} value={role.value}>{role.label}</option>)}
                     </select>
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2">
+                      <FileText className="w-4 h-4 text-blue-500" />
+                      CV / RESUME (PDF)
+                    </label>
+                    <div className="relative group">
+                      <input 
+                        type="file" 
+                        name="attachment" 
+                        accept=".pdf" 
+                        onChange={handleFileChange}
+                        className="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" 
+                      />
+                      <div className="w-full px-5 py-4 bg-slate-50/50 border border-dashed rounded-xl flex items-center justify-between group-hover:border-blue-400 transition-all">
+                        <span className="text-slate-500 font-medium">{fileName || "Upload your resume (PDF)..."}</span>
+                        <Upload className="w-5 h-5 text-slate-400 group-hover:text-blue-500" />
+                      </div>
+                    </div>
                   </div>
                   <div className="space-y-3">
                     <label className="text-xs font-bold tracking-widest uppercase text-slate-500 flex items-center gap-2"><FileText className="w-4 h-4 text-blue-500" />{careersData?.labels?.summary}</label>

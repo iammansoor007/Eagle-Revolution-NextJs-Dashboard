@@ -361,9 +361,9 @@ export default function AboutSection() {
                                 transition={{ delay: 0.55, duration: 0.6 }}
                                 className="flex flex-wrap gap-2 pt-2"
                             >
-                                {coreValues.map((value: string) => (
+                                {coreValues.map((value: string, i: number) => (
                                     <span
-                                        key={value}
+                                        key={`value-${i}`}
                                         className="px-3 py-1.5 bg-secondary/10 text-secondary text-xs font-medium rounded-full border border-secondary/20"
                                     >
                                         {value}
@@ -382,7 +382,7 @@ export default function AboutSection() {
                             <div className="flex flex-row flex-wrap sm:flex-nowrap items-center gap-3 sm:gap-4 w-full">
                                 {buttons.map((button: any, idx: number) =>
                                     button.primary ? (
-                                        <Link key={idx} href={button.href}>
+                                        <Link key={`btn-p-${idx}`} href={button.href}>
                                             <motion.div
                                                 whileHover={{ scale: 1.03, y: -2 }}
                                                 whileTap={{ scale: 0.98 }}
@@ -403,7 +403,7 @@ export default function AboutSection() {
                                             </motion.div>
                                         </Link>
                                     ) : (
-                                        <Link key={idx} href={button.href}>
+                                        <Link key={`btn-s-${idx}`} href={button.href}>
                                             <motion.div
                                                 whileHover={{ scale: 1.03, y: -2 }}
                                                 whileTap={{ scale: 0.98 }}
@@ -436,7 +436,7 @@ export default function AboutSection() {
                             className="grid grid-cols-3 gap-4 pt-8"
                         >
                             {stats.map((stat: any, idx: number) => (
-                                <StatCard key={idx} {...stat} />
+                                <StatCard key={`stat-${idx}`} {...stat} />
                             ))}
                         </motion.div>
                     </motion.div>

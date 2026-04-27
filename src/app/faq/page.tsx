@@ -65,7 +65,7 @@ export default function FAQPage() {
       </section>
 
       {/* Main FAQ Component with Page Specific Filtering */}
-      <FAQ currentPage="faq" />
+      <FAQ currentPage="faq" hideHeader={true} />
 
       {/* CTA Section */}
       <section className="py-20 bg-background border-t border-primary/10">
@@ -73,16 +73,18 @@ export default function FAQPage() {
           <div className="inline-block p-4 rounded-3xl bg-primary/5 mb-6">
             <HelpCircle className="w-10 h-10 text-primary" />
           </div>
-          <h2 className="text-3xl font-medium mb-4">Still have questions?</h2>
+          <h2 className="text-3xl font-medium mb-4">
+            {faqPage?.ctaTitle || "Still have questions?"}
+          </h2>
           <p className="text-muted-foreground mb-8 max-w-xl mx-auto">
-            Our team is ready to provide the detailed answers you need for your specific project.
+            {faqPage?.ctaDescription || "Our team is ready to provide the detailed answers you need for your specific project."}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
             <Link 
-              href="/contact" 
+              href={faqPage?.ctaPrimaryLink || "/contact"} 
               className="px-8 py-4 bg-primary text-white rounded-full font-bold shadow-xl shadow-primary/20 hover:scale-105 transition-all"
             >
-              Contact Support
+              {faqPage?.ctaPrimaryText || "Contact Support"}
             </Link>
             <Link 
               href="/estimate" 

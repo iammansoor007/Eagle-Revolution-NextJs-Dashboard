@@ -8,6 +8,7 @@ export interface ISubmission extends Document {
   message: string;
   type: string;
   source: string;
+  attachmentUrl?: string;
   extraData?: Record<string, any>;
   createdAt: Date;
 }
@@ -21,11 +22,17 @@ const SubmissionSchema = new Schema<ISubmission>(
     message: { type: String, required: true },
     type: { type: String, default: "Contact Form" },
     source: { type: String, default: "Website" },
+    attachmentUrl: { type: String },
     extraData: { type: Schema.Types.Mixed },
   },
   { timestamps: true }
 );
 
-const Submission: Model<ISubmission> = mongoose.models.Submission || mongoose.model<ISubmission>("Submission", SubmissionSchema);
+// Delete the model if it exists to ensure schema updates are applied in development
+if (mongoose.models.Submission) {
+  delete mongoose.models.Submission;
+}
+
+const Submission: Model<ISubmission> = mongoose.model<ISubmission>("Submission", SubmissionSchema);
 
 export default Submission;

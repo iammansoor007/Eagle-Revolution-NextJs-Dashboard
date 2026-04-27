@@ -24,8 +24,10 @@ const ServiceCard = ({ service, index }: any) => {
                         <h3 className="text-xl font-bold text-foreground mb-2 group-hover:text-primary transition-colors">{service.title}</h3>
                         <p className="text-muted-foreground text-sm leading-relaxed mb-5">{service.tagline || service.description}</p>
                         <div className="flex flex-wrap gap-2 mb-5">
-                            {(service.features || []).slice(0, 3).map((f: string, i: number) => (
-                                <span key={i} className="text-xs bg-primary/5 text-primary border border-primary/10 px-3 py-1 rounded-full font-medium">{f}</span>
+                            {(service.features || []).slice(0, 3).map((f: any, i: number) => (
+                                <span key={i} className="text-xs bg-primary/5 text-primary border border-primary/10 px-3 py-1 rounded-full font-medium">
+                                    {typeof f === 'string' ? f : f.text}
+                                </span>
                             ))}
                         </div>
                         <div className="flex items-center gap-2 text-primary font-semibold text-sm">
@@ -43,8 +45,8 @@ export default function ServicesTemplate({ pageData, params }: { pageData?: any,
     const data = dataRaw as any;
     const services = data?.services || [];
 
-    // hero.headline can be a string OR an object { prefix, highlight, suffix }
-    const headline = data?.hero?.headline;
+    // Use services.headline if available
+    const headline = data?.headline;
     const headlineJsx = headline
         ? typeof headline === 'string'
             ? <span>{headline}</span>
@@ -66,7 +68,7 @@ export default function ServicesTemplate({ pageData, params }: { pageData?: any,
                     className="inline-flex items-center gap-2 bg-primary/10 text-primary px-4 py-2 rounded-full border border-primary/20 mb-6"
                 >
                     <Star className="w-4 h-4 fill-primary" />
-                    <span className="text-xs font-bold uppercase tracking-widest">What We Do</span>
+                    <span className="text-xs font-bold uppercase tracking-widest">{data?.badge || "What We Do"}</span>
                 </motion.div>
                 <motion.h1
                     initial={{ opacity: 0, y: 20 }}
@@ -76,14 +78,14 @@ export default function ServicesTemplate({ pageData, params }: { pageData?: any,
                 >
                     {headlineJsx}
                 </motion.h1>
-                {data?.hero?.description && (
+                {data?.description && (
                     <motion.p
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
                         className="text-lg text-muted-foreground max-w-3xl mx-auto"
                     >
-                        {Array.isArray(data.hero.description) ? data.hero.description[0] : data.hero.description}
+                        {Array.isArray(data.description) ? data.description[0] : data.description}
                     </motion.p>
                 )}
             </div>

@@ -261,67 +261,50 @@ export default function ProjectsAdminPage() {
         ) : null}
       </AnimatePresence>
 
-      {/* Projects Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <div className="space-y-4">
         {projects.map((project, idx) => (
           <motion.div 
             key={idx}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="bg-white border border-slate-200 rounded-3xl overflow-hidden group hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 relative"
+            className="group bg-white border border-slate-200 rounded-2xl p-4 pr-6 hover:shadow-lg hover:shadow-slate-200 transition-all flex items-center gap-6 shadow-sm"
           >
-            <div className="relative h-56 overflow-hidden">
+            <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-slate-50 border border-slate-100">
               {project.image ? (
-                <img
-                  src={project.image}
-                  alt={project.title}
-                  className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-700"
-                />
+                <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
               ) : (
-                <div className="w-full h-full bg-slate-50 flex items-center justify-center">
-                  <ImageIcon className="w-12 h-12 text-slate-200" />
+                <div className="w-full h-full flex items-center justify-center">
+                  <ImageIcon className="w-8 h-8 text-slate-200" />
                 </div>
               )}
-              <div className="absolute top-4 left-4">
-                <span className="bg-primary/90 text-white text-[10px] font-extrabold uppercase tracking-widest px-3 py-1.5 rounded-full backdrop-blur-md shadow-lg">
-                  {project.category || "Project"}
-                </span>
+            </div>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-1">
+                <h3 className="text-lg font-bold text-slate-900 truncate">{project.title}</h3>
+                <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase tracking-widest">{project.category || "Project"}</span>
               </div>
-              <div className="absolute top-4 right-4 flex gap-2 translate-y-[-10px] opacity-0 group-hover:translate-y-0 group-hover:opacity-100 transition-all duration-300">
-                <button
-                  onClick={(e) => { e.preventDefault(); handleEdit(idx); }}
-                  className="p-2.5 bg-white text-slate-900 rounded-xl shadow-xl hover:bg-primary hover:text-white transition-all"
-                >
-                  <Pencil className="w-4 h-4" />
-                </button>
-                <button
-                  onClick={(e) => { e.preventDefault(); handleDelete(idx); }}
-                  className="p-2.5 bg-white text-red-600 rounded-xl shadow-xl hover:bg-red-600 hover:text-white transition-all"
-                >
-                  <Trash2 className="w-4 h-4" />
-                </button>
+              <p className="text-slate-500 text-sm font-medium line-clamp-1">{project.desc || "No description provided."}</p>
+              <div className="flex items-center gap-4 mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {project.year || "2024"}</span>
+                {project.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {project.location}</span>}
               </div>
             </div>
-            <div className="p-6 space-y-4">
-              <div>
-                <h3 className="text-xl font-extrabold text-slate-900 mb-2 leading-tight">{project.title}</h3>
-                <p className="text-slate-500 text-sm font-medium line-clamp-2 leading-relaxed">
-                  {project.desc || "No description provided."}
-                </p>
-              </div>
-              <div className="pt-4 border-t border-slate-100 flex items-center justify-between text-slate-400 font-bold text-[10px] uppercase tracking-widest">
-                <div className="flex items-center gap-1.5">
-                  <Calendar className="w-3.5 h-3.5" />
-                  {project.year || "2024"}
-                </div>
-                {project.location && (
-                  <div className="flex items-center gap-1.5">
-                    <MapPin className="w-3.5 h-3.5" />
-                    {project.location}
-                  </div>
-                )}
-              </div>
+
+            <div className="flex items-center gap-2 flex-shrink-0">
+              <button
+                onClick={() => handleEdit(idx)}
+                className="p-3 text-slate-400 hover:text-primary transition-all rounded-xl hover:bg-slate-50"
+              >
+                <Pencil className="w-5 h-5" />
+              </button>
+              <button
+                onClick={() => handleDelete(idx)}
+                className="p-3 text-slate-400 hover:text-red-500 transition-all rounded-xl hover:bg-slate-50"
+              >
+                <Trash2 className="w-5 h-5" />
+              </button>
             </div>
           </motion.div>
         ))}

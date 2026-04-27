@@ -279,68 +279,55 @@ export default function ReviewsAdminPage() {
         ) : null}
       </AnimatePresence>
 
-      {/* Reviews Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className="space-y-4">
         {testimonials.map((test, idx) => (
           <motion.div 
             key={idx}
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
             transition={{ delay: idx * 0.05 }}
-            className="bg-white border border-slate-200 rounded-3xl p-8 hover:shadow-2xl hover:shadow-slate-200 transition-all duration-500 relative group flex flex-col"
+            className="group bg-white border border-slate-200 rounded-2xl p-5 pr-6 hover:shadow-lg hover:shadow-slate-200 transition-all flex items-center gap-6 shadow-sm"
           >
-            <div className="flex items-start justify-between mb-6">
-              <div className="flex items-center gap-4">
-                <div className="relative">
-                  {test.avatar && (test.avatar.startsWith('http') || test.avatar.startsWith('/uploads')) ? (
-                    <img src={test.avatar} alt={test.name} className="w-14 h-14 rounded-2xl object-cover border border-slate-100 shadow-sm" />
-                  ) : (
-                    <div className="w-14 h-14 rounded-2xl bg-slate-50 border border-slate-100 flex items-center justify-center text-primary font-bold text-lg uppercase">
-                      {test.avatar || test.name.charAt(0)}
-                    </div>
-                  )}
-                  <div className="absolute -bottom-1 -right-1 bg-white p-1 rounded-lg border border-slate-100 shadow-sm">
-                    <Quote className="w-3 h-3 text-primary" />
-                  </div>
+            <div className="relative flex-shrink-0">
+              {test.avatar && (test.avatar.startsWith('http') || test.avatar.startsWith('/uploads')) ? (
+                <img src={test.avatar} alt={test.name} className="w-16 h-16 rounded-xl object-cover border border-slate-100 shadow-sm" />
+              ) : (
+                <div className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-primary font-bold text-lg uppercase">
+                  {test.avatar || test.name.charAt(0)}
                 </div>
-                <div>
-                  <h3 className="text-lg font-extrabold text-slate-900 leading-tight">{test.name}</h3>
-                  <p className="text-slate-400 text-[10px] font-bold uppercase tracking-widest">{test.position} • {test.company}</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-0.5 bg-amber-50 px-3 py-1 rounded-full border border-amber-100 shadow-sm">
-                <span className="text-amber-600 font-bold text-xs mr-1">{test.rating || 5}</span>
-                <Star className="w-3.5 h-3.5 text-amber-500 fill-amber-500" />
-              </div>
+              )}
             </div>
-            
-            <p className="text-slate-600 font-medium italic leading-relaxed mb-8 flex-1">
-              "{test.text}"
-            </p>
-            
-            <div className="flex items-center justify-between border-t border-slate-100 pt-6">
-              <div className="flex items-center gap-3">
-                {test.videoId && (
-                  <span className="flex items-center gap-1.5 text-[10px] font-bold text-primary bg-primary/10 px-3 py-1.5 rounded-full border border-primary/20 uppercase tracking-widest shadow-sm">
-                    Video Attached
-                  </span>
-                )}
-                <span className="text-slate-300 text-[10px] font-bold uppercase tracking-widest">
-                  Verified Client
-                </span>
+
+            <div className="flex-1 min-w-0">
+              <div className="flex items-center gap-3 mb-1">
+                <h3 className="text-lg font-bold text-slate-900 truncate">{test.name}</h3>
+                <div className="flex items-center gap-0.5 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
+                  <span className="text-amber-600 font-bold text-[10px]">{test.rating || 5}</span>
+                  <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
+                </div>
               </div>
-              <div className="flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-all duration-300 translate-x-2 group-hover:translate-x-0">
+              <p className="text-slate-500 text-sm font-medium line-clamp-1 italic">"{test.text}"</p>
+              <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-1">{test.position} • {test.company}</p>
+            </div>
+
+            <div className="flex items-center gap-4 flex-shrink-0">
+              {test.videoId && (
+                <span className="hidden md:block text-[9px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-full border border-primary/20 uppercase tracking-widest">
+                  Video
+                </span>
+              )}
+              <div className="flex items-center gap-1">
                 <button
                   onClick={() => handleEdit(idx)}
-                  className="p-2.5 bg-slate-50 text-slate-400 hover:text-primary hover:bg-primary/10 rounded-xl transition-all border border-slate-100"
+                  className="p-3 text-slate-400 hover:text-primary transition-all rounded-xl hover:bg-slate-50"
                 >
-                  <Pencil className="w-4 h-4" />
+                  <Pencil className="w-5 h-5" />
                 </button>
                 <button
                   onClick={() => handleDelete(idx)}
-                  className="p-2.5 bg-slate-50 text-slate-400 hover:text-red-600 hover:bg-red-50 rounded-xl transition-all border border-slate-100"
+                  className="p-3 text-slate-400 hover:text-red-500 transition-all rounded-xl hover:bg-slate-50"
                 >
-                  <Trash2 className="w-4 h-4" />
+                  <Trash2 className="w-5 h-5" />
                 </button>
               </div>
             </div>

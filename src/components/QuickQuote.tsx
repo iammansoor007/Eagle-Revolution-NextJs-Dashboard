@@ -156,7 +156,7 @@ ${formData.message}
                         'Content-Type': 'application/json'
                     },
                     body: JSON.stringify({
-                        type: 'Quick Quote',
+                        type: 'Quote Request',
                         subject: `🔨 Quick Quote - ${formData.name}`,
                         name: formData.name,
                         email: formData.email,
@@ -167,12 +167,16 @@ ${formData.message}
                     })
                 });
 
+                const result = await response.json().catch(() => ({}));
+                console.log('Quick Quote Response Status:', response.status);
+                console.log('Quick Quote Response Body:', result);
+
                 if (response.ok) {
                     showSuccess();
                     return;
                 }
             } catch (fetchError) {
-                console.log('Resend failed, using mailto fallback');
+                console.error('Quick Quote fetch error:', fetchError);
             }
 
             const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🔨 Quick Quote - ${formData.name}&body=${encodeURIComponent(emailContent)}`;

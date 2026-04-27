@@ -104,7 +104,7 @@ const NewsletterForm = () => {
             'Content-Type': 'application/json'
           },
           body: JSON.stringify({
-            type: 'Newsletter Subscription',
+            type: 'Newsletter',
             subject: 'New Newsletter Subscription',
             name: 'Newsletter Subscriber',
             email: email,
@@ -171,26 +171,27 @@ const NewsletterForm = () => {
 };
 
 const ServiceLinks = () => {
-  const { footer } = useContent();
-  const { services } = footer;
+  const { services: servicesData, footer } = useContent();
+  const dynamicServices = (servicesData as any).services || [];
+  const { services: footerServices } = footer;
 
   return (
     <div className="space-y-4">
       <h4 className="text-xs font-mono tracking-[0.2em] uppercase text-muted-foreground flex items-center gap-2">
         <Icon name="Sparkles" className="w-4 h-4" />
-        {services.title}
+        {footerServices.title}
       </h4>
       <div className="grid grid-cols-1 gap-2">
-        {services.main.map((service: any) => (
+        {dynamicServices.map((service: any) => (
           <Link
-            key={service.label}
-            href={service.href}
+            key={service.slug}
+            href={`/services/${service.slug}`}
             className="inline-flex items-center gap-3 text-sm text-muted-foreground hover:text-primary transition-all duration-300 group py-1"
           >
             <span className="text-muted-foreground/60 group-hover:text-primary transition-colors">
-              <Icon name={service.icon} className="w-5 h-5" />
+              <Icon name={service.icon || "Layout"} className="w-5 h-5" />
             </span>
-            <span>{service.label}</span>
+            <span>{service.title}</span>
           </Link>
         ))}
       </div>

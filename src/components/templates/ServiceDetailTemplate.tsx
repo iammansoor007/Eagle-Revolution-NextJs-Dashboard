@@ -15,8 +15,9 @@ import {
   Home, Layout, TreePine, Building2, Building, Droplets,
   CheckCircle, ArrowRight, Phone, Clock, Shield, Award,
   ChevronRight, Star, ThumbsUp, Truck,
-  ChevronDown, ArrowUpRight, Users, Trophy,
-  FileText, ClipboardCheck, Hammer, Minus, Plus, Sparkles, Zap, Palette, Sun, Snowflake
+  ChevronDown, ArrowUpRight, Users, Trophy, Loader2,
+  FileText, ClipboardCheck, Hammer, Minus, Plus, Sparkles, Zap, Palette, Sun, Snowflake,
+  ShieldCheck, BadgeCheck, TrendingUp, Check, Wrench, HardHat, Ruler, Paintbrush, Wind, Flame, Thermometer
 } from 'lucide-react';
 import { notFound } from 'next/navigation';
 import breakcrumb from '@/assets/Breadcrumb-Image.jpeg';
@@ -33,7 +34,8 @@ import pvcdecks from '@/assets/pvcdecks.jpg.jpeg';
 const iconMap: Record<string, any> = {
   Home, Layout, TreePine, Building2, Building, Droplets,
   Shield, Trophy, Users, ThumbsUp, FileText, ClipboardCheck,
-  Truck, Hammer, CheckCircle, Award, Clock, Sparkles, Zap, Palette, Sun, Snowflake, Star
+  Truck, Hammer, CheckCircle, Award, Clock, Sparkles, Zap, Palette, Sun, Snowflake, Star,
+  ShieldCheck, BadgeCheck, TrendingUp, Check, Wrench, HardHat, Ruler, Paintbrush, Wind, Flame, Thermometer
 };
 
 const imageMap: Record<string, any> = {
@@ -119,27 +121,19 @@ const StatCard = ({ stat, index }: any) => {
             <div className="icon-container w-10 h-10 sm:w-12 sm:h-12 flex items-center justify-center rounded-xl sm:rounded-2xl bg-primary/10 text-primary border border-primary/20 group-hover:!bg-primary group-hover:!border-primary transition-all duration-300">
               <StatIcon className="icon w-5 h-5 sm:w-6 sm:h-6 !text-primary group-hover:!text-white transition-all duration-300" />
             </div>
-            <div className="text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.2em] text-primary/40 group-hover:text-primary transition-colors">
-              Impact
-            </div>
           </div>
 
           <div className="space-y-0.5 sm:space-y-1">
             <h3 className="text-2xl xs:text-4xl sm:text-5xl font-black text-foreground tracking-tight">
               <Counter
-                value={parseInt(stat.value.replace(/[^0-9]/g, ''))}
-                suffix={stat.value.includes('%') ? '%' : (stat.value.includes('+') ? '+' : '')}
+                value={parseInt(stat.value?.toString().replace(/[^0-9]/g, '') || "0")}
+                suffix={stat.value?.toString().includes('%') ? '%' : (stat.value?.toString().includes('+') ? '+' : '')}
                 start={inView}
               />
             </h3>
             <p className="text-[10px] sm:text-sm font-semibold uppercase tracking-widest text-muted-foreground group-hover:text-foreground transition-colors duration-300">
               {stat.label}
             </p>
-          </div>
-
-          <div className="mt-4 sm:mt-8 flex items-center gap-2 sm:gap-4">
-            <div className="h-[1.5px] sm:h-[2px] w-6 sm:w-8 bg-primary/20 group-hover:w-full group-hover:bg-primary transition-all duration-500 rounded-full" />
-            <div className="w-1 sm:w-1.5 h-1 sm:h-1.5 rounded-full bg-primary opacity-0 group-hover:opacity-100 transition-all duration-500" />
           </div>
         </div>
       </div>
@@ -149,36 +143,8 @@ const StatCard = ({ stat, index }: any) => {
 
 // --- Process Card Component ---
 const ProcessCard = ({ step, index }: { step: any, index: number }) => {
-  const [isHovered, setIsHovered] = useState(false);
-  const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
   const cardRef = useRef<HTMLDivElement>(null);
   const inView = useInView(cardRef, { once: true, margin: "-50px" });
-
-  const x = useMotionValue(0);
-  const y = useMotionValue(0);
-  const springX = useSpring(x, { stiffness: 120, damping: 15 });
-  const springY = useSpring(y, { stiffness: 120, damping: 15 });
-  const rotateX = useTransform(springY, [-0.3, 0.3], [3, -3]);
-  const rotateY = useTransform(springX, [-0.3, 0.3], [-3, 3]);
-
-  const handleMouseMove = (e: React.MouseEvent) => {
-    if (!cardRef.current) return;
-    const rect = cardRef.current.getBoundingClientRect();
-    const mouseX = e.clientX - rect.left;
-    const mouseY = e.clientY - rect.top;
-    const xPct = (mouseX / rect.width - 0.5) * 0.3;
-    const yPct = (mouseY / rect.height - 0.5) * 0.3;
-    x.set(xPct);
-    y.set(yPct);
-    setMousePosition({ x: mouseX, y: mouseY });
-  };
-
-  const handleMouseLeave = () => {
-    setIsHovered(false);
-    x.set(0);
-    y.set(0);
-  };
-
   const StepIcon = iconMap[step.icon] || Shield;
 
   return (
@@ -186,59 +152,39 @@ const ProcessCard = ({ step, index }: { step: any, index: number }) => {
       ref={cardRef}
       initial={{ opacity: 0, y: 60 }}
       animate={inView ? { opacity: 1, y: 0 } : {}}
-      transition={{
-        duration: 0.7,
-        delay: index * 0.1,
-        ease: [0.16, 1, 0.3, 1]
-      }}
-      onMouseEnter={() => setIsHovered(true)}
-      onMouseLeave={handleMouseLeave}
-      onMouseMove={handleMouseMove}
-      style={{
-        rotateX,
-        rotateY,
-        transformPerspective: 1500,
-      }}
+      transition={{ duration: 0.7, delay: index * 0.1, ease: [0.16, 1, 0.3, 1] }}
       className="relative group h-full"
     >
-      <div className="relative h-full bg-card/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-border/50 overflow-hidden">
-        <motion.div
-          className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-          style={{
-            background: `radial-gradient(circle at ${mousePosition.x}px ${mousePosition.y}px, hsl(var(--primary)/0.08), transparent 50%)`,
-          }}
-        />
-
-        <div className="relative p-4 sm:p-8 lg:p-10 flex flex-col h-full z-10">
-          <div className="relative w-12 h-12 sm:w-16 sm:h-16 mb-6 sm:mb-8">
-            <div className="absolute inset-0 flex items-center justify-center">
-              <motion.div
-                animate={{
-                  scale: isHovered ? 1.15 : 1,
-                }}
-                transition={{ duration: 0.3 }}
-                className="text-primary"
-              >
-                <StepIcon className="w-5 h-5 sm:w-7 sm:h-7" />
-              </motion.div>
-            </div>
-          </div>
-
-          <div className="mb-3 sm:mb-4">
-            <span className="text-[10px] sm:text-xs font-bold uppercase tracking-[0.2em] text-primary/50">
-              Phase {String(index + 1).padStart(2, '0')}
-            </span>
-          </div>
-
-          <h3 className="text-base xs:text-lg sm:text-xl md:text-2xl lg:text-3xl font-heading font-bold text-foreground mb-2 xs:mb-3 sm:mb-4 group-hover:text-primary transition-colors duration-300">
-            {step.title}
-          </h3>
-
-          <p className="text-muted-foreground text-xs sm:text-base leading-relaxed flex-1">
-            {step.description}
-          </p>
+      <div className="relative h-full bg-card/80 backdrop-blur-sm rounded-2xl sm:rounded-3xl border border-border/50 p-6 sm:p-10 flex flex-col z-10 overflow-hidden hover:border-primary/30 transition-all duration-300">
+        <div className="w-12 h-12 sm:w-16 sm:h-16 mb-8 bg-primary/10 rounded-2xl flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-500">
+          <StepIcon className="w-6 h-6 sm:w-8 sm:h-8" />
         </div>
+        <div className="mb-4">
+          <span className="text-[10px] font-bold uppercase tracking-[0.2em] text-primary/50">Phase {String(index + 1).padStart(2, '0')}</span>
+        </div>
+        <h3 className="text-xl sm:text-2xl font-bold mb-4 group-hover:text-primary transition-colors">{step.title}</h3>
+        <p className="text-muted-foreground text-sm sm:text-base leading-relaxed flex-1">{step.description}</p>
       </div>
+    </motion.div>
+  );
+};
+
+// --- Benefit Card Component ---
+const BenefitCard = ({ benefit, index }: { benefit: any, index: number }) => {
+  const Icon = iconMap[benefit.icon] || Shield;
+  return (
+    <motion.div 
+      initial={{ opacity: 0, scale: 0.95 }}
+      whileInView={{ opacity: 1, scale: 1 }}
+      viewport={{ once: true }}
+      transition={{ delay: index * 0.1 }}
+      className="bg-white border border-border rounded-2xl p-8 hover:shadow-xl transition-all duration-300 hover:-translate-y-1"
+    >
+      <div className="w-12 h-12 bg-primary/10 rounded-xl flex items-center justify-center text-primary mb-6">
+        <Icon className="w-6 h-6" />
+      </div>
+      <h3 className="text-xl font-bold mb-3">{benefit.title}</h3>
+      <p className="text-muted-foreground text-sm leading-relaxed">{benefit.description}</p>
     </motion.div>
   );
 };
@@ -253,40 +199,19 @@ const FAQItem = ({ faq, index, isOpen, onToggle }: { faq: any, index: number, is
       transition={{ duration: 0.4, delay: index * 0.05 }}
       className="relative group"
     >
-      <div
-        className={`relative bg-card/90 backdrop-blur-sm rounded-xl sm:rounded-2xl border transition-all duration-300 ${isOpen
-          ? 'border-primary/40 shadow-2xl shadow-primary/10'
-          : 'border-primary/10 hover:border-primary/25 shadow-lg'
-          }`}
-      >
-        <button
-          onClick={() => onToggle(index)}
-          className="w-full text-left p-4 sm:p-6 md:p-8 focus:outline-none relative z-10"
-        >
-          <div className="flex items-center justify-between gap-4 sm:gap-6">
-            <h3 className={`text-sm sm:text-lg lg:text-xl font-semibold transition-all duration-300 leading-tight ${isOpen ? 'text-primary' : 'text-foreground'
-              }`}>
-              {faq.question}
-            </h3>
-            <div className={`w-7 h-7 sm:w-10 sm:h-10 rounded-full border flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-primary text-white' : 'border-border bg-background'}`}>
-              {isOpen ? <Minus className="w-3.5 h-3.5" /> : <Plus className="w-3.5 h-3.5" />}
+      <div className={`relative bg-card/90 backdrop-blur-sm rounded-xl border transition-all duration-300 ${isOpen ? 'border-primary/40 shadow-2xl shadow-primary/10' : 'border-primary/10 hover:border-primary/25 shadow-lg'}`}>
+        <button onClick={() => onToggle(index)} className="w-full text-left p-6 sm:p-8 focus:outline-none relative z-10">
+          <div className="flex items-center justify-between gap-6">
+            <h3 className={`text-sm sm:text-lg lg:text-xl font-semibold transition-all duration-300 ${isOpen ? 'text-primary' : 'text-foreground'}`}>{faq.question}</h3>
+            <div className={`w-8 h-8 rounded-full border flex items-center justify-center transition-all duration-300 ${isOpen ? 'bg-primary text-white' : 'border-border bg-background'}`}>
+              {isOpen ? <Minus className="w-4 h-4" /> : <Plus className="w-4 h-4" />}
             </div>
           </div>
         </button>
         <AnimatePresence>
           {isOpen && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: 'auto', opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={{ duration: 0.35 }}
-              className="overflow-hidden"
-            >
-              <div className="px-4 sm:px-6 md:px-8 pb-5 sm:pb-8">
-                <p className="text-muted-foreground text-xs xs:text-sm sm:text-base leading-relaxed">
-                  {faq.answer}
-                </p>
-              </div>
+            <motion.div initial={{ height: 0, opacity: 0 }} animate={{ height: 'auto', opacity: 1 }} exit={{ height: 0, opacity: 0 }} className="overflow-hidden">
+              <div className="px-8 pb-8"><p className="text-muted-foreground text-sm sm:text-base leading-relaxed">{faq.answer}</p></div>
             </motion.div>
           )}
         </AnimatePresence>
@@ -295,64 +220,47 @@ const FAQItem = ({ faq, index, isOpen, onToggle }: { faq: any, index: number, is
   );
 };
 
-// --- Award CTA Banner Component ---
-const AwardCTABanner = () => {
-  const { serviceDetailPage } = useContent();
-  const { trustBanner } = (serviceDetailPage as any) || {};
-
-  return (
-    <div className="relative bg-card border border-border rounded-2xl p-8 sm:p-12 overflow-hidden">
-      <div className="relative z-10 flex flex-col lg:flex-row items-center justify-between gap-8">
-        <div className="max-w-2xl text-center lg:text-left">
-          <h3 className="text-2xl sm:text-4xl font-bold mb-4" dangerouslySetInnerHTML={{ __html: trustBanner?.headline || "America's #1 Rated Home Improvement Team" }} />
-          <p className="text-muted-foreground text-lg mb-6" dangerouslySetInnerHTML={{ __html: trustBanner?.description || "Join thousands of satisfied homeowners who trusted us." }} />
-        </div>
-        <div className="flex flex-col sm:flex-row gap-4">
-          <Link href="/contact" className="px-8 py-4 bg-primary text-white font-bold rounded-full text-center">
-            {trustBanner?.cta?.primary || "Get Free Quote"}
-          </Link>
-          <a href={`tel:${trustBanner?.cta?.phone || "636-449-9714"}`} className="px-8 py-4 bg-white text-primary border-2 border-primary font-bold rounded-full text-center">
-            Call Now
-          </a>
-        </div>
-      </div>
-    </div>
-  );
-};
-
 export default function ServiceDetailTemplate({ pageData, params: syncParams }: { pageData?: any, params?: any }) {
-  const { services: servicesData, serviceDetailPage } = useContent();
+  const { services: servicesData } = useContent();
   const [openFaq, setOpenFaq] = useState<number | null>(null);
   const [slug, setSlug] = useState<string | null>(null);
+  const [isDataLoaded, setIsDataLoaded] = useState(false);
 
   useEffect(() => {
-    if (pageData?.slug) {
-      setSlug(pageData.slug);
-    } else if (syncParams?.slug) {
+    if (pageData?.slug) setSlug(pageData.slug);
+    else if (syncParams?.slug) {
       const pSlug = syncParams.slug;
       setSlug(Array.isArray(pSlug) ? pSlug.join('/') : pSlug);
     }
   }, [pageData, syncParams]);
 
   const servicesList = (servicesData as any).services || [];
-  const allServices = servicesList.map((service: any) => ({
-    ...service,
-    image: imageMap[service.title] || roofingImg
-  }));
+  const service = servicesList.find((s: any) => s.slug === slug);
 
-  const service = allServices.find((s: any) => s.slug === slug);
+  useEffect(() => {
+    // If the service is found and it has the new dynamic fields, we know the DB data is loaded
+    if (service && (service.overviewTitle || service.benefits?.length > 0)) {
+      setIsDataLoaded(true);
+    }
+  }, [service]);
 
-  if (!service && slug) {
-    return notFound();
+  if (!service && slug) return notFound();
+  
+  // Show a premium loader while fetching dynamic content to avoid "old data" flash
+  if (!service || (!isDataLoaded && slug)) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+        <Loader2 className="w-12 h-12 animate-spin text-primary opacity-20" />
+        <p className="text-slate-400 font-bold text-xs uppercase tracking-widest animate-pulse">Syncing Service Intelligence...</p>
+      </div>
+    );
   }
 
-  if (!service) return <div className="pt-32 text-center">Loading...</div>;
-
-  const IconComponent = iconMap[service.icon] || Home;
   const faqs = service.faq || [];
-  const processSteps = (service.process || []).map((p: any) => ({ ...p, icon: p.icon }));
-  const statsData = (service.stats || []).map((s: any) => ({ ...s, icon: s.icon }));
-  const isDeckPage = service.slug === 'custom-decks' || service.slug === 'pvc-decking';
+  const processSteps = service.process || [];
+  const statsData = service.stats || [];
+  const benefits = service.benefits || [];
+  const features = (service.features || []).map((f: any) => typeof f === 'string' ? { text: f, icon: "CheckCircle" } : f);
 
   return (
     <main className="bg-background text-foreground font-body">
@@ -362,9 +270,7 @@ export default function ServiceDetailTemplate({ pageData, params: syncParams }: 
         <div className="absolute inset-0 bg-black/60 flex items-center">
           <div className="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-12">
             <h1 className="text-3xl sm:text-7xl font-bold text-white mb-4">{service.title}</h1>
-            <p className="text-white/80 text-lg sm:text-2xl max-w-2xl">
-              Professional {service.title.toLowerCase()} services with military precision.
-            </p>
+            <p className="text-white/80 text-lg sm:text-2xl max-w-2xl">{service.tagline}</p>
           </div>
         </div>
       </section>
@@ -379,28 +285,57 @@ export default function ServiceDetailTemplate({ pageData, params: syncParams }: 
       </section>
 
       {/* Overview Section */}
-      <section className="py-16 px-4">
-        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-12 items-center">
-          <div>
-            <h2 className="text-3xl sm:text-6xl font-bold mb-6">Craftsmanship Without Compromise.</h2>
-            <p className="text-lg text-muted-foreground mb-8">{service.overview}</p>
-            <div className="grid sm:grid-cols-2 gap-4 mb-8">
-              {service.features.map((f: any, i: number) => (
-                <div key={i} className="flex items-center gap-2">
-                  <CheckCircle className="text-primary w-5 h-5" />
-                  <span>{f}</span>
-                </div>
-              ))}
+      <section className="py-24 px-4 overflow-hidden">
+        <div className="max-w-7xl mx-auto grid lg:grid-cols-2 gap-16 items-center">
+          <motion.div initial={{ opacity: 0, x: -50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }}>
+            <h2 className="text-3xl sm:text-6xl font-bold mb-8 leading-tight">{service.overviewTitle || "Craftsmanship Without Compromise."}</h2>
+            <p className="text-lg text-muted-foreground mb-10 leading-relaxed whitespace-pre-line">{service.overview}</p>
+            <div className="grid sm:grid-cols-2 gap-6 mb-12">
+              {features.map((f: any, i: number) => {
+                const Icon = iconMap[f.icon] || CheckCircle;
+                return (
+                  <div key={i} className="flex items-center gap-3 group">
+                    <div className="w-8 h-8 rounded-lg bg-primary/10 flex items-center justify-center text-primary group-hover:bg-primary group-hover:text-white transition-all duration-300">
+                      <Icon className="w-4 h-4" />
+                    </div>
+                    <span className="font-bold text-slate-700">{f.text}</span>
+                  </div>
+                );
+              })}
             </div>
-            <Link href="/contact" className="inline-flex items-center gap-2 px-8 py-4 bg-primary text-white font-bold rounded-2xl">
-              Start Your Project <ArrowRight className="w-4 h-4" />
+            <Link href={service.cta?.link || "/contact"} className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-white font-bold rounded-2xl shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all">
+              {service.cta?.text || "Start Your Project"} <ArrowRight className="w-5 h-5" />
             </Link>
-          </div>
-          <div className="relative aspect-[4/5] rounded-3xl overflow-hidden shadow-2xl">
-            <Image src={service.image} alt={service.title} fill className="object-cover" />
-          </div>
+          </motion.div>
+          <motion.div initial={{ opacity: 0, x: 50 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="relative">
+            <div className="relative aspect-[4/5] rounded-[2.5rem] overflow-hidden shadow-2xl z-10 border border-border/50">
+              <img 
+                src={service.overviewImage || (imageMap[service.title] ? (imageMap[service.title] as any).src : "/src/assets/roof1.jpg.jpeg")} 
+                alt={service.title} 
+                className="w-full h-full object-cover" 
+              />
+            </div>
+            <div className="absolute -bottom-10 -right-10 w-64 h-64 bg-primary/5 rounded-full blur-3xl" />
+          </motion.div>
         </div>
       </section>
+
+      {/* Benefits Section */}
+      {benefits.length > 0 && (
+        <section className="py-24 bg-slate-50">
+          <div className="max-w-7xl mx-auto px-4">
+            <div className="text-center mb-16">
+              <h2 className="text-4xl sm:text-6xl font-bold mb-4">Key Benefits</h2>
+              <p className="text-lg text-muted-foreground">Why our {service.title.toLowerCase()} solutions stand out.</p>
+            </div>
+            <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+              {benefits.map((benefit: any, idx: number) => (
+                <BenefitCard key={idx} benefit={benefit} index={idx} />
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Process Section */}
       <section className="py-24 bg-muted/30">
@@ -428,10 +363,6 @@ export default function ServiceDetailTemplate({ pageData, params: syncParams }: 
           </div>
         </div>
       </section>
-
-      <div className="max-w-7xl mx-auto px-4 py-12">
-        <AwardCTABanner />
-      </div>
     </main>
   );
 }

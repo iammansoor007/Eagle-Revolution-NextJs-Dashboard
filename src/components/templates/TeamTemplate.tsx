@@ -79,14 +79,25 @@ const ParallaxLayer = ({ children, speed = 0.1, className = "" }: any) => {
 
 const TeamPortrait = ({ image, title, badge1, badge2, alignRight = false }: any) => {
   const [isHovered, setIsHovered] = useState(false);
+  const [imageError, setImageError] = useState(false);
   const ref = useRef<any>(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  const fallbackImage = "https://images.unsplash.com/photo-1560250097-0b93528c311a?ixlib=rb-4.0.3&auto=format&fit=crop&w=800&q=80";
+
   return (
     <motion.div ref={ref} initial={{ opacity: 0, y: 40 }} animate={inView ? { opacity: 1, y: 0 } : {}} transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }} className={`relative group w-full ${alignRight ? 'lg:ml-auto' : ''}`} onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
       <div className="relative z-10 w-full max-w-[500px] mx-auto lg:mx-0">
         <div className="absolute -inset-2 sm:-inset-3 bg-gradient-to-br from-blue-500/10 via-slate-500/10 to-blue-700/10 rounded-[2rem] sm:rounded-[2.5rem] blur-xl sm:blur-2xl group-hover:from-blue-500/20 group-hover:via-slate-500/20 group-hover:to-blue-700/20 transition-all duration-700" />
         <div className="relative rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden shadow-[0_10px_40px_rgb(0,0,0,0.08)] group-hover:shadow-[0_20px_50px_rgb(0,0,0,0.15)] transition-shadow duration-700">
-          <motion.img src={image} alt={title} animate={isHovered ? { scale: 1.05 } : { scale: 1 }} transition={{ duration: 1.5, ease: "easeOut" }} className="w-full h-[280px] min-[350px]:h-[380px] sm:h-[450px] lg:h-[550px] object-cover" />
+          <motion.img 
+            src={imageError ? fallbackImage : image} 
+            alt={title} 
+            onError={() => setImageError(true)}
+            animate={isHovered ? { scale: 1.05 } : { scale: 1 }} 
+            transition={{ duration: 1.5, ease: "easeOut" }} 
+            className="w-full h-[280px] min-[350px]:h-[380px] sm:h-[450px] lg:h-[550px] object-cover" 
+          />
           <div className="absolute inset-0 bg-gradient-to-t from-slate-900/80 via-slate-900/10 to-transparent opacity-80" />
         </div>
         <motion.div initial={{ opacity: 0, x: -10 }} animate={inView ? { opacity: 1, x: 0 } : {}} transition={{ delay: 0.3 }} className="absolute top-4 left-4 sm:top-6 sm:left-6 z-20">
@@ -138,7 +149,7 @@ export default function TeamTemplate({ pageData, params }: { pageData?: any, par
               <div className="w-6 sm:w-8 h-[2px] bg-gradient-to-r from-blue-500 to-blue-300" />
             </div>
             <h1 className="text-3xl min-[350px]:text-4xl sm:text-5xl lg:text-6xl font-light text-slate-900 mb-4 leading-tight">
-              {teamData?.section?.headline?.split('with')[0]} with<br />
+              {teamData?.section?.headline?.split('with')[0]} <br />
               <span className="font-bold text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-blue-950">{teamData?.section?.headline?.split('with')[1]}</span>
             </h1>
             <p className="text-slate-500 text-[13px] min-[350px]:text-sm sm:text-lg font-light max-w-2xl mx-auto px-4 leading-relaxed">{teamData?.section?.description}</p>
@@ -164,7 +175,19 @@ export default function TeamTemplate({ pageData, params }: { pageData?: any, par
                   </div>
                 </div>
                 <div className={`lg:col-span-5 ${alignRight ? 'order-1 lg:order-2' : 'order-1 lg:order-1'} leadership-reveal lg:sticky lg:top-32 relative z-10 w-full max-w-[400px] lg:max-w-none mx-auto lg:mx-0`}>
-                  <TeamPortrait image={Images[member.image as keyof typeof Images] || Images.BrandonAnderson} title={`${member.name} - ${member.role}`} badge1={member.badge1} badge2={member.badge2} alignRight={alignRight} />
+                  <TeamPortrait
+                    image={
+                      member.image ? (
+                        (member.image.startsWith('/') || member.image.startsWith('http'))
+                          ? member.image
+                          : (Images[member.image as keyof typeof Images] || Images.BrandonAnderson)
+                      ) : Images.BrandonAnderson
+                    }
+                    title={`${member.name} - ${member.role}`}
+                    badge1={member.badge1}
+                    badge2={member.badge2}
+                    alignRight={alignRight}
+                  />
                 </div>
               </div>
             );
