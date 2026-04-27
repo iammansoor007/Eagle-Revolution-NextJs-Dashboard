@@ -157,7 +157,7 @@ ${formData.message}
                     },
                     body: JSON.stringify({
                         type: 'Quote Request',
-                        subject: `🔨 Quick Quote - ${formData.name}`,
+                        subject: `Quick Quote - ${formData.name}`,
                         name: formData.name,
                         email: formData.email,
                         phone: formData.phone,

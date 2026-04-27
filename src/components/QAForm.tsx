@@ -618,7 +618,7 @@ ${formData.message}
     try {
       const payload = {
         type: 'Quote Request',
-        subject: `🦅 Quote Request - ${formData.name}`,
+        subject: `Eagle Revolution Quote Request - ${formData.name}`,
         name: formData.name,
         email: formData.email,
         phone: formData.phone,
@@ -659,13 +659,13 @@ ${formData.message}
         return;
       } else {
         console.error('API submission failed, falling back to mailto');
-        const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🦅 Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
+        const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
         window.location.href = mailtoLink;
         setShowSuccess(true);
       }
     } catch (error) {
       console.error('Final submission error:', error);
-      const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=🦅 Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
+      const mailtoLink = `mailto:banderson@eaglerevolution.com?subject=Quote Request - ${formData.name}&body=${encodeURIComponent(emailContent)}`;
       window.location.href = mailtoLink;
       setShowSuccess(true);
     } finally {

@@ -103,9 +103,9 @@ export default function AdminDashboard() {
   const quickActions = [
     { label: "Edit Homepage", desc: "Update Hero, About & Contact", href: "/admin/pages/home", icon: Briefcase, delay: 0.05 },
     { label: "Manage Services", desc: "Edit service details & content", href: "/admin/services", icon: Briefcase, delay: 0.1 },
-    { label: "Manage Team", desc: "Update team members & bios", href: "/admin/team", icon: Users, delay: 0.15 },
+    { label: "Manage Team", desc: "Update team members & bios", href: "/admin/pages/team", icon: Users, delay: 0.15 },
     { label: "Client Reviews", desc: "Moderate customer testimonials", href: "/admin/reviews", icon: Star, delay: 0.2 },
-    { label: "Manage Gallery", desc: "Upload project photography", href: "/admin/gallery", icon: ImageIcon, delay: 0.25 },
+    { label: "Manage Gallery", desc: "Upload project photography", href: "/admin/projects", icon: ImageIcon, delay: 0.25 },
     { label: "Submissions", desc: "View form leads & inquiries", href: "/admin/submissions", icon: Phone, delay: 0.3 },
   ];
 

@@ -30,7 +30,7 @@ export async function POST(request: Request) {
       const file = formData.get('attachment') as File;
       if (file && file.size > 0) {
         const buffer = Buffer.from(await file.arrayBuffer());
-        
+
         // Save file to public/uploads
         const filename = Date.now() + "_" + file.name.replace(/[^a-zA-Z0-9.]/g, "_");
         const uploadDir = path.join(process.cwd(), "public", "uploads");
@@ -39,11 +39,11 @@ export async function POST(request: Request) {
         }
         const filePath = path.join(uploadDir, filename);
         await writeFile(filePath, buffer);
-        
+
         attachmentUrl = `/uploads/${filename}`;
         console.log('File saved to:', filePath);
         console.log('Attachment URL set to:', attachmentUrl);
-        
+
         attachments.push({
           filename: file.name,
           content: buffer,
@@ -129,7 +129,7 @@ export async function POST(request: Request) {
 
     // Add extra data if any
     if (Object.keys(extraData).length > 0) {
-      html += `<div style="margin-top: 20px; border-top: 1px solid #eee; pt-10px;">
+      html += `<div style="margin-top: 20px; border-top: 1px solid #eee; padding-top: 10px;">
         <p><strong>Additional Details:</strong></p>
         <ul style="list-style: none; padding: 0;">`;
 
@@ -146,50 +146,36 @@ export async function POST(request: Request) {
         <p style="font-size: 12px; color: #666; margin-top: 30px; border-top: 1px solid #eee; padding-top: 10px;">
           ⏱️ Submitted: ${new Date().toLocaleString()}<br>
           🇺🇸 Veteran Owned & Operated
-      // We continue to send email even if DB fails, but we'll return an error later
-      return NextResponse.json({ 
-        error: 'Database save failed', 
-        details: dbError.message,
-        stack: dbError.stack
-      }, { status: 500 });
-    }
+        </p>
+      </div>
+    `;
 
     // Prepare email content
     const emailContent = `
-🔨 NEW SUBMISSION - EAGLE REVOLUTION
-
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📋 CUSTOMER INFORMATION
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+NEW SUBMISSION - EAGLE REVOLUTION
+----------------------------------
 Name: ${name}
 Email: ${email}
 Phone: ${phone || 'Not provided'}
 Type: ${type || 'Contact Form'}
 Subject: ${subject || 'No Subject'}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-📝 DETAILS
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-Message: ${message || 'No message provided'}
+DETAILS:
+${message || 'No message provided'}
 
 ${Object.entries(extraData).length > 0 ? `
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-ℹ️ ADDITIONAL DATA
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ADDITIONAL INFO:
 ${Object.entries(extraData).map(([key, value]) => `${key}: ${value}`).join('\n')}
 ` : ''}
 
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
-⏱️ Submitted: ${new Date().toLocaleString()}
-🌐 Source: Website
-🇺🇸 Veteran Owned & Operated
-━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+Submitted: ${new Date().toLocaleString()}
+Source: Website
     `;
 
     // Send email using Resend
     const { data: resendData, error: resendError } = await resend.emails.send({
       from: 'Eagle Revolution <onboarding@resend.dev>',
-      to: ['banderson@eaglerevolution.com'],
+      to: [receiverEmail],
       subject: subject || `New Lead: ${name}`,
       html: `
         <div style="font-family: sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #e2e8f0; border-radius: 12px; overflow: hidden;">
@@ -220,28 +206,28 @@ ${Object.entries(extraData).map(([key, value]) => `${key}: ${value}`).join('\n')
           </div>
         </div>
       `,
-      attachments: attachmentUrl ? [{ filename: 'CV_Document', path: attachmentUrl }] : []
+      attachments: attachments.length > 0 ? attachments : []
     });
 
     if (resendError) {
       console.error('Resend API Error:', resendError);
-      return NextResponse.json({ 
-        error: 'Email failed but DB saved', 
+      return NextResponse.json({
+        error: 'Email failed but DB saved',
         details: resendError.message,
-        submissionId: submission?._id 
+        submissionId: submission?._id
       }, { status: 200 }); // Return 200 so UI doesn't show error if DB saved
     }
 
-    return NextResponse.json({ 
-      success: true, 
+    return NextResponse.json({
+      success: true,
       message: 'Submission saved and email sent',
-      submissionId: submission?._id 
+      submissionId: submission?._id
     });
 
   } catch (error: any) {
     console.error('CRITICAL API ERROR:', error);
-    return NextResponse.json({ 
-      error: 'Critical server error', 
+    return NextResponse.json({
+      error: 'Critical server error',
       details: error.message,
       stack: error.stack
     }, { status: 500 });
