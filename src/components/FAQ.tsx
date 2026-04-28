@@ -511,7 +511,9 @@ const FAQ = ({ currentPage = "home", hideHeader = false }: { currentPage?: strin
   const [activeCategory, setActiveCategory] = useState('all');
   const [searchQuery, setSearchQuery] = useState('');
 
-  const { section, categories, items } = faq;
+  const section = (faq as any).section || { badge: '', headline: '', title: '', description: '' };
+  const categories: any[] = (faq as any).categories || [];
+  const items: any[] = (faq as any).items || [];
 
   const filteredItems = (items || []).filter((item: any) => {
     // Visibility Logic - default to 'global' if not specified

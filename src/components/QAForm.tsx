@@ -333,7 +333,7 @@ const StageIndicator = ({ currentStep }: { currentStep: number }) => {
 };
 
 const SuccessModal = ({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const { success } = useContent().quote;
+  const success = (useContent().quote as any).success || { title: '', message: '', response: '', buttonText: 'Close' };
 
   useEffect(() => {
     if (isOpen) {
@@ -542,7 +542,11 @@ const GetQuote = () => {
     message: ''
   });
 
-  const { section, services, projectTypes, timelines, email, success } = quote;
+  const section = (quote as any).section || { badge: '', headline: '', description: '' };
+  const services: any[] = (quote as any).services || [];
+  const projectTypes: any[] = (quote as any).projectTypes || [];
+  const timelines: any[] = (quote as any).timelines || [];
+  const success = (quote as any).success || { title: '', message: '', response: '', buttonText: 'Close' };
 
   const toggleService = (serviceId: number) => {
     setSelectedServices(prev =>

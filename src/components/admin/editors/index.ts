@@ -11,4 +11,5 @@ export const TemplateEditors: Record<string, any> = {
   contact: dynamic(() => import('./ContactEditor')),
   reviews: dynamic(() => import('./ReviewsEditor')),
   'service-detail': dynamic(() => import('./ServiceDetailEditor')),
+  settings: dynamic(() => import('./SettingsEditor')),
 };

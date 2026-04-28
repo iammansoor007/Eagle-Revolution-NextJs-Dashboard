@@ -37,7 +37,7 @@ const CeoPortrait = () => {
   const ref = useRef(null);
   const inView = useInView(ref, { once: true, margin: "-50px" });
 
-  const { ceo } = useContent().leadership;
+  const ceo = (useContent().leadership as any).ceo || { image: {}, alt: '', badges: { top: '', bottom: '' } };
 
   return (
     <motion.div
@@ -140,7 +140,8 @@ const Leadership = () => {
   const sectionRef = useRef(null);
   const [isClient, setIsClient] = useState(false);
 
-  const { section, ceo } = leadership;
+  const section = (leadership as any).section || { badge: '', headline: '', description: '' };
+  const ceo = (leadership as any).ceo || { name: '', title: '', image: {}, alt: '', badges: { top: '', bottom: '' }, quotes: [], description: [], socials: [] };
 
   useEffect(() => {
     setIsClient(true);

@@ -163,7 +163,7 @@ export default function AboutSection() {
     const sectionRef = useRef<HTMLElement>(null);
     const shouldReduceMotion = useReducedMotion();
 
-    const { badge, headline, description, image, stats, buttons, trustBadges, coreValues } = about;
+    const { badge, headline, description, image, stats = [], buttons = [], trustBadges = [], coreValues } = about;
 
     const variants = useMemo(
         () => ({

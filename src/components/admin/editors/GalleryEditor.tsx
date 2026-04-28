@@ -6,8 +6,9 @@ import {
   Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, 
   ChevronRight, Star, Phone, Plus, Trash2, Mail, Upload, 
   List, Heart, HelpCircle, Check, Target, Award, Shield, 
-  ArrowRight, MapPin, Calendar, Layers
+  ArrowRight, MapPin, Calendar, Layers, Sparkles
 } from "lucide-react";
+import ContentSelector from "@/components/admin/ContentSelector";
 
 // Shared Reusable Image Upload Component
 const ImageUpload = ({ label, value, onChange, description }: any) => {
@@ -73,8 +74,10 @@ export default function GalleryEditor({ pageId, data, setData }: { pageId: strin
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
        setData({
+         galleryPage: {
+           header: { badge: "Our Work", title: "Project Gallery", description: "Browse our completed projects across St. Louis." }
+         },
          portfolio: {
-           section: { badge: "", headline: "", description: "" },
            projects: []
          }
        });
@@ -83,23 +86,26 @@ export default function GalleryEditor({ pageId, data, setData }: { pageId: strin
 
   if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
 
-  const updatePortfolio = (section: string, field: string | null, value: any) => {
-    const currentPortfolio = data.portfolio || {
-      section: { badge: "", headline: "", description: "" },
-      projects: []
-    };
+  const updateHeader = (field: string, value: any) => {
+    setData({
+      ...data,
+      galleryPage: {
+        ...(data.galleryPage || {}),
+        header: {
+          ...(data.galleryPage?.header || {}),
+          [field]: value
+        }
+      }
+    });
+  };
 
-    const targetSectionData = currentPortfolio[section as keyof typeof currentPortfolio] || {};
-
+  const updateProjects = (value: any) => {
     setData({
       ...data,
       portfolio: {
-        ...currentPortfolio,
-        [section]: field ? {
-          ...targetSectionData,
-          [field]: value,
-        } : value,
-      },
+        ...(data.portfolio || {}),
+        projects: value
+      }
     });
   };
 
@@ -111,135 +117,71 @@ export default function GalleryEditor({ pageId, data, setData }: { pageId: strin
   const activeTabTitle = tabs.find(t => t.id === activeTab)?.title;
 
   return (
-    <div className="bg-white min-h-[600px] flex flex-col">
+    <div className="bg-white min-h-[700px] flex flex-col">
       {/* Tab Navigation */}
-      <div className="border-b border-slate-100 bg-white sticky top-0 z-10">
+      <div className="border-b border-slate-100 bg-white sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-1 p-4 overflow-x-auto no-scrollbar scroll-smooth">
           {tabs.map((tab: any) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shrink-0 ${
                 activeTab === tab.id
-                ? "bg-primary/5 text-primary"
-                : "text-slate-400 hover:text-slate-600"
+                ? "bg-primary text-white shadow-lg shadow-primary/20"
+                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
               }`}
             >
-              <tab.icon className="w-3.5 h-3.5" />
+              <tab.icon className="w-4 h-4" />
               {tab.label}
             </button>
           ))}
         </div>
       </div>
 
-      {/* Editor Content */}
-      <div className="flex-1 p-10 overflow-y-auto max-h-[800px] custom-scrollbar">
-        {/* Tab Title Marker */}
-        <div className="mb-10 pb-6 border-b border-slate-50">
-           <h2 className="text-2xl font-normal text-slate-900 tracking-tight">{activeTabTitle}</h2>
-           <p className="text-xs text-slate-400 mt-1">Configure the project gallery and its introductory narrative.</p>
+      <div className="flex-1 p-10 overflow-y-auto max-h-[850px] custom-scrollbar bg-[#F8FAFC]">
+        <div className="mb-12 pb-8 border-b border-slate-200">
+           <h2 className="text-3xl font-medium text-slate-900 tracking-tight">{activeTabTitle}</h2>
+           <p className="text-sm text-slate-400 mt-2 font-medium">Configure the project gallery and its introductory narrative.</p>
         </div>
 
         <AnimatePresence mode="wait">
-          <motion.div key={activeTab} initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-12">
+          <motion.div 
+            key={activeTab} 
+            initial={{ opacity: 0, y: 15 }} 
+            animate={{ opacity: 1, y: 0 }} 
+            exit={{ opacity: 0, y: -15 }} 
+            className="space-y-16 pb-20"
+          >
             
             {/* HEADER SECTION */}
             {activeTab === "header" && (
-              <div className="max-w-3xl space-y-8">
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Gallery Badge</label>
-                    <input type="text" value={data.portfolio?.section?.badge || ""} onChange={(e) => updatePortfolio("section", "badge", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30 transition-all" placeholder="Our Recent Work" />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Main Headline</label>
-                    <input type="text" value={data.portfolio?.section?.headline || ""} onChange={(e) => updatePortfolio("section", "headline", e.target.value)} className="w-full bg-slate-50/50 border border-slate-100 rounded-xl px-5 py-3 text-xs outline-none focus:bg-white focus:border-primary/30 transition-all" placeholder="Precision & Craftsmanship" />
-                 </div>
-                 <div className="space-y-2">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Intro Paragraph</label>
-                    <textarea value={data.portfolio?.section?.description || ""} onChange={(e) => updatePortfolio("section", "description", e.target.value)} rows={4} className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl px-6 py-4 text-xs text-slate-600 outline-none focus:bg-white focus:border-primary/30 transition-all" placeholder="Tell the story behind your portfolio..." />
+              <div className="max-w-3xl space-y-10">
+                 <div className="space-y-6 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Gallery Badge</label>
+                       <input type="text" value={data.galleryPage?.header?.badge || ""} onChange={(e) => updateHeader("badge", e.target.value)} className="w-full bg-slate-50 px-5 py-3.5 rounded-xl text-xs font-bold text-primary outline-none" />
+                    </div>
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Main Headline</label>
+                       <input type="text" value={data.galleryPage?.header?.title || ""} onChange={(e) => updateHeader("title", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-xl font-bold outline-none" />
+                    </div>
+                    <div className="space-y-3">
+                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Intro Description</label>
+                       <textarea value={data.galleryPage?.header?.description || ""} onChange={(e) => updateHeader("description", e.target.value)} rows={4} className="w-full bg-slate-50 px-5 py-4 rounded-2xl text-sm text-slate-500 outline-none leading-relaxed" />
+                    </div>
                  </div>
               </div>
             )}
 
-            {/* PROJECTS SECTION */}
+             {/* PROJECTS SECTION */}
             {activeTab === "projects" && (
               <div className="space-y-8">
-                 <div className="grid grid-cols-1 gap-8">
-                    {(data.portfolio?.projects || []).map((project: any, i: number) => (
-                      <div key={i} className="bg-slate-50/30 rounded-3xl p-8 border border-slate-100 space-y-8">
-                        <div className="flex justify-between items-center text-[9px] font-medium text-slate-300 uppercase tracking-widest">
-                           <span>Project Showcase #{i+1}</span>
-                           <button onClick={() => {
-                              const newP = data.portfolio.projects.filter((_: any, idx: number) => idx !== i);
-                              updatePortfolio("projects", null, newP);
-                           }} className="hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-10">
-                           <div className="space-y-6">
-                              <div className="space-y-2">
-                                 <label className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Project Title</label>
-                                 <input type="text" value={project.title} onChange={(e) => {
-                                   const newP = [...data.portfolio.projects];
-                                   newP[i].title = e.target.value;
-                                   updatePortfolio("projects", null, newP);
-                                 }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-sm outline-none focus:border-primary/30" />
-                              </div>
-                              <div className="grid grid-cols-2 gap-4">
-                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Category</label>
-                                    <input type="text" value={project.category} onChange={(e) => {
-                                      const newP = [...data.portfolio.projects];
-                                      newP[i].category = e.target.value;
-                                      updatePortfolio("projects", null, newP);
-                                    }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-[10px] outline-none" />
-                                 </div>
-                                 <div className="space-y-2">
-                                    <label className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Location</label>
-                                    <input type="text" value={project.location} onChange={(e) => {
-                                      const newP = [...data.portfolio.projects];
-                                      newP[i].location = e.target.value;
-                                      updatePortfolio("projects", null, newP);
-                                    }} className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-[10px] outline-none" />
-                                 </div>
-                              </div>
-                           </div>
-                           <div>
-                              <ImageUpload 
-                                label="Featured Image" 
-                                value={project.image} 
-                                onChange={(url: string) => {
-                                  const newP = [...data.portfolio.projects];
-                                  newP[i].image = url;
-                                  updatePortfolio("projects", null, newP);
-                                }} 
-                              />
-                           </div>
-                        </div>
-
-                        <div className="space-y-2">
-                           <label className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">Project Description</label>
-                           <textarea 
-                             value={project.desc} 
-                             onChange={(e) => {
-                               const newP = [...data.portfolio.projects];
-                               newP[i].desc = e.target.value;
-                               updatePortfolio("projects", null, newP);
-                             }}
-                             rows={3}
-                             className="w-full bg-white border border-slate-200 rounded-xl px-5 py-4 text-xs text-slate-500 outline-none focus:border-primary/30"
-                             placeholder="Describe the scope of work..."
-                           />
-                        </div>
-                      </div>
-                    ))}
-                    <button 
-                      onClick={() => updatePortfolio("projects", null, [...(data.portfolio?.projects || []), { title: "New Project", category: "Remodeling", location: "O'Fallon, MO", year: "2024", scope: "Full Exterior", desc: "", image: "" }])}
-                      className="w-full border border-dashed border-slate-200 rounded-3xl py-10 text-[10px] font-medium text-slate-300 hover:text-primary hover:border-primary/30 transition-all uppercase tracking-widest"
-                    >
-                      + Add New Gallery Showcase
-                    </button>
-                 </div>
+                 <ContentSelector 
+                    type="projects" 
+                    label="Showcase Portfolio (Select from Inventory)" 
+                    selectedItems={data.portfolio?.projects || []} 
+                    onSelect={(items) => updateProjects(items)} 
+                 />
               </div>
             )}
 

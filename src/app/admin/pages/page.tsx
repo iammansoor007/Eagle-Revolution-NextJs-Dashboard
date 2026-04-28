@@ -137,28 +137,28 @@ export default function PagesDashboard() {
       {/* Header Area */}
       <div className="flex flex-wrap items-center justify-between gap-10 mb-16 px-4">
         <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">
+          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-600 uppercase tracking-[0.2em]">
             <Link href="/admin" className="hover:text-primary transition-colors">Dashboard</Link>
             <ChevronRight className="w-3 h-3" />
             <span className="text-slate-900">System Inventory</span>
           </div>
-          <h1 className="text-4xl font-medium text-slate-900 tracking-tight">Website Pages</h1>
+          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">Website Pages</h1>
         </div>
 
         <div className="flex items-center gap-6">
           <div className="relative w-80">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
             <input 
               type="text" 
               placeholder="Search by name or slug..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-xs font-medium outline-none focus:border-primary/30 transition-all shadow-sm"
+              className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-[11px] font-medium outline-none focus:border-primary/30 transition-all shadow-sm"
             />
           </div>
           <button 
             onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-3 bg-primary text-white px-10 py-4 rounded-2xl text-sm font-medium hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-95"
+            className="flex items-center gap-3 bg-primary text-white px-10 py-4 rounded-2xl text-xs font-medium hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-95"
           >
             <Plus className="w-4 h-4" />
             New Page
@@ -176,11 +176,11 @@ export default function PagesDashboard() {
             <div className="flex items-center gap-6">
               <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full">
                  <span className="text-[10px] font-medium text-primary uppercase tracking-widest">{selectedIds.length}</span>
-                 <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Selected</span>
+                 <span className="text-[10px] font-medium text-slate-800 uppercase tracking-widest">Selected</span>
               </div>
               <button 
                 onClick={() => setSelectedIds([])}
-                className="text-[10px] font-medium text-slate-300 hover:text-slate-900 uppercase tracking-widest transition-colors"
+                className="text-[10px] font-medium text-slate-600 hover:text-slate-900 uppercase tracking-widest transition-colors"
               >
                 Clear All
               </button>
@@ -228,32 +228,32 @@ export default function PagesDashboard() {
 
               <div className="flex-1">
                 <div className="flex items-center gap-4 mb-3">
-                  <h3 className="text-2xl font-medium text-slate-900 tracking-tight group-hover:text-primary transition-colors">{page.title}</h3>
-                  <span className="text-[10px] font-medium text-slate-300 uppercase tracking-[0.2em] bg-slate-50/50 px-3 py-1 rounded-full border border-slate-50">
+                  <h3 className="text-lg font-medium text-slate-900 tracking-tight group-hover:text-primary transition-colors">{page.title}</h3>
+                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em] bg-slate-50/50 px-3 py-1 rounded-full border border-slate-100">
                     /{page.slug}
                   </span>
                 </div>
                 
                 {/* Refined Actions Row */}
                 <div className="flex items-center gap-4 text-[10px] font-medium uppercase tracking-[0.15em]">
-                  <Link href={`/admin/pages/${page._id}`} className="text-primary/70 hover:text-primary transition-all">
+                  <Link href={`/admin/pages/${page._id}`} className="text-primary/70 hover:text-primary transition-all text-[9px]">
                     Edit
                   </Link>
-                  <span className="text-slate-200">•</span>
-                  <Link href={`/${page.slug}`} target="_blank" className="text-slate-400 hover:text-slate-900 transition-all">
+                  <span className="text-slate-300">•</span>
+                  <Link href={`/${page.slug}`} target="_blank" className="text-slate-600 hover:text-slate-900 transition-all text-[9px]">
                     Preview
                   </Link>
-                  <span className="text-slate-200">•</span>
+                  <span className="text-slate-300">•</span>
                   <button 
                     onClick={(e) => handleIndividualAction(e, 'duplicate', page._id)}
-                    className="text-slate-400 hover:text-slate-900 transition-all"
+                    className="text-slate-600 hover:text-slate-900 transition-all text-[9px]"
                   >
                     Duplicate
                   </button>
-                  <span className="text-slate-200">•</span>
+                  <span className="text-slate-300">•</span>
                   <button 
                     onClick={(e) => handleIndividualAction(e, 'delete', page._id)}
-                    className="text-slate-400 hover:text-red-500 transition-all"
+                    className="text-slate-600 hover:text-red-500 transition-all text-[9px]"
                   >
                     Delete
                   </button>
@@ -261,7 +261,7 @@ export default function PagesDashboard() {
               </div>
               
               <div className="text-right shrink-0">
-                 <div className="text-[10px] font-medium text-slate-300 uppercase tracking-widest bg-slate-50/50 px-4 py-1.5 rounded-xl border border-slate-50">
+                 <div className="text-[9px] font-bold text-slate-700 uppercase tracking-widest bg-slate-50 px-4 py-1.5 rounded-xl border border-slate-100">
                     {page.template}
                  </div>
               </div>
@@ -271,8 +271,8 @@ export default function PagesDashboard() {
                <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-slate-50">
                  <Search className="w-10 h-10 text-slate-200" />
                </div>
-               <h2 className="text-xl font-medium text-slate-900 mb-2">No matching pages found</h2>
-               <p className="text-sm text-slate-400 max-w-sm mx-auto">Try refining your search keywords or create a new page to expand your inventory.</p>
+               <h2 className="text-lg font-medium text-slate-900 mb-2">No matching pages found</h2>
+               <p className="text-xs text-slate-400 max-w-sm mx-auto">Try refining your search keywords or create a new page to expand your inventory.</p>
             </div>
           )}
         </div>
@@ -345,6 +345,7 @@ export default function PagesDashboard() {
                       <option value="contact">Inquiry Portal</option>
                       <option value="careers">Careers Hub</option>
                       <option value="service-detail">Specific Service</option>
+                      <option value="settings">Global Settings</option>
                     </select>
                     <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 rotate-90 pointer-events-none" />
                   </div>

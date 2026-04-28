@@ -305,7 +305,7 @@ const Services = () => {
   const imageScale = useTransform(smoothProgress, [0, 0.1], [1.15, 1]);
   const overlayOpacity = useTransform(smoothProgress, [0, 0.08], [0.5, 0.1]);
 
-  const { badge, headline, description, stats, cta } = servicesData;
+  const { badge, headline = { prefix: '', highlight: '', suffix: '' }, description = [], stats = [], cta = { title: '', description: '', buttonText: '', buttonLink: '/' } } = servicesData;
   
   const servicesListRaw = (servicesData as any).services || [];
   const servicesList = servicesListRaw.map((s: any, idx: number) => ({
