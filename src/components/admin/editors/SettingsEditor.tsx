@@ -73,6 +73,20 @@ const ImageUpload = ({ label, value, onChange }: any) => {
 
 export default function SettingsEditor({ pageId, data, setData }: { pageId: string, data: any, setData: (d: any) => void }) {
   const [activeTab, setActiveTab] = useState("branding");
+  const [publishedPages, setPublishedPages] = useState<any[]>([]);
+
+  useEffect(() => {
+    const fetchPages = async () => {
+      try {
+        const res = await fetch("/api/admin/pages");
+        const pages = await res.json();
+        setPublishedPages(pages.filter((p: any) => p.status === "published"));
+      } catch (err) {
+        console.error("Failed to fetch pages:", err);
+      }
+    };
+    fetchPages();
+  }, []);
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
@@ -117,7 +131,7 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
   const activeTabTitle = tabs.find(t => t.id === activeTab)?.title;
 
   return (
-    <div className="bg-white min-h-[700px] flex flex-col">
+    <div className="bg-white">
       {/* Tab Navigation */}
       <div className="border-b border-slate-100 bg-white sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-1 p-4 overflow-x-auto no-scrollbar scroll-smooth">
@@ -138,7 +152,7 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
         </div>
       </div>
 
-      <div className="flex-1 p-10 overflow-y-auto max-h-[850px] custom-scrollbar bg-[#F8FAFC]">
+      <div className="p-10 bg-[#F8FAFC]">
         <div className="mb-12 pb-8 border-b border-slate-200">
            <h2 className="text-3xl font-medium text-slate-900 tracking-tight">{activeTabTitle}</h2>
            <p className="text-sm text-slate-400 mt-2 font-medium">Manage global configuration, navigation, and brand consistency across the entire site.</p>
@@ -181,8 +195,21 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
                           <input type="text" value={data.navbar?.ctaText || ""} onChange={(e) => updateNested(["navbar", "ctaText"], e.target.value)} className={UI.inputPrimary} />
                        </div>
                        <div className="space-y-2">
-                          <label className={UI.label}>Navbar CTA Link</label>
-                          <input type="text" value={data.navbar?.ctaLink || ""} onChange={(e) => updateNested(["navbar", "ctaLink"], e.target.value)} className={UI.input} />
+                          <label className={UI.label}>Navbar CTA Link (Published Only)</label>
+                          <div className="relative">
+                             <select 
+                               value={data.navbar?.ctaLink || ""} 
+                               onChange={(e) => updateNested(["navbar", "ctaLink"], e.target.value)} 
+                               className={UI.input + " appearance-none cursor-pointer font-medium"}
+                             >
+                                <option value="/contact">Contact Portal (Default)</option>
+                                <option value="/gallery">Gallery Portfolio</option>
+                                {publishedPages.map(p => (
+                                  <option key={p._id} value={`/${p.slug}`}>{p.title}</option>
+                                ))}
+                             </select>
+                             <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 rotate-90 pointer-events-none" />
+                          </div>
                        </div>
                     </div>
                  </div>
@@ -201,10 +228,29 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
                                      }} className={UI.input + " font-bold"} placeholder="Link Label" />
                                   </div>
                                   <div className="space-y-2">
-                                     <label className={UI.label}>URL Path</label>
-                                     <input type="text" value={link.href} onChange={(e) => {
-                                       const newL = [...data.navbar.companyLinks]; newL[i].href = e.target.value; updateNested(["navbar", "companyLinks"], newL);
-                                     }} className={UI.input} placeholder="URL Path" />
+                                     <label className={UI.label}>URL Path (Published Only)</label>
+                                     <div className="relative">
+                                        <select 
+                                          value={link.href} 
+                                          onChange={(e) => {
+                                            const newL = [...data.navbar.companyLinks]; 
+                                            newL[i].href = e.target.value; 
+                                            updateNested(["navbar", "companyLinks"], newL);
+                                          }} 
+                                          className={UI.input + " appearance-none cursor-pointer font-medium"}
+                                        >
+                                           <option value="/">Home Page</option>
+                                           <option value="/services">Services</option>
+                                           <option value="/gallery">Gallery</option>
+                                           <option value="/contact">Contact</option>
+                                           <optgroup label="Custom Published Pages">
+                                              {publishedPages.map(p => (
+                                                <option key={p._id} value={`/${p.slug}`}>{p.title}</option>
+                                              ))}
+                                           </optgroup>
+                                        </select>
+                                        <ChevronRight className="absolute right-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 rotate-90 pointer-events-none" />
+                                     </div>
                                   </div>
                                </div>
                                <button onClick={() => {
@@ -219,9 +265,23 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
                                        <input type="text" value={sub.label} onChange={(e) => {
                                          const newL = [...data.navbar.companyLinks]; newL[i].subLinks[j].label = e.target.value; updateNested(["navbar", "companyLinks"], newL);
                                        }} className={UI.input + " py-2 text-xs"} placeholder="Sub-link Label" />
-                                       <input type="text" value={sub.href} onChange={(e) => {
-                                         const newL = [...data.navbar.companyLinks]; newL[i].subLinks[j].href = e.target.value; updateNested(["navbar", "companyLinks"], newL);
-                                       }} className={UI.input + " py-2 text-xs"} placeholder="Sub-link Path" />
+                                       <div className="relative">
+                                          <select 
+                                            value={sub.href} 
+                                            onChange={(e) => {
+                                              const newL = [...data.navbar.companyLinks]; 
+                                              newL[i].subLinks[j].href = e.target.value; 
+                                              updateNested(["navbar", "companyLinks"], newL);
+                                            }} 
+                                            className={UI.input + " py-2 text-xs appearance-none cursor-pointer"}
+                                          >
+                                             <option value="/">Home</option>
+                                             {publishedPages.map(p => (
+                                               <option key={p._id} value={`/${p.slug}`}>{p.title}</option>
+                                             ))}
+                                          </select>
+                                          <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-300 rotate-90 pointer-events-none" />
+                                       </div>
                                     </div>
                                     <button onClick={() => {
                                       const newL = [...data.navbar.companyLinks]; newL[i].subLinks = link.subLinks.filter((_: any, idx: number) => idx !== j); updateNested(["navbar", "companyLinks"], newL);
@@ -289,18 +349,34 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
                              <label className={UI.label}>Secondary Bar Links</label>
                              <div className="grid grid-cols-1 gap-3">
                                 {(data.footer?.bottom?.links || []).map((link: any, idx: number) => (
-                                  <div key={idx} className="flex gap-2 group">
-                                     <input type="text" value={link.label} onChange={(e) => {
-                                        const newL = [...data.footer.bottom.links]; newL[idx].label = e.target.value; updateNested(["footer", "bottom", "links"], newL);
-                                     }} className={UI.input + " py-2 text-xs"} placeholder="Label" />
-                                     <input type="text" value={link.href} onChange={(e) => {
-                                        const newL = [...data.footer.bottom.links]; newL[idx].href = e.target.value; updateNested(["footer", "bottom", "links"], newL);
-                                     }} className={UI.input + " py-2 text-xs"} placeholder="URL" />
-                                     <button onClick={() => {
-                                        const newL = data.footer.bottom.links.filter((_: any, i: number) => i !== idx); updateNested(["footer", "bottom", "links"], newL);
-                                     }} className="text-slate-200 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><X className="w-4 h-4" /></button>
-                                  </div>
-                                ))}
+                                   <div key={idx} className="flex gap-2 group">
+                                      <input type="text" value={link.label} onChange={(e) => {
+                                         const newL = [...data.footer.bottom.links]; newL[idx].label = e.target.value; updateNested(["footer", "bottom", "links"], newL);
+                                      }} className={UI.input + " py-2 text-xs"} placeholder="Label" />
+                                      <div className="relative flex-1">
+                                         <select 
+                                           value={link.href} 
+                                           onChange={(e) => {
+                                              const newL = [...data.footer.bottom.links]; newL[idx].href = e.target.value; updateNested(["footer", "bottom", "links"], newL);
+                                           }} 
+                                           className={UI.input + " py-2 text-xs appearance-none cursor-pointer font-medium"}
+                                         >
+                                            <option value="/">Home</option>
+                                            <option value="/privacy">Privacy Policy</option>
+                                            <option value="/terms">Terms of Service</option>
+                                            <optgroup label="Published Content">
+                                              {publishedPages.map(p => (
+                                                <option key={p._id} value={`/${p.slug}`}>{p.title}</option>
+                                              ))}
+                                            </optgroup>
+                                         </select>
+                                         <ChevronRight className="absolute right-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-300 rotate-90 pointer-events-none" />
+                                      </div>
+                                      <button onClick={() => {
+                                         const newL = data.footer.bottom.links.filter((_: any, i: number) => i !== idx); updateNested(["footer", "bottom", "links"], newL);
+                                      }} className="text-slate-200 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all"><X className="w-4 h-4" /></button>
+                                   </div>
+                                 ))}
                                 <button onClick={() => updateNested(["footer", "bottom", "links"], [...(data.footer?.bottom?.links || []), { label: "Legal", href: "/legal" }])} className="text-[10px] font-bold text-primary uppercase tracking-widest hover:underline transition-all">+ Add Legal Link</button>
                              </div>
                           </div>

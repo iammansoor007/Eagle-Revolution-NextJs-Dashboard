@@ -115,7 +115,7 @@ export default function ServiceDetailEditor({ pageId, data, setData }: { pageId:
   const activeTabTitle = tabs.find(t => t.id === activeTab)?.title;
 
   return (
-    <div className="bg-white min-h-[700px] flex flex-col">
+    <div className="bg-white">
       {/* Tab Navigation */}
       <div className="border-b border-slate-100 bg-white sticky top-0 z-10 shadow-sm">
         <div className="flex items-center gap-1 p-4 overflow-x-auto no-scrollbar scroll-smooth">
@@ -136,7 +136,7 @@ export default function ServiceDetailEditor({ pageId, data, setData }: { pageId:
         </div>
       </div>
 
-      <div className="flex-1 p-10 overflow-y-auto max-h-[850px] custom-scrollbar bg-[#F8FAFC]">
+      <div className="p-10 bg-[#F8FAFC]">
         <div className="mb-12 pb-8 border-b border-slate-200">
            <h2 className="text-3xl font-medium text-slate-900 tracking-tight">{activeTabTitle}</h2>
            <p className="text-sm text-slate-400 mt-2 font-medium">Fully configure this individual service detail page.</p>

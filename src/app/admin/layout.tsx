@@ -156,7 +156,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
         </div>
 
         {/* Page content */}
-        <main className="flex-1 overflow-y-auto relative p-6 sm:p-8 lg:p-10 custom-scrollbar">
+        <main className="flex-1 overflow-y-auto relative custom-scrollbar">
           <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
