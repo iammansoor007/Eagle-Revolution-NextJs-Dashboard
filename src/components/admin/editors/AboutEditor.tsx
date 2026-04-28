@@ -11,66 +11,10 @@ import {
 
 import ContentSelector from "@/components/admin/ContentSelector";
 import IconSelector from "@/components/admin/IconSelector";
+import ImageField from "@/components/admin/ImageField";
 
 import { UI } from "./styles";
 
-// Shared Reusable Image Upload Component
-const ImageUpload = ({ label, value, onChange, description }: any) => {
-  const [uploading, setUploading] = useState(false);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const { url } = await res.json();
-        onChange(url);
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <label className={UI.label}>{label}</label>
-      <div className="group relative">
-        <div className="aspect-video w-full bg-slate-50/50 border border-slate-200 rounded-2xl overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/30">
-          {value ? (
-            <>
-              <img src={value} alt="Preview" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                <label className="cursor-pointer bg-primary text-white px-5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-widest hover:scale-105 transition-all">
-                  Update Photo
-                  <input type="file" className="hidden" onChange={handleUpload} accept="image/*" />
-                </label>
-                <button onClick={() => onChange("")} className="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition-all">
-                  Remove
-                </button>
-              </div>
-            </>
-          ) : (
-            <label className="flex flex-col items-center gap-3 cursor-pointer">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
-                {uploading ? <Loader2 className="w-5 h-5 animate-spin text-primary" /> : <Upload className="w-5 h-5 text-slate-300" />}
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] font-medium text-slate-400">Click to upload media</p>
-              </div>
-              <input type="file" className="hidden" onChange={handleUpload} accept="image/*" />
-            </label>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function AboutEditor({ pageId, data, setData }: { pageId: string, data: any, setData: (d: any) => void }) {
   const [activeTab, setActiveTab] = useState("hero");
@@ -233,7 +177,7 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                   </div>
 
                   <div className="col-span-4 space-y-10">
-                    <ImageUpload label="Hero Background Cinematic" value={data.aboutPage?.hero?.bgImage} onChange={(url: string) => updateAbout("hero", "bgImage", url)} />
+                    <ImageField label="Hero Background Cinematic" value={data.aboutPage?.hero?.bgImage || ""} onChange={(url: string) => updateAbout("hero", "bgImage", url)} altValue={data.aboutPage?.hero?.bgImageAlt || ""} onAltChange={(alt: string) => updateAbout("hero", "bgImageAlt", alt)} />
                     <div className="space-y-3">
                        <label className={UI.label}>Trust Label</label>
                        <input type="text" value={data.aboutPage?.hero?.trustLabel || ""} onChange={(e) => updateAbout("hero", "trustLabel", e.target.value)} className={UI.input} placeholder="Highly Rated on Google" />
@@ -347,7 +291,7 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
 
                     <div className="col-span-5 space-y-10">
                        <div className="space-y-6">
-                          <ImageUpload label="Founder Portrait" value={data.aboutPage?.story?.portrait?.image} onChange={(url: string) => updateAbout("story", "portrait", { ...data.aboutPage.story.portrait, image: url })} />
+                           <ImageField label="Founder Portrait" value={data.aboutPage?.story?.portrait?.image || ""} onChange={(url: string) => updateAbout("story", "portrait", { ...(data.aboutPage?.story?.portrait || {}), image: url })} altValue={data.aboutPage?.story?.portrait?.imageAlt || ""} onAltChange={(alt: string) => updateAbout("story", "portrait", { ...(data.aboutPage?.story?.portrait || {}), imageAlt: alt })} />
                           <div className="grid grid-cols-2 gap-4">
                              <div className="space-y-2">
                                <label className={UI.label}>Badge Left</label>

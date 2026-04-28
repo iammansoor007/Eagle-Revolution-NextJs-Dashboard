@@ -12,64 +12,8 @@ import {
 } from "lucide-react";
 import { UI } from "./styles";
 import IconSelector from "@/components/admin/IconSelector";
+import ImageField from "@/components/admin/ImageField";
 
-// Shared Reusable Image Upload Component
-const ImageUpload = ({ label, value, onChange }: any) => {
-  const [uploading, setUploading] = useState(false);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-    try {
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const { url } = await res.json();
-        onChange(url);
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-3">
-      <label className={UI.label}>{label}</label>
-      <div className="group relative">
-        <div className="aspect-video w-full bg-slate-50/50 border border-slate-200 rounded-2xl overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/30">
-          {value ? (
-            <>
-              <img src={value} alt="Preview" className="w-full h-full object-cover" />
-              <div className="absolute inset-0 bg-white/60 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-4">
-                <label className="cursor-pointer bg-primary text-white px-5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-widest hover:scale-105 transition-all">
-                  Update
-                  <input type="file" className="hidden" onChange={handleUpload} accept="image/*" />
-                </label>
-                <button onClick={() => onChange("")} className="bg-white border border-slate-200 text-slate-600 px-5 py-2 rounded-lg text-[10px] font-medium uppercase tracking-widest hover:bg-red-50 hover:text-red-600 transition-all">
-                  Remove
-                </button>
-              </div>
-            </>
-          ) : (
-            <label className="flex flex-col items-center gap-3 cursor-pointer">
-              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center shadow-sm border border-slate-100">
-                {uploading ? <Loader2 className="w-5 h-5 animate-spin text-primary" /> : <Upload className="w-5 h-5 text-slate-300" />}
-              </div>
-              <div className="text-center">
-                <p className="text-[10px] font-medium text-slate-400">Click to upload media</p>
-              </div>
-              <input type="file" className="hidden" onChange={handleUpload} accept="image/*" />
-            </label>
-          )}
-        </div>
-      </div>
-    </div>
-  );
-};
 
 export default function SettingsEditor({ pageId, data, setData }: { pageId: string, data: any, setData: (d: any) => void }) {
   const [activeTab, setActiveTab] = useState("branding");
@@ -178,8 +122,8 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
                     </div>
                  </div>
                  <div className="col-span-5 space-y-10">
-                    <ImageUpload label="Global Favicon / Icon" value={data.settings?.favicon} onChange={(url: string) => updateNested(["settings", "favicon"], url)} />
-                    <ImageUpload label="Primary Header Logo" value={data.navbar?.logo} onChange={(url: string) => updateNested(["navbar", "logo"], url)} />
+                     <ImageField label="Global Favicon / Icon" value={data.settings?.favicon || ""} onChange={(url: string) => updateNested(["settings", "favicon"], url)} />
+                     <ImageField label="Primary Header Logo" value={data.navbar?.logo || ""} onChange={(url: string) => updateNested(["navbar", "logo"], url)} />
                  </div>
               </div>
             )}
@@ -315,7 +259,7 @@ export default function SettingsEditor({ pageId, data, setData }: { pageId: stri
                              <label className={UI.label}>Footer Narrative</label>
                              <textarea value={data.footer?.company?.description || ""} onChange={(e) => updateNested(["footer", "company", "description"], e.target.value)} rows={3} className={UI.textarea} />
                           </div>
-                          <ImageUpload label="Footer Specific Logo" value={data.footer?.company?.logo} onChange={(url: string) => updateNested(["footer", "company", "logo"], url)} />
+                           <ImageField label="Footer Specific Logo" value={data.footer?.company?.logo || ""} onChange={(url: string) => updateNested(["footer", "company", "logo"], url)} />
                        </div>
                     </div>
 

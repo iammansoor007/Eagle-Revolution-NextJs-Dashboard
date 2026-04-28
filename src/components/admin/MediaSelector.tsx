@@ -4,8 +4,7 @@ import { useState, useEffect, useRef } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   X, Search, Upload, Check, Loader2, 
-  Image as ImageIcon, Grid, List, Plus, 
-  ExternalLink, ChevronRight, Info
+  Image as ImageIcon, Plus, Info
 } from "lucide-react";
 
 interface MediaSelectorProps {
@@ -70,180 +69,188 @@ export default function MediaSelector({ onSelect, onClose, title = "Select Asset
   );
 
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center p-6 sm:p-12">
+    <div className="fixed inset-0 z-[200] flex items-center justify-center p-4 sm:p-8">
+      {/* Backdrop */}
       <motion.div 
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
         className="absolute inset-0 bg-slate-900/60 backdrop-blur-xl"
       />
+
+      {/* Modal */}
       <motion.div 
-        initial={{ scale: 0.95, opacity: 0, y: 20 }} 
+        initial={{ scale: 0.96, opacity: 0, y: 16 }} 
         animate={{ scale: 1, opacity: 1, y: 0 }} 
-        exit={{ scale: 0.95, opacity: 0, y: 20 }}
-        className="relative w-full max-w-6xl h-[85vh] bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-white/20 flex flex-col"
+        exit={{ scale: 0.96, opacity: 0, y: 16 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+        className="relative w-full max-w-5xl h-[82vh] bg-white rounded-2xl shadow-2xl overflow-hidden flex flex-col"
       >
-        {/* Header */}
-        <div className="bg-slate-50/80 px-12 py-8 border-b border-slate-100 flex justify-between items-center shrink-0">
-          <div className="flex items-center gap-6">
-             <div className="w-12 h-12 rounded-2xl bg-primary flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                <ImageIcon className="w-6 h-6" />
-             </div>
-             <div>
-                <h2 className="text-xl font-bold text-slate-900 tracking-tight">{title}</h2>
-                <div className="flex items-center gap-2 mt-0.5">
-                   {['library', 'upload'].map((tab) => (
-                     <button 
-                       key={tab}
-                       onClick={() => setActiveTab(tab as any)}
-                       className={`text-[9px] font-bold uppercase tracking-[0.2em] transition-all px-3 py-1 rounded-full ${
-                         activeTab === tab ? "bg-primary text-white shadow-sm" : "text-slate-400 hover:text-slate-600"
-                       }`}
-                     >
-                       {tab === 'library' ? 'Media Library' : 'Direct Upload'}
-                     </button>
-                   ))}
-                </div>
-             </div>
+        {/* ── Compact Toolbar ── */}
+        <div className="flex items-center gap-3 px-5 py-3 border-b border-slate-100 bg-slate-50/60 shrink-0">
+          {/* Icon + Title + Tabs */}
+          <div className="w-7 h-7 rounded-lg bg-primary flex items-center justify-center text-white shrink-0">
+            <ImageIcon className="w-3.5 h-3.5" />
           </div>
-          <button onClick={onClose} className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-all">
-            <X className="w-5 h-5" />
+          <span className="text-xs font-bold text-slate-900 tracking-tight shrink-0">{title}</span>
+
+          {/* Tab Pills */}
+          <div className="flex items-center gap-1 shrink-0">
+            {(['library', 'upload'] as const).map((tab) => (
+              <button
+                key={tab}
+                onClick={() => setActiveTab(tab)}
+                className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-1 rounded-lg transition-all ${
+                  activeTab === tab
+                    ? "bg-primary text-white"
+                    : "text-slate-400 hover:text-slate-600 hover:bg-slate-100"
+                }`}
+              >
+                {tab === 'library' ? 'Library' : 'Upload New'}
+              </button>
+            ))}
+          </div>
+
+          {/* Search — grows to fill available space */}
+          {activeTab === 'library' && (
+            <div className="relative flex-1 min-w-0">
+              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-3 h-3 text-slate-400" />
+              <input
+                type="text"
+                placeholder="Search assets…"
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full bg-white border border-slate-200 rounded-lg pl-8 pr-3 py-1.5 text-[11px] font-medium outline-none focus:border-primary/40 transition-all"
+              />
+            </div>
+          )}
+          {activeTab !== 'library' && <div className="flex-1" />}
+
+          {/* Asset count badge */}
+          {activeTab === 'library' && (
+            <span className="text-[10px] font-bold text-slate-400 whitespace-nowrap shrink-0">
+              {filteredMedia.length} assets
+            </span>
+          )}
+
+          {/* Close */}
+          <button
+            onClick={onClose}
+            className="w-7 h-7 rounded-lg bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:border-slate-300 transition-all shrink-0"
+          >
+            <X className="w-3.5 h-3.5" />
           </button>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 overflow-hidden flex flex-col">
-           {activeTab === 'library' ? (
-             <>
-               {/* Search Bar */}
-               <div className="px-12 py-6 bg-white border-b border-slate-50 flex items-center gap-6 shrink-0">
-                  <div className="relative flex-1">
-                    <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-                    <input 
-                      type="text" 
-                      placeholder="Search existing media assets..."
-                      value={search}
-                      onChange={(e) => setSearch(e.target.value)}
-                      className="w-full bg-slate-50/50 border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-[11px] font-medium outline-none focus:bg-white focus:border-primary/20 transition-all"
-                    />
-                  </div>
-                  <div className="flex items-center gap-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest whitespace-nowrap">
-                     <span className="text-slate-900">{filteredMedia.length}</span> Assets Available
-                  </div>
-               </div>
-
-               {/* Grid */}
-               <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
-                  {loading ? (
-                    <div className="flex flex-col items-center justify-center h-full gap-4">
-                       <Loader2 className="w-10 h-10 animate-spin text-primary/30" />
-                       <p className="text-[10px] font-bold text-slate-300 uppercase tracking-[0.3em]">Connecting to Vault</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-3 gap-8">
-                       {filteredMedia.map((item) => (
-                         <motion.div 
-                           key={item._id}
-                           whileHover={{ y: -6, scale: 1.02 }}
-                           onClick={() => onSelect(item)}
-                           onDoubleClick={() => {
-                             onSelect(item);
-                             onClose();
-                           }}
-                           className="group relative aspect-square rounded-[1.5rem] overflow-hidden bg-white border border-slate-100 cursor-pointer hover:shadow-xl hover:shadow-slate-200 hover:border-primary/40 transition-all"
-                         >
-                            <div className="absolute inset-0 p-1.5">
-                              <div className="w-full h-full rounded-2xl overflow-hidden relative">
-                                <img src={item.url} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110" />
-                                <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/10 transition-colors" />
-                              </div>
-                            </div>
-                            
-                            {/* Modern Overlay */}
-                            <div className="absolute inset-0 bg-gradient-to-t from-slate-950/60 to-transparent opacity-0 group-hover:opacity-100 transition-all flex items-end justify-center p-3 backdrop-blur-[1px]">
-                               <div className="bg-white w-full py-2 rounded-xl text-[8px] font-black uppercase tracking-widest text-primary shadow-xl text-center flex items-center justify-center gap-2">
-                                  <Check className="w-3 h-3" />
-                                  Select Asset
-                               </div>
-                            </div>
-
-                            {/* Info Tag */}
-                            <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-md px-2 py-1 rounded-lg border border-white/20 opacity-0 group-hover:opacity-100 transition-opacity">
-                               <p className="text-[7px] font-black text-slate-900 truncate max-w-[80px] uppercase tracking-widest">{item.name}</p>
-                            </div>
-
-                            {/* SEO Checkmark */}
-                            {item.alt && (
-                              <div className="absolute top-3 right-3 bg-emerald-500 text-white p-1 rounded-full shadow-lg opacity-0 group-hover:opacity-100 transition-opacity">
-                                <Check className="w-2 h-2" />
-                              </div>
-                            )}
-                         </motion.div>
-                       ))}
-                       {filteredMedia.length === 0 && (
-                         <div className="col-span-full py-20 text-center">
-                            <ImageIcon className="w-12 h-12 text-slate-100 mx-auto mb-4" />
-                            <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">No matching assets found</p>
-                         </div>
-                       )}
-                    </div>
-                  )}
-               </div>
-             </>
-           ) : (
-             <div className="flex-1 flex items-center justify-center p-12">
-                <div 
-                  onClick={() => !uploading && fileInputRef.current?.click()}
-                  className={`w-full max-w-2xl aspect-[16/9] rounded-[3rem] border-4 border-dashed border-slate-100 flex flex-col items-center justify-center gap-8 transition-all hover:border-primary/20 hover:bg-slate-50/50 cursor-pointer group ${uploading ? 'pointer-events-none' : ''}`}
-                >
-                   <input 
-                     type="file" 
-                     accept="image/*" 
-                     className="hidden" 
-                     ref={fileInputRef} 
-                     onChange={handleDirectUpload}
-                   />
-                   
-                   {uploading ? (
-                     <div className="flex flex-col items-center gap-6">
-                        <Loader2 className="w-16 h-16 animate-spin text-primary" />
-                        <div className="text-center">
-                           <p className="text-lg font-bold text-slate-900 tracking-tight">Uploading to Library</p>
-                           <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Processing file & generating SEO records</p>
-                        </div>
-                     </div>
-                   ) : (
-                     <>
-                        <div className="w-24 h-24 rounded-[2.5rem] bg-slate-50 border border-slate-100 flex items-center justify-center text-slate-300 group-hover:scale-110 group-hover:bg-white group-hover:text-primary transition-all duration-500 shadow-sm">
-                           <Plus className="w-10 h-10" />
-                        </div>
-                        <div className="text-center">
-                           <h3 className="text-2xl font-bold text-slate-900 tracking-tight mb-2">Drop your image here</h3>
-                           <p className="text-sm font-medium text-slate-400">Click to browse your system files for direct upload</p>
-                        </div>
-                        <div className="flex items-center gap-3">
-                           <div className="px-5 py-2 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">PNG</div>
-                           <div className="px-5 py-2 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">JPG</div>
-                           <div className="px-5 py-2 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-bold text-slate-400 uppercase tracking-widest">WEBP</div>
-                        </div>
-                     </>
-                   )}
+        {/* ── Content ── */}
+        <div className="flex-1 overflow-hidden">
+          {activeTab === 'library' ? (
+            <div className="h-full overflow-y-auto p-4">
+              {loading ? (
+                <div className="flex flex-col items-center justify-center h-full gap-3">
+                  <Loader2 className="w-8 h-8 animate-spin text-primary/30" />
+                  <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">Loading Assets…</p>
                 </div>
-             </div>
-           )}
+              ) : filteredMedia.length === 0 ? (
+                <div className="flex flex-col items-center justify-center h-full gap-3">
+                  <ImageIcon className="w-10 h-10 text-slate-100" />
+                  <p className="text-[10px] font-bold text-slate-300 uppercase tracking-widest">No matching assets</p>
+                  <button
+                    onClick={() => setActiveTab('upload')}
+                    className="mt-1 text-[10px] font-bold text-primary uppercase tracking-widest hover:underline"
+                  >
+                    Upload New →
+                  </button>
+                </div>
+              ) : (
+                <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3">
+                  {filteredMedia.map((item) => (
+                    <motion.div
+                      key={item._id}
+                      whileHover={{ y: -3, scale: 1.02 }}
+                      onClick={() => { onSelect(item); onClose(); }}
+                      className="group relative aspect-square rounded-xl overflow-hidden bg-slate-50 border border-slate-100 cursor-pointer hover:shadow-lg hover:border-primary/30 transition-all"
+                    >
+                      <img
+                        src={item.url}
+                        alt={item.alt || item.name}
+                        className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                      />
+
+                      {/* Hover tint — whole card is clickable */}
+                      <div className="absolute inset-0 bg-primary/0 group-hover:bg-primary/10 ring-0 group-hover:ring-2 ring-primary rounded-xl transition-all duration-150" />
+
+                      {/* Filename */}
+                      <div className="absolute top-1.5 left-1.5 bg-white/90 backdrop-blur-sm px-1.5 py-0.5 rounded-md opacity-0 group-hover:opacity-100 transition-opacity max-w-[80%]">
+                        <p className="text-[7px] font-black text-slate-900 truncate uppercase tracking-wider">{item.name}</p>
+                      </div>
+
+                      {/* SEO badge */}
+                      {item.alt && (
+                        <div className="absolute top-1.5 right-1.5 bg-emerald-500 text-white p-0.5 rounded-full shadow opacity-0 group-hover:opacity-100 transition-opacity">
+                          <Check className="w-2 h-2" />
+                        </div>
+                      )}
+                    </motion.div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            /* ── Upload Tab ── */
+            <div className="flex-1 flex items-center justify-center p-8 h-full">
+              <div
+                onClick={() => !uploading && fileInputRef.current?.click()}
+                className={`w-full max-w-xl aspect-video rounded-2xl border-2 border-dashed border-slate-200 flex flex-col items-center justify-center gap-5 transition-all hover:border-primary/30 hover:bg-slate-50 cursor-pointer group ${uploading ? 'pointer-events-none' : ''}`}
+              >
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  ref={fileInputRef}
+                  onChange={handleDirectUpload}
+                />
+
+                {uploading ? (
+                  <div className="flex flex-col items-center gap-4">
+                    <Loader2 className="w-10 h-10 animate-spin text-primary" />
+                    <div className="text-center">
+                      <p className="text-sm font-bold text-slate-900">Uploading to Library…</p>
+                      <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Processing & generating SEO records</p>
+                    </div>
+                  </div>
+                ) : (
+                  <>
+                    <div className="w-14 h-14 rounded-2xl bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-400 group-hover:bg-white group-hover:text-primary group-hover:scale-110 transition-all duration-300">
+                      <Plus className="w-6 h-6" />
+                    </div>
+                    <div className="text-center">
+                      <h3 className="text-base font-bold text-slate-900 tracking-tight">Drop or click to upload</h3>
+                      <p className="text-xs text-slate-400 font-medium mt-1">Image will be saved to your Media Library automatically</p>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      {['PNG', 'JPG', 'WEBP', 'GIF'].map(fmt => (
+                        <span key={fmt} className="px-3 py-1 rounded-lg bg-slate-50 border border-slate-200 text-[10px] font-bold text-slate-400 uppercase">{fmt}</span>
+                      ))}
+                    </div>
+                  </>
+                )}
+              </div>
+            </div>
+          )}
         </div>
 
-        {/* Footer */}
-        <div className="bg-slate-50 px-12 py-6 border-t border-slate-100 flex justify-between items-center shrink-0">
-           <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-3">
-              <Info className="w-3.5 h-3.5" />
-              Centralized Media system active • All images optimized for SEO
-           </p>
-           <button 
-             onClick={onClose}
-             className="text-[10px] font-bold text-slate-900 uppercase tracking-widest hover:text-primary transition-colors"
-           >
-              Cancel Selection
-           </button>
+        {/* ── Footer ── */}
+        <div className="px-5 py-2.5 border-t border-slate-100 bg-slate-50/60 flex justify-between items-center shrink-0">
+          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest flex items-center gap-2">
+            <Info className="w-3 h-3" />
+            All uploads are registered in the central Media Library
+          </p>
+          <button
+            onClick={onClose}
+            className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-primary transition-colors"
+          >
+            Cancel
+          </button>
         </div>
       </motion.div>
     </div>

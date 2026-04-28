@@ -65,7 +65,7 @@ const Hero = () => {
           {images?.[0]?.startsWith('http') ? (
             <img
               src={images[0]}
-              alt="Hero Background"
+              alt={hero.bgImageAlt || "Eagle Revolution Roofing"}
               className="w-full h-full object-cover scale-105"
             />
           ) : (
