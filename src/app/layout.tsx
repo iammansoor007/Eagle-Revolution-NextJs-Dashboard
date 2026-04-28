@@ -920,11 +920,26 @@ const breadcrumbJsonLd = {
 
 import { ContentProvider } from "@/context/ContentContext";
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  // ── Fetch CMS-managed tracking scripts from MongoDB ──
+  interface SiteScript { id: string; name: string; location: string; code: string; active: boolean; }
+  let siteScripts: SiteScript[] = [];
+  try {
+    await connectToDatabase();
+    const doc = await SiteContent.findOne({ key: 'site_scripts_v2' });
+    if (Array.isArray(doc?.data)) siteScripts = doc.data;
+  } catch (e) {
+    // Non-fatal — site renders fine without CMS scripts
+  }
+  const activeScripts = siteScripts.filter((s) => s.active);
+  const headScripts    = activeScripts.filter((s) => s.location === 'head');
+  const bodyStartScripts = activeScripts.filter((s) => s.location === 'body_start');
+  const bodyEndScripts   = activeScripts.filter((s) => s.location === 'body_end');
+
   return (
     <html lang="en" suppressHydrationWarning>
       <head>
@@ -944,8 +959,16 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link rel="preconnect" href="https://images.unsplash.com" />
+        {/* ── CMS-managed <head> scripts ── */}
+        {headScripts.map((s) => (
+          <script key={s.id} dangerouslySetInnerHTML={{ __html: s.code.replace(/<script[^>]*>|<\/script>/gi, '').trim() }} />
+        ))}
       </head>
       <body className={`${spaceGrotesk.variable} ${dmSans.variable} antialiased`}>
+        {/* ── CMS-managed body_start scripts ── */}
+        {bodyStartScripts.map((s) => (
+          <div key={s.id} dangerouslySetInnerHTML={{ __html: s.code }} />
+        ))}
         <ContentProvider>
           <Providers>
             <div className="relative min-h-screen flex flex-col">
@@ -967,6 +990,11 @@ export default function RootLayout({
             </div>
           </Providers>
         </ContentProvider>
+
+        {/* ── CMS-managed body_end scripts ── */}
+        {bodyEndScripts.map((s) => (
+          <div key={s.id} dangerouslySetInnerHTML={{ __html: s.code }} />
+        ))}
       </body>
     </html>
   );

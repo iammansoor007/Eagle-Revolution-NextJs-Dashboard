@@ -7,19 +7,20 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   LayoutDashboard, FileText, Briefcase, Users, Star,
   HelpCircle, ImageIcon, Phone, Settings, LogOut,
-  Shield, Menu, X, ChevronRight, Globe, Folder
+  Shield, Menu, X, ChevronRight, Globe, Folder, Code2
 } from "lucide-react";
 
 const navItems = [
-  { label: "Dashboard",   href: "/admin",          icon: LayoutDashboard },
-  { label: "Pages",       href: "/admin/pages",     icon: FileText },
-  { label: "Media",       href: "/admin/media",     icon: ImageIcon },
-  { label: "Reviews",     href: "/admin/reviews",   icon: Star },
-  { label: "Projects",    href: "/admin/projects",  icon: Folder },
-  { label: "FAQ",         href: "/admin/faq",       icon: HelpCircle },
-  { label: "Services",    href: "/admin/services",  icon: Briefcase },
+  { label: "Dashboard",   href: "/admin",           icon: LayoutDashboard },
+  { label: "Pages",       href: "/admin/pages",      icon: FileText },
+  { label: "Media",       href: "/admin/media",      icon: ImageIcon },
+  { label: "Reviews",     href: "/admin/reviews",    icon: Star },
+  { label: "Projects",    href: "/admin/projects",   icon: Folder },
+  { label: "FAQ",         href: "/admin/faq",        icon: HelpCircle },
+  { label: "Services",    href: "/admin/services",   icon: Briefcase },
   { label: "Submissions", href: "/admin/submissions", icon: Phone },
-  { label: "Settings",    href: "/admin/settings",  icon: Settings },
+  { label: "Scripts",     href: "/admin/scripts",    icon: Code2 },
+  { label: "Settings",    href: "/admin/settings",   icon: Settings },
 ];
 
 function Sidebar({ collapsed, onClose }: { collapsed?: boolean; onClose?: () => void }) {
