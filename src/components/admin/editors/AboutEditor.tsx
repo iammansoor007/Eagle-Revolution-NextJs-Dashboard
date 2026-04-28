@@ -9,6 +9,11 @@ import {
   ArrowRight, Users, Zap, Globe, TrendingUp, Flag, Linkedin, Quote
 } from "lucide-react";
 
+import ContentSelector from "@/components/admin/ContentSelector";
+import IconSelector from "@/components/admin/IconSelector";
+
+import { UI } from "./styles";
+
 // Shared Reusable Image Upload Component
 const ImageUpload = ({ label, value, onChange, description }: any) => {
   const [uploading, setUploading] = useState(false);
@@ -34,7 +39,7 @@ const ImageUpload = ({ label, value, onChange, description }: any) => {
 
   return (
     <div className="space-y-3">
-      <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{label}</label>
+      <label className={UI.label}>{label}</label>
       <div className="group relative">
         <div className="aspect-video w-full bg-slate-50/50 border border-slate-200 rounded-2xl overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/30">
           {value ? (
@@ -108,13 +113,14 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
             items: [{ value: 0, label: "", suffix: "", icon: "Shield", description: "" }], 
             trustBadges: [{ icon: "Award", text: "" }] 
           },
-          capabilities: { badge: "", headline: "", description: "" },
           values: { 
             headline: "", 
             highlight: "", 
             description: "", 
             items: [{ title: "", description: "", icon: "BadgeCheck", statLabel: "", stat: "" }] 
           },
+          services: [],
+          capabilities: { badge: "", headline: "", description: "" },
           ctaBanner: { 
             badge: "", 
             headline: "", 
@@ -152,6 +158,7 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
     { id: "mission", label: "Mission", icon: Target, title: "Core Purpose & Principles" },
     { id: "stats", label: "Impact", icon: TrendingUp, title: "Statistical Impact & Trust" },
     { id: "values", label: "Values", icon: Heart, title: "Our Core Philosophies" },
+    { id: "services", label: "Services", icon: List, title: "Featured Capabilities" },
     { id: "cta", label: "Conversion", icon: Mail, title: "CTA Banners & Links" },
   ];
 
@@ -166,7 +173,7 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shrink-0 ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shrink-0 ${
                 activeTab === tab.id
                 ? "bg-primary text-white shadow-lg shadow-primary/20"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
@@ -200,27 +207,27 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                 <div className="grid grid-cols-12 gap-10">
                   <div className="col-span-8 space-y-10">
                     <div className="space-y-4">
-                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Headline Split (3 Lines)</label>
+                      <label className={UI.label}>Headline Split (3 Lines)</label>
                       <div className="grid grid-cols-1 gap-4 bg-white p-6 rounded-2xl border border-slate-100 shadow-sm">
-                        <input type="text" value={data.aboutPage?.hero?.headline?.line1 || ""} onChange={(e) => updateAbout("hero", "headline", { ...data.aboutPage.hero.headline, line1: e.target.value })} className="bg-slate-50 px-4 py-3 rounded-xl text-lg font-bold outline-none" placeholder="Line 1" />
-                        <input type="text" value={data.aboutPage?.hero?.headline?.line2 || ""} onChange={(e) => updateAbout("hero", "headline", { ...data.aboutPage.hero.headline, line2: e.target.value })} className="bg-primary/5 text-primary px-4 py-3 rounded-xl text-lg font-bold outline-none" placeholder="Line 2 (Gradient Text)" />
-                        <input type="text" value={data.aboutPage?.hero?.headline?.line3 || ""} onChange={(e) => updateAbout("hero", "headline", { ...data.aboutPage.hero.headline, line3: e.target.value })} className="bg-slate-50 px-4 py-3 rounded-xl text-lg font-bold outline-none" placeholder="Line 3" />
+                        <input type="text" value={data.aboutPage?.hero?.headline?.line1 || ""} onChange={(e) => updateAbout("hero", "headline", { ...data.aboutPage.hero.headline, line1: e.target.value })} className={UI.inputLarge} placeholder="Line 1" />
+                        <input type="text" value={data.aboutPage?.hero?.headline?.line2 || ""} onChange={(e) => updateAbout("hero", "headline", { ...data.aboutPage.hero.headline, line2: e.target.value })} className={UI.inputPrimary} placeholder="Line 2 (Gradient Text)" />
+                        <input type="text" value={data.aboutPage?.hero?.headline?.line3 || ""} onChange={(e) => updateAbout("hero", "headline", { ...data.aboutPage.hero.headline, line3: e.target.value })} className={UI.inputLarge} placeholder="Line 3" />
                       </div>
                     </div>
 
                     <div className="space-y-4">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Narrative Description</label>
-                       <textarea value={data.aboutPage?.hero?.description || ""} onChange={(e) => updateAbout("hero", "description", e.target.value)} rows={4} className="w-full bg-white border border-slate-200 rounded-2xl px-6 py-4 text-sm text-slate-600 outline-none" />
+                       <label className={UI.label}>Narrative Description</label>
+                       <textarea value={data.aboutPage?.hero?.description || ""} onChange={(e) => updateAbout("hero", "description", e.target.value)} rows={4} className={UI.textarea} />
                     </div>
 
                     <div className="grid grid-cols-2 gap-8">
                        <div className="space-y-3">
-                          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">CTA Button Label</label>
-                          <input type="text" value={data.aboutPage?.hero?.cta || ""} onChange={(e) => updateAbout("hero", "cta", e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm outline-none" />
+                          <label className={UI.label}>CTA Button Label</label>
+                          <input type="text" value={data.aboutPage?.hero?.cta || ""} onChange={(e) => updateAbout("hero", "cta", e.target.value)} className={UI.input} />
                        </div>
                        <div className="space-y-3">
-                          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">CTA Button Link</label>
-                          <input type="text" value={data.aboutPage?.hero?.ctaLink || ""} onChange={(e) => updateAbout("hero", "ctaLink", e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-sm outline-none" />
+                          <label className={UI.label}>CTA Button Link</label>
+                          <input type="text" value={data.aboutPage?.hero?.ctaLink || ""} onChange={(e) => updateAbout("hero", "ctaLink", e.target.value)} className={UI.input} />
                        </div>
                     </div>
                   </div>
@@ -228,52 +235,64 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                   <div className="col-span-4 space-y-10">
                     <ImageUpload label="Hero Background Cinematic" value={data.aboutPage?.hero?.bgImage} onChange={(url: string) => updateAbout("hero", "bgImage", url)} />
                     <div className="space-y-3">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Trust Label</label>
-                       <input type="text" value={data.aboutPage?.hero?.trustLabel || ""} onChange={(e) => updateAbout("hero", "trustLabel", e.target.value)} className="w-full bg-white border border-slate-200 rounded-xl px-5 py-3 text-xs outline-none" placeholder="Highly Rated on Google" />
+                       <label className={UI.label}>Trust Label</label>
+                       <input type="text" value={data.aboutPage?.hero?.trustLabel || ""} onChange={(e) => updateAbout("hero", "trustLabel", e.target.value)} className={UI.input} placeholder="Highly Rated on Google" />
                     </div>
                   </div>
                 </div>
 
                 <div className="grid grid-cols-2 gap-10">
                    <div className="space-y-6">
-                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Hero Side Stats</label>
+                      <label className={UI.label}>Hero Side Stats</label>
                       <div className="space-y-4">
                         {(data.aboutPage?.hero?.stats || []).map((s: any, i: number) => (
-                          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4">
-                             <div className="flex justify-between items-center">
+                          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4 relative">
+                             <div className="flex justify-between items-center mb-2">
                                 <span className="text-[9px] font-bold text-slate-300 uppercase tracking-widest">Stat {i+1}</span>
                                 <button onClick={() => {
                                   const newS = data.aboutPage.hero.stats.filter((_: any, idx: number) => idx !== i);
                                   updateAbout("hero", "stats", newS);
-                                }} className="text-slate-200 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                                }} className="text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                              </div>
                              <div className="grid grid-cols-2 gap-4">
-                               <input type="text" value={s.val} onChange={(e) => {
-                                 const newS = [...data.aboutPage.hero.stats]; newS[i].val = e.target.value; updateAbout("hero", "stats", newS);
-                               }} className="bg-slate-50 px-4 py-2 rounded-lg text-xs font-bold" placeholder="25+" />
-                               <input type="text" value={s.label} onChange={(e) => {
-                                 const newS = [...data.aboutPage.hero.stats]; newS[i].label = e.target.value; updateAbout("hero", "stats", newS);
-                               }} className="bg-slate-50 px-4 py-2 rounded-lg text-xs" placeholder="Label" />
+                               <div className="space-y-2">
+                                 <label className={UI.label}>Value</label>
+                                 <input type="text" value={s.val} onChange={(e) => {
+                                   const newS = [...data.aboutPage.hero.stats]; newS[i].val = e.target.value; updateAbout("hero", "stats", newS);
+                                 }} className={UI.input} placeholder="25+" />
+                               </div>
+                               <div className="space-y-2">
+                                 <label className={UI.label}>Label</label>
+                                 <input type="text" value={s.label} onChange={(e) => {
+                                   const newS = [...data.aboutPage.hero.stats]; newS[i].label = e.target.value; updateAbout("hero", "stats", newS);
+                                 }} className={UI.input} placeholder="Label" />
+                               </div>
                              </div>
-                             <input type="text" value={s.icon} onChange={(e) => {
-                               const newS = [...data.aboutPage.hero.stats]; newS[i].icon = e.target.value; updateAbout("hero", "stats", newS);
-                             }} className="w-full bg-slate-50 px-4 py-2 rounded-lg text-[10px]" placeholder="Icon Name" />
+                             <IconSelector 
+                                label="Stat Icon"
+                                value={s.icon} 
+                                onChange={(val) => {
+                                  const newS = [...data.aboutPage.hero.stats]; newS[i].icon = val; updateAbout("hero", "stats", newS);
+                                }} 
+                             />
                           </div>
                         ))}
-                        <button onClick={() => updateAbout("hero", "stats", [...(data.aboutPage?.hero?.stats || []), { label: "", val: "", icon: "Shield" }])} className="w-full border-2 border-dashed border-slate-200 py-4 rounded-2xl text-[10px] font-bold text-slate-300 uppercase tracking-widest hover:text-primary transition-all">+ Add Stat</button>
+                        <button onClick={() => updateAbout("hero", "stats", [...(data.aboutPage?.hero?.stats || []), { label: "", val: "", icon: "Shield" }])} className={UI.buttonAdd}>+ Add Stat</button>
                       </div>
                    </div>
 
                    <div className="space-y-6">
-                      <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Contact Quicklink</label>
-                      <div className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-sm space-y-6">
-                         <div className="space-y-2">
-                           <span className="text-[9px] font-bold text-slate-300 uppercase">Phone Number</span>
-                           <input type="text" value={data.aboutPage?.hero?.phone || ""} onChange={(e) => updateAbout("hero", "phone", e.target.value)} className="w-full bg-slate-50 px-4 py-3 rounded-xl text-lg font-black text-slate-900 outline-none" />
-                         </div>
-                         <div className="space-y-2">
-                           <span className="text-[9px] font-bold text-slate-300 uppercase">Phone Label</span>
-                           <input type="text" value={data.aboutPage?.hero?.phoneLabel || ""} onChange={(e) => updateAbout("hero", "phoneLabel", e.target.value)} className="w-full bg-slate-50 px-4 py-2 rounded-xl text-xs outline-none" placeholder="Call for a free consultation" />
+                      <label className={UI.label}>Contact Quicklink</label>
+                      <div className={UI.card}>
+                         <div className="space-y-6">
+                            <div className="space-y-2">
+                              <label className={UI.label}>Phone Number</label>
+                              <input type="text" value={data.aboutPage?.hero?.phone || ""} onChange={(e) => updateAbout("hero", "phone", e.target.value)} className={UI.inputLarge} />
+                            </div>
+                            <div className="space-y-2">
+                              <label className={UI.label}>Phone Label</label>
+                              <input type="text" value={data.aboutPage?.hero?.phoneLabel || ""} onChange={(e) => updateAbout("hero", "phoneLabel", e.target.value)} className={UI.input} placeholder="Call for a free consultation" />
+                            </div>
                          </div>
                       </div>
                    </div>
@@ -287,29 +306,41 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                  <div className="grid grid-cols-12 gap-10">
                     <div className="col-span-7 space-y-10">
                        <div className="space-y-4">
-                          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Story Intro</label>
-                          <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-                             <input type="text" value={data.aboutPage?.story?.badge || ""} onChange={(e) => updateAbout("story", "badge", e.target.value)} className="w-full bg-slate-50 px-4 py-2 rounded-lg text-xs font-bold text-primary outline-none" placeholder="Badge" />
-                             <input type="text" value={data.aboutPage?.story?.headline || ""} onChange={(e) => updateAbout("story", "headline", e.target.value)} className="w-full bg-slate-50 px-4 py-3 rounded-lg text-xl font-bold outline-none" placeholder="Main Headline" />
-                             <input type="text" value={data.aboutPage?.story?.highlight || ""} onChange={(e) => updateAbout("story", "highlight", e.target.value)} className="w-full bg-primary/5 text-primary px-4 py-3 rounded-lg text-xl font-bold outline-none" placeholder="Highlight text for gradient" />
-                             <textarea value={data.aboutPage?.story?.description || ""} onChange={(e) => updateAbout("story", "description", e.target.value)} className="w-full bg-slate-50 px-4 py-3 rounded-xl text-sm text-slate-500 outline-none" rows={3} placeholder="Intro narrative..." />
+                          <label className={UI.label}>Story Intro</label>
+                          <div className={UI.card + " space-y-6"}>
+                             <div className="space-y-2">
+                                <label className={UI.label}>Badge</label>
+                                <input type="text" value={data.aboutPage?.story?.badge || ""} onChange={(e) => updateAbout("story", "badge", e.target.value)} className={UI.input} placeholder="Badge" />
+                             </div>
+                             <div className="space-y-2">
+                                <label className={UI.label}>Main Headline</label>
+                                <input type="text" value={data.aboutPage?.story?.headline || ""} onChange={(e) => updateAbout("story", "headline", e.target.value)} className={UI.inputLarge} placeholder="Main Headline" />
+                             </div>
+                             <div className="space-y-2">
+                                <label className={UI.label}>Highlight Text</label>
+                                <input type="text" value={data.aboutPage?.story?.highlight || ""} onChange={(e) => updateAbout("story", "highlight", e.target.value)} className={UI.inputPrimary} placeholder="Highlight text for gradient" />
+                             </div>
+                             <div className="space-y-2">
+                                <label className={UI.label}>Intro Narrative</label>
+                                <textarea value={data.aboutPage?.story?.description || ""} onChange={(e) => updateAbout("story", "description", e.target.value)} className={UI.textarea} rows={3} placeholder="Intro narrative..." />
+                             </div>
                           </div>
                        </div>
 
                        <div className="space-y-4">
-                          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Founder Bio Paragraphs</label>
+                          <label className={UI.label}>Founder Bio Paragraphs</label>
                           <div className="space-y-4">
                              {(data.aboutPage?.story?.founder?.bio || []).map((p: string, i: number) => (
                                <div key={i} className="flex gap-4">
                                  <textarea value={p} onChange={(e) => {
                                    const newB = [...data.aboutPage.story.founder.bio]; newB[i] = e.target.value; updateAbout("story", "founder", { ...data.aboutPage.story.founder, bio: newB });
-                                 }} className="flex-1 bg-white border border-slate-200 rounded-2xl px-6 py-4 text-sm text-slate-600 outline-none" rows={4} />
+                                 }} className={UI.textarea} rows={4} />
                                  <button onClick={() => {
                                    const newB = data.aboutPage.story.founder.bio.filter((_: any, idx: number) => idx !== i); updateAbout("story", "founder", { ...data.aboutPage.story.founder, bio: newB });
-                                 }} className="text-slate-200 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                                 }} className="text-slate-200 hover:text-red-500 transition-colors self-start mt-4"><Trash2 className="w-4 h-4" /></button>
                                </div>
                              ))}
-                             <button onClick={() => updateAbout("story", "founder", { ...data.aboutPage.story.founder, bio: [...(data.aboutPage.story.founder.bio || []), ""] })} className="text-[10px] font-bold text-primary uppercase tracking-widest">+ Add Bio Segment</button>
+                             <button onClick={() => updateAbout("story", "founder", { ...data.aboutPage.story.founder, bio: [...(data.aboutPage.story.founder.bio || []), ""] })} className={UI.buttonAdd}>+ Add Bio Segment</button>
                           </div>
                        </div>
                     </div>
@@ -318,19 +349,40 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                        <div className="space-y-6">
                           <ImageUpload label="Founder Portrait" value={data.aboutPage?.story?.portrait?.image} onChange={(url: string) => updateAbout("story", "portrait", { ...data.aboutPage.story.portrait, image: url })} />
                           <div className="grid grid-cols-2 gap-4">
-                             <input type="text" value={data.aboutPage?.story?.portrait?.badgeLeft || ""} onChange={(e) => updateAbout("story", "portrait", { ...data.aboutPage.story.portrait, badgeLeft: e.target.value })} className="bg-white border border-slate-200 px-3 py-2 rounded-lg text-[9px] font-bold outline-none" placeholder="Badge Left" />
-                             <input type="text" value={data.aboutPage?.story?.portrait?.badgeRight || ""} onChange={(e) => updateAbout("story", "portrait", { ...data.aboutPage.story.portrait, badgeRight: e.target.value })} className="bg-white border border-slate-200 px-3 py-2 rounded-lg text-[9px] font-bold outline-none" placeholder="Badge Right" />
+                             <div className="space-y-2">
+                               <label className={UI.label}>Badge Left</label>
+                               <input type="text" value={data.aboutPage?.story?.portrait?.badgeLeft || ""} onChange={(e) => updateAbout("story", "portrait", { ...data.aboutPage.story.portrait, badgeLeft: e.target.value })} className={UI.input} placeholder="Badge Left" />
+                             </div>
+                             <div className="space-y-2">
+                               <label className={UI.label}>Badge Right</label>
+                               <input type="text" value={data.aboutPage?.story?.portrait?.badgeRight || ""} onChange={(e) => updateAbout("story", "portrait", { ...data.aboutPage.story.portrait, badgeRight: e.target.value })} className={UI.input} placeholder="Badge Right" />
+                             </div>
                           </div>
                        </div>
 
-                       <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6">
-                          <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Founder Details</label>
-                          <input type="text" value={data.aboutPage?.story?.founder?.name || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, name: e.target.value })} className="w-full bg-slate-50 px-4 py-2 rounded-lg text-sm font-bold outline-none" placeholder="Full Name" />
-                          <input type="text" value={data.aboutPage?.story?.founder?.title || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, title: e.target.value })} className="w-full bg-slate-50 px-4 py-2 rounded-lg text-xs outline-none" placeholder="Title/Role" />
-                          <textarea value={data.aboutPage?.story?.founder?.quote || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, quote: e.target.value })} className="w-full bg-slate-50 px-4 py-3 rounded-xl text-xs text-slate-500 italic outline-none" rows={3} placeholder="Primary Quote..." />
-                          <div className="space-y-3">
-                             <input type="text" value={data.aboutPage?.story?.founder?.linkedin || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, linkedin: e.target.value })} className="w-full bg-slate-50 px-4 py-2 rounded-lg text-[10px] outline-none" placeholder="LinkedIn URL" />
-                             <input type="text" value={data.aboutPage?.story?.founder?.email || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, email: e.target.value })} className="w-full bg-slate-50 px-4 py-2 rounded-lg text-[10px] outline-none" placeholder="Direct Email" />
+                       <div className={UI.card + " space-y-6"}>
+                          <label className={UI.sectionHeader}>Founder Details</label>
+                          <div className="space-y-2">
+                            <label className={UI.label}>Full Name</label>
+                            <input type="text" value={data.aboutPage?.story?.founder?.name || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, name: e.target.value })} className={UI.input} placeholder="Full Name" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className={UI.label}>Title/Role</label>
+                            <input type="text" value={data.aboutPage?.story?.founder?.title || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, title: e.target.value })} className={UI.input} placeholder="Title/Role" />
+                          </div>
+                          <div className="space-y-2">
+                            <label className={UI.label}>Primary Quote</label>
+                            <textarea value={data.aboutPage?.story?.founder?.quote || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, quote: e.target.value })} className={UI.textarea} rows={3} placeholder="Primary Quote..." />
+                          </div>
+                          <div className="space-y-4">
+                             <div className="space-y-2">
+                               <label className={UI.label}>LinkedIn URL</label>
+                               <input type="text" value={data.aboutPage?.story?.founder?.linkedin || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, linkedin: e.target.value })} className={UI.input} placeholder="LinkedIn URL" />
+                             </div>
+                             <div className="space-y-2">
+                               <label className={UI.label}>Direct Email</label>
+                               <input type="text" value={data.aboutPage?.story?.founder?.email || ""} onChange={(e) => updateAbout("story", "founder", { ...data.aboutPage.story.founder, email: e.target.value })} className={UI.input} placeholder="Direct Email" />
+                             </div>
                           </div>
                        </div>
                     </div>
@@ -342,61 +394,89 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
             {activeTab === "mission" && (
               <div className="space-y-16">
                  <div className="grid grid-cols-2 gap-10">
-                    <div className="space-y-8 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Mission Context</label>
-                       <input type="text" value={data.aboutPage?.mission?.badge || ""} onChange={(e) => updateAbout("mission", "badge", e.target.value)} className="w-full bg-slate-50 px-5 py-3 rounded-xl text-xs font-bold text-primary outline-none" />
-                       <input type="text" value={data.aboutPage?.mission?.headline || ""} onChange={(e) => updateAbout("mission", "headline", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-xl font-bold outline-none" />
-                       <textarea value={data.aboutPage?.mission?.description || ""} onChange={(e) => updateAbout("mission", "description", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-sm text-slate-500 outline-none" rows={4} />
+                    <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+                       <label className={UI.sectionHeader}>Mission Context</label>
+                       <div className="space-y-2">
+                          <label className={UI.label}>Badge</label>
+                          <input type="text" value={data.aboutPage?.mission?.badge || ""} onChange={(e) => updateAbout("mission", "badge", e.target.value)} className={UI.input} />
+                       </div>
+                       <div className="space-y-2">
+                          <label className={UI.label}>Headline</label>
+                          <input type="text" value={data.aboutPage?.mission?.headline || ""} onChange={(e) => updateAbout("mission", "headline", e.target.value)} className={UI.inputLarge} />
+                       </div>
+                       <div className="space-y-2">
+                          <label className={UI.label}>Description</label>
+                          <textarea value={data.aboutPage?.mission?.description || ""} onChange={(e) => updateAbout("mission", "description", e.target.value)} className={UI.textarea} rows={4} />
+                       </div>
                     </div>
 
                     <div className="space-y-6">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Impact Stats (Side Grid)</label>
+                       <label className={UI.label}>Impact Stats (Side Grid)</label>
                        <div className="grid grid-cols-2 gap-4">
                           {(data.aboutPage?.mission?.stats || []).map((s: any, i: number) => (
-                            <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative">
-                               <input type="text" value={s.value} onChange={(e) => {
-                                 const newS = [...data.aboutPage.mission.stats]; newS[i].value = e.target.value; updateAbout("mission", "stats", newS);
-                               }} className="w-full bg-transparent text-2xl font-bold text-slate-900 outline-none" placeholder="25+" />
-                               <input type="text" value={s.label} onChange={(e) => {
-                                 const newS = [...data.aboutPage.mission.stats]; newS[i].label = e.target.value; updateAbout("mission", "stats", newS);
-                               }} className="w-full bg-transparent text-[10px] font-medium text-slate-400 outline-none" placeholder="Label" />
+                            <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm relative space-y-4">
                                <button onClick={() => {
                                  const newS = data.aboutPage.mission.stats.filter((_: any, idx: number) => idx !== i); updateAbout("mission", "stats", newS);
-                               }} className="absolute top-2 right-2 text-slate-200 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
+                               }} className="absolute top-4 right-4 text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                               <div className="space-y-2">
+                                  <label className={UI.label}>Value</label>
+                                  <input type="text" value={s.value} onChange={(e) => {
+                                    const newS = [...data.aboutPage.mission.stats]; newS[i].value = e.target.value; updateAbout("mission", "stats", newS);
+                                  }} className={UI.inputLarge} placeholder="25+" />
+                               </div>
+                               <div className="space-y-2">
+                                  <label className={UI.label}>Label</label>
+                                  <input type="text" value={s.label} onChange={(e) => {
+                                    const newS = [...data.aboutPage.mission.stats]; newS[i].label = e.target.value; updateAbout("mission", "stats", newS);
+                                  }} className={UI.input} placeholder="Label" />
+                               </div>
                             </div>
                           ))}
-                          <button onClick={() => updateAbout("mission", "stats", [...(data.aboutPage?.mission?.stats || []), { value: "", label: "" }])} className="border-2 border-dashed border-slate-200 rounded-2xl flex items-center justify-center py-4 text-[10px] font-bold text-slate-300 hover:text-primary transition-all">+ Add Stat</button>
+                          <button onClick={() => updateAbout("mission", "stats", [...(data.aboutPage?.mission?.stats || []), { value: "", label: "" }])} className={UI.buttonAdd}>+ Add Stat</button>
                        </div>
                     </div>
                  </div>
 
                  <div className="space-y-6">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Guiding Principles (Cards)</label>
+                    <label className={UI.label}>Guiding Principles (Cards)</label>
                     <div className="grid grid-cols-2 gap-8">
                        {(data.aboutPage?.mission?.principles || []).map((p: any, i: number) => (
-                         <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 relative group">
+                         <div key={i} className={UI.card + " space-y-6 relative group"}>
                             <button onClick={() => {
                               const newP = data.aboutPage.mission.principles.filter((_: any, idx: number) => idx !== i); updateAbout("mission", "principles", newP);
-                            }} className="absolute top-6 right-6 text-slate-200 hover:text-red-500"><Trash2 className="w-5 h-5" /></button>
-                            <div className="flex justify-between items-center">
-                               <input type="text" value={p.icon} onChange={(e) => {
-                                 const newP = [...data.aboutPage.mission.principles]; newP[i].icon = e.target.value; updateAbout("mission", "principles", newP);
-                               }} className="w-24 bg-slate-50 px-3 py-1.5 rounded-lg text-[10px] font-bold text-primary outline-none" placeholder="Icon Name" />
-                               <input type="text" value={p.val} onChange={(e) => {
-                                 const newP = [...data.aboutPage.mission.principles]; newP[i].val = e.target.value; updateAbout("mission", "principles", newP);
-                               }} className="bg-slate-50 px-3 py-1.5 rounded-lg text-[10px] text-slate-400 outline-none text-right" placeholder="Value marker (e.g. 100%)" />
+                            }} className="absolute top-8 right-8 text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-5 h-5" /></button>
+                            <div className="grid grid-cols-2 gap-4">
+                               <IconSelector 
+                                  label="Principle Icon"
+                                  value={p.icon} 
+                                  onChange={(val) => {
+                                    const newP = [...data.aboutPage.mission.principles]; newP[i].icon = val; updateAbout("mission", "principles", newP);
+                                  }} 
+                               />
+                               <div className="space-y-2">
+                                  <label className={UI.label}>Value Marker</label>
+                                  <input type="text" value={p.val} onChange={(e) => {
+                                    const newP = [...data.aboutPage.mission.principles]; newP[i].val = e.target.value; updateAbout("mission", "principles", newP);
+                                  }} className={UI.input} placeholder="e.g. 100%" />
+                               </div>
                             </div>
-                            <input type="text" value={p.title} onChange={(e) => {
-                               const newP = [...data.aboutPage.mission.principles]; newP[i].title = e.target.value; updateAbout("mission", "principles", newP);
-                            }} className="w-full bg-transparent text-xl font-bold text-slate-900 outline-none" placeholder="Principle Title" />
-                            <textarea value={p.desc} onChange={(e) => {
-                               const newP = [...data.aboutPage.mission.principles]; newP[i].desc = e.target.value; updateAbout("mission", "principles", newP);
-                            }} className="w-full bg-transparent text-xs text-slate-500 leading-relaxed outline-none" rows={3} placeholder="Detailed principle narrative..." />
+                            <div className="space-y-2">
+                               <label className={UI.label}>Title</label>
+                               <input type="text" value={p.title} onChange={(e) => {
+                                  const newP = [...data.aboutPage.mission.principles]; newP[i].title = e.target.value; updateAbout("mission", "principles", newP);
+                               }} className={UI.inputLarge} placeholder="Principle Title" />
+                            </div>
+                            <div className="space-y-2">
+                               <label className={UI.label}>Description</label>
+                               <textarea value={p.desc} onChange={(e) => {
+                                  const newP = [...data.aboutPage.mission.principles]; newP[i].desc = e.target.value; updateAbout("mission", "principles", newP);
+                               }} className={UI.textarea} rows={3} placeholder="Detailed principle narrative..." />
+                            </div>
                          </div>
                        ))}
-                       <button onClick={() => updateAbout("mission", "principles", [...(data.aboutPage?.mission?.principles || []), { title: "", desc: "", icon: "Zap", val: "" }])} className="border-2 border-dashed border-slate-200 rounded-3xl py-12 flex flex-col items-center justify-center gap-3 text-slate-300 hover:text-primary transition-all">
-                          <Plus className="w-8 h-8" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">Add New Principle</span>
+                       <button onClick={() => updateAbout("mission", "principles", [...(data.aboutPage?.mission?.principles || []), { title: "", desc: "", icon: "Zap", val: "" }])} className={UI.buttonAdd + " h-full flex flex-col justify-center gap-4 py-20"}>
+                          <Plus className="w-10 h-10 mx-auto" />
+                          <span>Add New Principle</span>
                        </button>
                     </div>
                  </div>
@@ -407,48 +487,75 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
             {activeTab === "stats" && (
               <div className="space-y-16">
                  <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6 max-w-3xl">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Trust Metrics Intro</label>
-                    <input type="text" value={data.aboutPage?.stats?.badge || ""} onChange={(e) => updateAbout("stats", "badge", e.target.value)} className="w-full bg-slate-50 px-5 py-3 rounded-xl text-xs font-bold text-primary outline-none" placeholder="Badge" />
-                    <input type="text" value={data.aboutPage?.stats?.headline || ""} onChange={(e) => updateAbout("stats", "headline", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-xl font-bold outline-none" placeholder="Headline" />
-                    <textarea value={data.aboutPage?.stats?.description || ""} onChange={(e) => updateAbout("stats", "description", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-sm text-slate-500 outline-none" rows={3} placeholder="Summary narrative..." />
+                    <label className={UI.sectionHeader}>Trust Metrics Intro</label>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Badge</label>
+                       <input type="text" value={data.aboutPage?.stats?.badge || ""} onChange={(e) => updateAbout("stats", "badge", e.target.value)} className={UI.input} placeholder="Badge" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Headline</label>
+                       <input type="text" value={data.aboutPage?.stats?.headline || ""} onChange={(e) => updateAbout("stats", "headline", e.target.value)} className={UI.inputLarge} placeholder="Headline" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Summary Narrative</label>
+                       <textarea value={data.aboutPage?.stats?.description || ""} onChange={(e) => updateAbout("stats", "description", e.target.value)} className={UI.textarea} rows={3} placeholder="Summary narrative..." />
+                    </div>
                  </div>
 
                  <div className="space-y-6">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Impact Metric Counters</label>
+                    <label className={UI.label}>Impact Metric Counters</label>
                     <div className="grid grid-cols-4 gap-6">
                        {(data.aboutPage?.stats?.items || []).map((s: any, i: number) => (
                          <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4 relative">
                             <button onClick={() => {
                               const newI = data.aboutPage.stats.items.filter((_: any, idx: number) => idx !== i); updateAbout("stats", "items", newI);
-                            }} className="absolute top-2 right-2 text-slate-200 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
-                            <input type="text" value={s.icon} onChange={(e) => {
-                              const newI = [...data.aboutPage.stats.items]; newI[i].icon = e.target.value; updateAbout("stats", "items", newI);
-                            }} className="bg-slate-50 px-3 py-1.5 rounded-lg text-[9px] font-bold text-primary outline-none w-full" placeholder="Icon" />
-                            <div className="flex gap-2">
-                               <input type="number" value={s.value} onChange={(e) => {
-                                 const newI = [...data.aboutPage.stats.items]; newI[i].value = parseInt(e.target.value); updateAbout("stats", "items", newI);
-                               }} className="w-full bg-slate-50 px-3 py-2 rounded-lg text-lg font-bold" />
-                               <input type="text" value={s.suffix} onChange={(e) => {
-                                 const newI = [...data.aboutPage.stats.items]; newI[i].suffix = e.target.value; updateAbout("stats", "items", newI);
-                               }} className="w-12 bg-slate-50 px-3 py-2 rounded-lg text-lg font-bold text-primary" placeholder="+" />
+                            }} className="absolute top-4 right-4 text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            
+                            <IconSelector 
+                               label="Stat Icon"
+                               value={s.icon} 
+                               onChange={(val) => {
+                                 const newI = [...data.aboutPage.stats.items]; newI[i].icon = val; updateAbout("stats", "items", newI);
+                               }} 
+                            />
+
+                            <div className="grid grid-cols-2 gap-2">
+                               <div className="space-y-1">
+                                  <label className={UI.label}>Value</label>
+                                  <input type="number" value={s.value} onChange={(e) => {
+                                    const newI = [...data.aboutPage.stats.items]; newI[i].value = parseInt(e.target.value); updateAbout("stats", "items", newI);
+                                  }} className={UI.input} />
+                               </div>
+                               <div className="space-y-1">
+                                  <label className={UI.label}>Suffix</label>
+                                  <input type="text" value={s.suffix} onChange={(e) => {
+                                    const newI = [...data.aboutPage.stats.items]; newI[i].suffix = e.target.value; updateAbout("stats", "items", newI);
+                                  }} className={UI.inputPrimary} placeholder="+" />
+                               </div>
                             </div>
-                            <input type="text" value={s.label} onChange={(e) => {
-                               const newI = [...data.aboutPage.stats.items]; newI[i].label = e.target.value; updateAbout("stats", "items", newI);
-                            }} className="w-full bg-transparent text-[10px] font-bold text-slate-900 outline-none" placeholder="Label" />
-                            <textarea value={s.description} onChange={(e) => {
-                               const newI = [...data.aboutPage.stats.items]; newI[i].description = e.target.value; updateAbout("stats", "items", newI);
-                            }} className="w-full bg-transparent text-[9px] text-slate-400 outline-none leading-relaxed" rows={2} placeholder="Brief desc..." />
+                            <div className="space-y-2">
+                               <label className={UI.label}>Label</label>
+                               <input type="text" value={s.label} onChange={(e) => {
+                                  const newI = [...data.aboutPage.stats.items]; newI[i].label = e.target.value; updateAbout("stats", "items", newI);
+                               }} className={UI.input} placeholder="Label" />
+                            </div>
+                            <div className="space-y-2">
+                               <label className={UI.label}>Brief Description</label>
+                               <textarea value={s.description} onChange={(e) => {
+                                  const newI = [...data.aboutPage.stats.items]; newI[i].description = e.target.value; updateAbout("stats", "items", newI);
+                               }} className={UI.textarea} rows={2} placeholder="Brief desc..." />
+                            </div>
                          </div>
                        ))}
-                       <button onClick={() => updateAbout("stats", "items", [...(data.aboutPage?.stats?.items || []), { value: 0, label: "", suffix: "+", icon: "Shield", description: "" }])} className="border-2 border-dashed border-slate-200 rounded-2xl flex flex-col items-center justify-center text-slate-300 hover:text-primary transition-all py-6">
-                          <Plus className="w-6 h-6" />
-                          <span className="text-[9px] font-bold uppercase mt-2">Add Stat</span>
+                       <button onClick={() => updateAbout("stats", "items", [...(data.aboutPage?.stats?.items || []), { value: 0, label: "", suffix: "+", icon: "Shield", description: "" }])} className={UI.buttonAdd + " h-full flex flex-col justify-center gap-2"}>
+                          <Plus className="w-8 h-8 mx-auto" />
+                          <span>Add Stat</span>
                        </button>
                     </div>
                  </div>
 
                  <div className="space-y-6">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Industry Marquee (Scrolling Labels)</label>
+                    <label className={UI.label}>Industry Marquee (Scrolling Labels)</label>
                     <div className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm flex flex-wrap gap-4">
                        {(data.aboutPage?.recognition || []).map((r: string, i: number) => (
                          <div key={i} className="flex items-center gap-3 bg-slate-50 px-4 py-2 rounded-xl border border-slate-100">
@@ -457,10 +564,10 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                             }} className="bg-transparent text-xs font-bold text-slate-600 outline-none" />
                             <button onClick={() => {
                               const newR = data.aboutPage.recognition.filter((_: any, idx: number) => idx !== i); updateAbout("recognition", null, newR);
-                            }} className="text-slate-300 hover:text-red-500"><Trash2 className="w-3.5 h-3.5" /></button>
+                            }} className="text-slate-300 hover:text-red-500 transition-colors"><Trash2 className="w-3.5 h-3.5" /></button>
                          </div>
                        ))}
-                       <button onClick={() => updateAbout("recognition", null, [...(data.aboutPage?.recognition || []), "NEW LABEL"])} className="px-5 py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-bold text-slate-300 hover:text-primary transition-all">+ Add Entry</button>
+                       <button onClick={() => updateAbout("recognition", null, [...(data.aboutPage?.recognition || []), "NEW LABEL"])} className="px-6 py-2 border-2 border-dashed border-slate-200 rounded-xl text-[10px] font-bold text-slate-400 hover:text-primary hover:border-primary/30 transition-all">+ Add Entry</button>
                     </div>
                  </div>
               </div>
@@ -470,45 +577,100 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
             {activeTab === "values" && (
               <div className="space-y-16">
                  <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6 max-w-3xl">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Values Headline & Branding</label>
-                    <input type="text" value={data.aboutPage?.values?.headline || ""} onChange={(e) => updateAbout("values", "headline", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-xl font-bold outline-none" placeholder="Full Headline" />
-                    <input type="text" value={data.aboutPage?.values?.highlight || ""} onChange={(e) => updateAbout("values", "highlight", e.target.value)} className="w-full bg-primary/5 text-primary px-5 py-3 rounded-xl text-lg font-bold outline-none" placeholder="Text to highlight" />
-                    <textarea value={data.aboutPage?.values?.description || ""} onChange={(e) => updateAbout("values", "description", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-sm text-slate-500 outline-none" rows={3} placeholder="Context description..." />
+                    <label className={UI.sectionHeader}>Values Headline & Branding</label>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Full Headline</label>
+                       <input type="text" value={data.aboutPage?.values?.headline || ""} onChange={(e) => updateAbout("values", "headline", e.target.value)} className={UI.inputLarge} placeholder="Full Headline" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Highlight Text</label>
+                       <input type="text" value={data.aboutPage?.values?.highlight || ""} onChange={(e) => updateAbout("values", "highlight", e.target.value)} className={UI.inputPrimary} placeholder="Text to highlight" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Context Description</label>
+                       <textarea value={data.aboutPage?.values?.description || ""} onChange={(e) => updateAbout("values", "description", e.target.value)} className={UI.textarea} rows={3} placeholder="Context description..." />
+                    </div>
                  </div>
 
                  <div className="space-y-6">
-                    <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Core Philosophies (Cards)</label>
+                    <label className={UI.label}>Core Philosophies (Cards)</label>
                     <div className="grid grid-cols-3 gap-8">
                        {(data.aboutPage?.values?.items || []).map((v: any, i: number) => (
-                         <div key={i} className="bg-white p-8 rounded-3xl border border-slate-100 shadow-sm space-y-6 relative group">
+                         <div key={i} className={UI.card + " space-y-6 relative group"}>
                             <button onClick={() => {
                                const newI = data.aboutPage.values.items.filter((_: any, idx: number) => idx !== i); updateAbout("values", "items", newI);
-                            }} className="absolute top-6 right-6 text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-5 h-5" /></button>
-                            <input type="text" value={v.icon} onChange={(e) => {
-                               const newI = [...data.aboutPage.values.items]; newI[i].icon = e.target.value; updateAbout("values", "items", newI);
-                            }} className="w-24 bg-slate-50 px-3 py-1.5 rounded-lg text-[10px] font-bold text-primary outline-none" placeholder="Icon" />
-                            <input type="text" value={v.title} onChange={(e) => {
-                               const newI = [...data.aboutPage.values.items]; newI[i].title = e.target.value; updateAbout("values", "items", newI);
-                            }} className="w-full bg-transparent text-xl font-bold text-slate-900 outline-none" placeholder="Value Title" />
-                            <textarea value={v.description} onChange={(e) => {
-                               const newI = [...data.aboutPage.values.items]; newI[i].description = e.target.value; updateAbout("values", "items", newI);
-                            }} className="w-full bg-transparent text-xs text-slate-500 leading-relaxed outline-none" rows={3} placeholder="Description..." />
-                            <div className="pt-6 border-t border-slate-100 flex gap-4">
-                               <input type="text" value={v.statLabel} onChange={(e) => {
-                                 const newI = [...data.aboutPage.values.items]; newI[i].statLabel = e.target.value; updateAbout("values", "items", newI);
-                               }} className="flex-1 bg-slate-50 px-3 py-1.5 rounded-lg text-[9px] outline-none" placeholder="Stat Label" />
-                               <input type="text" value={v.stat} onChange={(e) => {
-                                 const newI = [...data.aboutPage.values.items]; newI[i].stat = e.target.value; updateAbout("values", "items", newI);
-                               }} className="w-20 bg-primary/5 text-primary px-3 py-1.5 rounded-lg text-xs font-bold outline-none" placeholder="Stat Value" />
+                            }} className="absolute top-8 right-8 text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-5 h-5" /></button>
+                            
+                            <IconSelector 
+                               label="Philosophy Icon"
+                               value={v.icon} 
+                               onChange={(val) => {
+                                 const newI = [...data.aboutPage.values.items]; newI[i].icon = val; updateAbout("values", "items", newI);
+                               }} 
+                            />
+
+                            <div className="space-y-2">
+                               <label className={UI.label}>Value Title</label>
+                               <input type="text" value={v.title} onChange={(e) => {
+                                  const newI = [...data.aboutPage.values.items]; newI[i].title = e.target.value; updateAbout("values", "items", newI);
+                               }} className={UI.inputLarge} placeholder="Value Title" />
+                            </div>
+                            <div className="space-y-2">
+                               <label className={UI.label}>Description</label>
+                               <textarea value={v.description} onChange={(e) => {
+                                  const newI = [...data.aboutPage.values.items]; newI[i].description = e.target.value; updateAbout("values", "items", newI);
+                               }} className={UI.textarea} rows={3} placeholder="Description..." />
+                            </div>
+                            <div className="pt-6 border-t border-slate-100 grid grid-cols-2 gap-4">
+                               <div className="space-y-1">
+                                  <label className={UI.label}>Stat Label</label>
+                                  <input type="text" value={v.statLabel} onChange={(e) => {
+                                    const newI = [...data.aboutPage.values.items]; newI[i].statLabel = e.target.value; updateAbout("values", "items", newI);
+                                  }} className={UI.input} placeholder="Stat Label" />
+                               </div>
+                               <div className="space-y-1">
+                                  <label className={UI.label}>Stat Value</label>
+                                  <input type="text" value={v.stat} onChange={(e) => {
+                                    const newI = [...data.aboutPage.values.items]; newI[i].stat = e.target.value; updateAbout("values", "items", newI);
+                                  }} className={UI.inputPrimary} placeholder="Stat Value" />
+                               </div>
                             </div>
                          </div>
                        ))}
-                       <button onClick={() => updateAbout("values", "items", [...(data.aboutPage?.values?.items || []), { title: "", description: "", icon: "BadgeCheck", statLabel: "", stat: "" }])} className="border-2 border-dashed border-slate-200 rounded-3xl py-12 flex flex-col items-center justify-center gap-3 text-slate-300 hover:text-primary transition-all">
-                          <Plus className="w-8 h-8" />
-                          <span className="text-[10px] font-bold uppercase tracking-widest">Add New Value</span>
+                       <button onClick={() => updateAbout("values", "items", [...(data.aboutPage?.values?.items || []), { title: "", description: "", icon: "BadgeCheck", statLabel: "", stat: "" }])} className={UI.buttonAdd + " h-full flex flex-col justify-center gap-4 py-20"}>
+                          <Plus className="w-10 h-10 mx-auto" />
+                          <span>Add New Value</span>
                        </button>
                     </div>
                  </div>
+              </div>
+            )}
+
+             {/* SERVICES SECTION */}
+            {activeTab === "services" && (
+              <div className="space-y-12">
+                 <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-6">
+                    <label className={UI.sectionHeader}>Capabilities Branding</label>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Badge</label>
+                       <input type="text" value={data.aboutPage?.capabilities?.badge || ""} onChange={(e) => updateAbout("capabilities", "badge", e.target.value)} className={UI.input} placeholder="Badge (e.g. Services)" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Headline</label>
+                       <input type="text" value={data.aboutPage?.capabilities?.headline || ""} onChange={(e) => updateAbout("capabilities", "headline", e.target.value)} className={UI.inputLarge} placeholder="Headline (e.g. Our Capabilities)" />
+                    </div>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Intro Narrative</label>
+                       <textarea value={data.aboutPage?.capabilities?.description || ""} onChange={(e) => updateAbout("capabilities", "description", e.target.value)} className={UI.textarea} rows={3} placeholder="Intro narrative..." />
+                    </div>
+                 </div>
+
+                 <ContentSelector 
+                    type="services" 
+                    label="Featured Capabilities (Select from Management)" 
+                    selectedItems={data.aboutPage?.services || []} 
+                    onSelect={(items) => updateAbout("services", null, items)} 
+                 />
               </div>
             )}
 
@@ -517,28 +679,40 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
               <div className="space-y-16">
                  <div className="grid grid-cols-12 gap-10">
                     <div className="col-span-8 space-y-10">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Global CTA Banner Management</label>
                        <div className="bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm space-y-8">
-                          <input type="text" value={data.aboutPage?.ctaBanner?.badge || ""} onChange={(e) => updateAbout("ctaBanner", "badge", e.target.value)} className="w-full bg-slate-50 px-5 py-3 rounded-xl text-xs font-bold text-primary outline-none" placeholder="Badge" />
-                          <div className="grid grid-cols-2 gap-4">
-                             <input type="text" value={data.aboutPage?.ctaBanner?.headline || ""} onChange={(e) => updateAbout("ctaBanner", "headline", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-lg font-bold outline-none" placeholder="Main Headline" />
-                             <input type="text" value={data.aboutPage?.ctaBanner?.highlight || ""} onChange={(e) => updateAbout("ctaBanner", "highlight", e.target.value)} className="w-full bg-primary/5 text-primary px-5 py-4 rounded-xl text-lg font-bold outline-none" placeholder="Highlight Text" />
+                          <label className={UI.sectionHeader}>Global CTA Banner Management</label>
+                          <div className="space-y-2">
+                             <label className={UI.label}>Badge</label>
+                             <input type="text" value={data.aboutPage?.ctaBanner?.badge || ""} onChange={(e) => updateAbout("ctaBanner", "badge", e.target.value)} className={UI.input} placeholder="Badge" />
                           </div>
-                          <textarea value={data.aboutPage?.ctaBanner?.description || ""} onChange={(e) => updateAbout("ctaBanner", "description", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-sm text-slate-500 outline-none leading-relaxed" rows={4} placeholder="Conversion narrative..." />
+                          <div className="grid grid-cols-2 gap-4">
+                             <div className="space-y-2">
+                                <label className={UI.label}>Main Headline</label>
+                                <input type="text" value={data.aboutPage?.ctaBanner?.headline || ""} onChange={(e) => updateAbout("ctaBanner", "headline", e.target.value)} className={UI.inputLarge} placeholder="Main Headline" />
+                             </div>
+                             <div className="space-y-2">
+                                <label className={UI.label}>Highlight Text</label>
+                                <input type="text" value={data.aboutPage?.ctaBanner?.highlight || ""} onChange={(e) => updateAbout("ctaBanner", "highlight", e.target.value)} className={UI.inputPrimary} placeholder="Highlight Text" />
+                             </div>
+                          </div>
+                          <div className="space-y-2">
+                             <label className={UI.label}>Conversion Narrative</label>
+                             <textarea value={data.aboutPage?.ctaBanner?.description || ""} onChange={(e) => updateAbout("ctaBanner", "description", e.target.value)} className={UI.textarea} rows={4} placeholder="Conversion narrative..." />
+                          </div>
                           
                           <div className="grid grid-cols-2 gap-8">
                              <div className="space-y-4">
-                                <span className="text-[9px] font-bold text-slate-300 uppercase">Primary Action</span>
+                                <label className={UI.label}>Primary Action</label>
                                 <div className="grid grid-cols-1 gap-3">
-                                   <input type="text" value={data.aboutPage?.ctaBanner?.primaryCta || ""} onChange={(e) => updateAbout("ctaBanner", "primaryCta", e.target.value)} className="bg-slate-50 px-4 py-2.5 rounded-xl text-xs font-bold" placeholder="Label" />
-                                   <input type="text" value={data.aboutPage?.ctaBanner?.primaryLink || ""} onChange={(e) => updateAbout("ctaBanner", "primaryLink", e.target.value)} className="bg-slate-50 px-4 py-2.5 rounded-xl text-xs" placeholder="Link" />
+                                   <input type="text" value={data.aboutPage?.ctaBanner?.primaryCta || ""} onChange={(e) => updateAbout("ctaBanner", "primaryCta", e.target.value)} className={UI.input} placeholder="Label" />
+                                   <input type="text" value={data.aboutPage?.ctaBanner?.primaryLink || ""} onChange={(e) => updateAbout("ctaBanner", "primaryLink", e.target.value)} className={UI.input} placeholder="Link" />
                                 </div>
                              </div>
                              <div className="space-y-4">
-                                <span className="text-[9px] font-bold text-slate-300 uppercase">Secondary Action</span>
+                                <label className={UI.label}>Secondary Action</label>
                                 <div className="grid grid-cols-1 gap-3">
-                                   <input type="text" value={data.aboutPage?.ctaBanner?.secondaryCta || ""} onChange={(e) => updateAbout("ctaBanner", "secondaryCta", e.target.value)} className="bg-slate-50 px-4 py-2.5 rounded-xl text-xs font-bold" placeholder="Label" />
-                                   <input type="text" value={data.aboutPage?.ctaBanner?.secondaryLink || ""} onChange={(e) => updateAbout("ctaBanner", "secondaryLink", e.target.value)} className="bg-slate-50 px-4 py-2.5 rounded-xl text-xs" placeholder="Link" />
+                                   <input type="text" value={data.aboutPage?.ctaBanner?.secondaryCta || ""} onChange={(e) => updateAbout("ctaBanner", "secondaryCta", e.target.value)} className={UI.input} placeholder="Label" />
+                                   <input type="text" value={data.aboutPage?.ctaBanner?.secondaryLink || ""} onChange={(e) => updateAbout("ctaBanner", "secondaryLink", e.target.value)} className={UI.input} placeholder="Link" />
                                 </div>
                              </div>
                           </div>
@@ -546,7 +720,7 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                     </div>
 
                     <div className="col-span-4 space-y-6">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Trust Indicators (Features)</label>
+                       <label className={UI.label}>Trust Indicators (Features)</label>
                        <div className="space-y-3">
                           {(data.aboutPage?.ctaBanner?.features || []).map((f: string, i: number) => (
                             <div key={i} className="flex items-center gap-3 bg-white p-4 rounded-2xl border border-slate-100 shadow-sm">
@@ -558,7 +732,7 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
                                }} className="text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                             </div>
                           ))}
-                          <button onClick={() => updateAbout("ctaBanner", "features", [...(data.aboutPage?.ctaBanner?.features || []), "Feature Descriptor"])} className="w-full border-2 border-dashed border-slate-200 rounded-2xl py-4 text-[10px] font-bold text-slate-300 hover:text-primary transition-all uppercase tracking-widest">+ Add Feature</button>
+                          <button onClick={() => updateAbout("ctaBanner", "features", [...(data.aboutPage?.ctaBanner?.features || []), "Feature Descriptor"])} className={UI.buttonAdd}>+ Add Feature</button>
                        </div>
                     </div>
                  </div>

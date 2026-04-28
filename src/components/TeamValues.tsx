@@ -141,7 +141,16 @@ const Leadership = () => {
   const [isClient, setIsClient] = useState(false);
 
   const section = (leadership as any).section || { badge: '', headline: '', description: '' };
-  const ceo = (leadership as any).ceo || { name: '', title: '', image: {}, alt: '', badges: { top: '', bottom: '' }, quotes: [], description: [], socials: [] };
+  const ceo = (leadership as any).ceo || { 
+    name: '', 
+    title: '', 
+    image: {}, 
+    alt: '', 
+    badges: { top: '', bottom: '' }, 
+    quotes: [], 
+    description: [], 
+    socials: [] 
+  };
 
   useEffect(() => {
     setIsClient(true);

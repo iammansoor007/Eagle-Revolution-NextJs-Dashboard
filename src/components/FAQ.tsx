@@ -322,7 +322,7 @@ const AccordionItem = ({ item, index, isOpen, onToggle }: { item: any; index: nu
                     {item.answer}
                   </p>
 
-                  {item.metadata && (
+                  {Array.isArray(item.metadata) && item.metadata.length > 0 && (
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-5">
                       {item.metadata.map((meta: any, i: number) => (
                         <motion.div
@@ -340,7 +340,7 @@ const AccordionItem = ({ item, index, isOpen, onToggle }: { item: any; index: nu
                     </div>
                   )}
 
-                  {item.links && (
+                  {Array.isArray(item.links) && item.links.length > 0 && (
                     <motion.div
                       initial={{ opacity: 0, y: 10 }}
                       animate={{ opacity: 1, y: 0 }}
@@ -411,7 +411,7 @@ const CategoryFilter = ({ categories, activeCategory, onCategoryChange }: { cate
   // Normalize categories if they are just strings
   const normalizedCategories = [
     { id: 'all', label: 'All Questions', icon: 'Layers' },
-    ...categories.map(cat => (typeof cat === 'string' ? { id: cat, label: cat, icon: null } : cat))
+    ...(Array.isArray(categories) ? categories : []).map(cat => (typeof cat === 'string' ? { id: cat, label: cat, icon: null } : cat))
   ];
 
   return (

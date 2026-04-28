@@ -9,6 +9,7 @@ import {
   ArrowRight, MessageSquare, Filter, BookOpen, Sparkles
 } from "lucide-react";
 import ContentSelector from "@/components/admin/ContentSelector";
+import { UI } from "./styles";
 
 export default function FAQEditor({ pageId, data, setData }: { pageId: string, data: any, setData: (d: any) => void }) {
   const [activeTab, setActiveTab] = useState("header");
@@ -70,7 +71,7 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shrink-0 ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shrink-0 ${
                 activeTab === tab.id
                 ? "bg-primary text-white shadow-lg shadow-primary/20"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
@@ -101,14 +102,15 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
             {/* HEADER SECTION */}
             {activeTab === "header" && (
               <div className="max-w-3xl space-y-10">
-                 <div className="space-y-6 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Main Headline</label>
-                       <input type="text" value={data.faq?.section?.headline || ""} onChange={(e) => updateFAQ("section", "headline", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-xl font-bold outline-none" />
+                 <div className={UI.card + " space-y-6"}>
+                    <label className={UI.sectionHeader}>Section Branding</label>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Main Headline</label>
+                       <input type="text" value={data.faq?.section?.headline || ""} onChange={(e) => updateFAQ("section", "headline", e.target.value)} className={UI.inputLarge} />
                     </div>
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Knowledge Intro Narrative</label>
-                       <textarea value={data.faq?.section?.description || ""} onChange={(e) => updateFAQ("section", "description", e.target.value)} rows={4} className="w-full bg-slate-50 px-5 py-4 rounded-2xl text-sm text-slate-500 outline-none leading-relaxed" />
+                    <div className="space-y-2">
+                       <label className={UI.label}>Knowledge Intro Narrative</label>
+                       <textarea value={data.faq?.section?.description || ""} onChange={(e) => updateFAQ("section", "description", e.target.value)} rows={4} className={UI.textarea} />
                     </div>
                  </div>
               </div>
@@ -117,31 +119,34 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
             {/* CATEGORIES SECTION */}
             {activeTab === "categories" && (
               <div className="space-y-10">
-                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Filtering Taxonomy</label>
+                 <label className={UI.label}>Filtering Taxonomy</label>
                  <div className="grid grid-cols-3 gap-6">
                     {(data.faq?.categories || []).map((cat: any, i: number) => (
-                      <div key={i} className="bg-white p-6 rounded-2xl border border-slate-100 shadow-sm space-y-4 relative group hover:border-primary/20 transition-all">
-                         <div className="flex justify-between items-center">
-                            <Filter className="w-4 h-4 text-primary" />
+                      <div key={i} className={UI.card + " space-y-6 relative group p-6 rounded-3xl"}>
+                         <div className="flex justify-between items-center mb-2">
+                            <div className="w-10 h-10 bg-primary/5 text-primary rounded-xl flex items-center justify-center border border-primary/10">
+                               <Filter className="w-4 h-4" />
+                            </div>
                             <button onClick={() => {
                                const newC = data.faq.categories.filter((_: any, idx: number) => idx !== i);
                                updateFAQ("categories", null, newC);
                             }} className="text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
                          </div>
-                         <div className="space-y-1">
+                         <div className="space-y-2">
+                            <label className={UI.label + " mb-0"}>Category Label</label>
                             <input type="text" value={cat.label} onChange={(e) => {
                                  const newC = [...data.faq.categories];
                                  newC[i].label = e.target.value;
                                  newC[i].id = e.target.value.toLowerCase().replace(/\s+/g, '-');
                                  updateFAQ("categories", null, newC);
-                               }} className="w-full bg-transparent font-bold text-slate-800 outline-none text-sm" placeholder="Category Label" />
-                            <p className="text-[9px] text-slate-300 font-mono uppercase tracking-tighter">ID: {cat.id}</p>
+                               }} className={UI.input + " font-bold"} placeholder="Category Label" />
+                            <p className="text-[9px] text-slate-300 font-mono uppercase tracking-tighter px-1">ID: {cat.id}</p>
                          </div>
                       </div>
                     ))}
-                    <button onClick={() => updateFAQ("categories", null, [...(data.faq?.categories || []), { id: "new", label: "New Category" }])} className="border-2 border-dashed border-slate-200 rounded-2xl py-10 flex flex-col items-center justify-center gap-3 text-slate-300 hover:text-primary transition-all">
-                       <Plus className="w-8 h-8" />
-                       <span className="text-[10px] font-bold uppercase tracking-widest">Add Category</span>
+                    <button onClick={() => updateFAQ("categories", null, [...(data.faq?.categories || []), { id: "new", label: "New Category" }])} className={UI.buttonAdd + " py-12"}>
+                       <Plus className="w-8 h-8 mx-auto" />
+                       <span>Add Category</span>
                     </button>
                  </div>
               </div>

@@ -28,7 +28,14 @@ const Hero = () => {
   const parallaxX = useTransform(smoothX, (val) => val * 0.8);
   const parallaxY = useTransform(smoothY, (val) => val * 0.8);
 
-  const { badge, headlines, description, buttons, stats, images } = hero;
+  const { 
+    badge = "Premium Exterior Solutions", 
+    headlines = [], 
+    description = "", 
+    buttons = [], 
+    stats = [], 
+    images = [] 
+  } = hero || {};
 
   useEffect(() => {
     const handleMouseMove = (e: MouseEvent) => {

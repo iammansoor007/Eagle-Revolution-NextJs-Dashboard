@@ -9,6 +9,7 @@ import {
   ArrowRight, MapPin, Calendar, Layers, Sparkles
 } from "lucide-react";
 import ContentSelector from "@/components/admin/ContentSelector";
+import { UI } from "./styles";
 
 // Shared Reusable Image Upload Component
 const ImageUpload = ({ label, value, onChange, description }: any) => {
@@ -35,7 +36,7 @@ const ImageUpload = ({ label, value, onChange, description }: any) => {
 
   return (
     <div className="space-y-3">
-      <label className="text-[10px] font-medium text-slate-500 uppercase tracking-widest">{label}</label>
+      <label className={UI.label}>{label}</label>
       <div className="group relative">
         <div className="aspect-video w-full bg-slate-50/50 border border-slate-200 rounded-2xl overflow-hidden flex items-center justify-center transition-all group-hover:border-primary/30">
           {value ? (
@@ -125,7 +126,7 @@ export default function GalleryEditor({ pageId, data, setData }: { pageId: strin
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-medium uppercase tracking-widest transition-all shrink-0 ${
+              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shrink-0 ${
                 activeTab === tab.id
                 ? "bg-primary text-white shadow-lg shadow-primary/20"
                 : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
@@ -156,18 +157,19 @@ export default function GalleryEditor({ pageId, data, setData }: { pageId: strin
             {/* HEADER SECTION */}
             {activeTab === "header" && (
               <div className="max-w-3xl space-y-10">
-                 <div className="space-y-6 bg-white p-10 rounded-[2.5rem] border border-slate-100 shadow-sm">
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Gallery Badge</label>
-                       <input type="text" value={data.galleryPage?.header?.badge || ""} onChange={(e) => updateHeader("badge", e.target.value)} className="w-full bg-slate-50 px-5 py-3.5 rounded-xl text-xs font-bold text-primary outline-none" />
+                 <div className={UI.card + " space-y-6"}>
+                    <label className={UI.sectionHeader}>Section Branding</label>
+                    <div className="space-y-2">
+                       <label className={UI.label}>Gallery Badge</label>
+                       <input type="text" value={data.galleryPage?.header?.badge || ""} onChange={(e) => updateHeader("badge", e.target.value)} className={UI.inputPrimary} />
                     </div>
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Main Headline</label>
-                       <input type="text" value={data.galleryPage?.header?.title || ""} onChange={(e) => updateHeader("title", e.target.value)} className="w-full bg-slate-50 px-5 py-4 rounded-xl text-xl font-bold outline-none" />
+                    <div className="space-y-2">
+                       <label className={UI.label}>Main Headline</label>
+                       <input type="text" value={data.galleryPage?.header?.title || ""} onChange={(e) => updateHeader("title", e.target.value)} className={UI.inputLarge} />
                     </div>
-                    <div className="space-y-3">
-                       <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Intro Description</label>
-                       <textarea value={data.galleryPage?.header?.description || ""} onChange={(e) => updateHeader("description", e.target.value)} rows={4} className="w-full bg-slate-50 px-5 py-4 rounded-2xl text-sm text-slate-500 outline-none leading-relaxed" />
+                    <div className="space-y-2">
+                       <label className={UI.label}>Intro Description</label>
+                       <textarea value={data.galleryPage?.header?.description || ""} onChange={(e) => updateHeader("description", e.target.value)} rows={4} className={UI.textarea} />
                     </div>
                  </div>
               </div>

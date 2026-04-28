@@ -1,7 +1,7 @@
 "use client";
 
 import { motion, useInView, useScroll, useTransform } from "framer-motion";
-import { useRef, useEffect, useState, useMemo } from "react";
+import { useRef, useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { useContent } from "../../hooks/useContent";
@@ -19,8 +19,6 @@ import gutter from '../../assets/gutterinstallation.jpg.jpeg';
 import pvcdecks from '../../assets/pvcdecks.jpg.jpeg';
 
 import {
-  MousePointer2,
-  Globe,
   ShieldCheck,
   ArrowUpRight,
   Clock,
@@ -39,14 +37,14 @@ import {
   Shield as LucideShield,
   Home as LucideHome,
   Building as LucideBuilding,
-  Wind as LucideWindow,
   Droplet as LucideDroplet,
   Layers as LucideLayers,
   Star as LucideStar,
   Quote,
   Linkedin,
   Mail,
-  Flag
+  Flag,
+  GlobeIcon
 } from 'lucide-react';
 import React from 'react';
 
@@ -56,7 +54,7 @@ const iconMap: Record<string, any> = {
   Home: LucideHome, Layout: LucideLayers, TreePine: LucideStar, Building2: LucideBuilding, Building: LucideBuilding, Droplets: LucideDroplet,
   Shield: LucideShield, Trophy: Award, Users: Users, ThumbsUp: Heart, FileText: LucideLayers, ClipboardCheck: CheckCircle,
   Truck: LucideLayers, Hammer: LucideStar, CheckCircle: CheckCircle, Award: Award, Clock: Clock,
-  Scale, Gem, Zap, Target: LucideTarget, Sparkles, TrendingUp, BadgeCheck, ShieldCheck, Globe, Quote, Linkedin, Mail, Flag
+  Scale, Gem, Zap, Target: LucideTarget, Sparkles, TrendingUp, BadgeCheck, ShieldCheck, Globe: GlobeIcon, Quote, Linkedin, Mail, Flag
 };
 
 const imageMap: Record<string, any> = {
@@ -314,23 +312,6 @@ const Hero = () => {
         </div>
       </div>
     </section>
-  );
-};
-
-// ==================== PARALLAX LAYER ====================
-const ParallaxLayer = ({ children, speed = 0.1, className = "" }: { children: React.ReactNode; speed?: number; className?: string }) => {
-  const ref = useRef(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"]
-  });
-
-  const y = useTransform(scrollYProgress, [0, 1], [0, speed * 50]);
-
-  return (
-    <motion.div ref={ref} style={{ y }} className={`absolute inset-0 will-change-transform ${className}`}>
-      {children}
-    </motion.div>
   );
 };
 
@@ -704,7 +685,12 @@ const ServiceCard = ({ service, index }: { service: any; index: number }) => {
 const ServicesSection = () => {
   const { aboutPage, services } = useContent();
   const capabilities = aboutPage?.capabilities || {};
-  const servicesList = (Array.isArray(services) ? services : services?.services || []).slice(0, 6);
+  
+  // Use the selected services from CMS if available, otherwise fallback to first 6
+  const featuredServices = aboutPage?.services || [];
+  const servicesList = featuredServices.length > 0 
+    ? featuredServices 
+    : (Array.isArray(services) ? services : services?.services || []).slice(0, 6);
 
   return (
     <section className="py-16 md:py-24 px-6 lg:px-12 bg-transparent relative z-30">
@@ -712,7 +698,7 @@ const ServicesSection = () => {
         <motion.div initial={{ opacity: 0, y: 30 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ duration: 0.6 }} className="text-center mb-16">
           <span className="inline-block text-primary text-xs font-black uppercase tracking-[0.5em] mb-4">{capabilities.badge || "Services"}</span>
           <h2 className="text-4xl md:text-6xl font-heading font-bold mb-6 tracking-tighter text-foreground">
-            {capabilities.headline?.replace('Capabilities', '')}
+            {capabilities.headline || "Our Capabilities"}
           </h2>
           <div className="w-24 h-1 bg-primary mx-auto rounded-full mb-6" />
           <p className="max-w-3xl mx-auto text-muted-foreground text-lg md:text-xl leading-relaxed">{capabilities.description}</p>
