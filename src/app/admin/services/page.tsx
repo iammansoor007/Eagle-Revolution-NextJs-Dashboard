@@ -14,6 +14,7 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 
 const ICON_LIST = [
   "Home", "Layout", "Building2", "Building", "Droplets", "Shield", "ShieldCheck", 
@@ -80,68 +81,6 @@ function IconSelector({ value, onChange }: { value: string, onChange: (v: string
   );
 }
 
-function ImageUpload({ value, onChange, label }: { value: string, onChange: (v: string) => void, label: string }) {
-  const [uploading, setUploading] = useState(false);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(true);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        onChange(data.url);
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-      alert("Failed to upload image.");
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">{label}</label>
-      <div className="relative group">
-        {value ? (
-          <div className="relative aspect-video rounded-xl overflow-hidden border border-slate-200 shadow-sm">
-            <img src={value} alt="Preview" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center gap-2">
-              <label className="cursor-pointer bg-white text-slate-900 px-4 py-2 rounded-lg font-bold text-xs hover:scale-105 transition-transform">
-                Change Image
-                <input type="file" className="hidden" accept="image/*" onChange={handleUpload} />
-              </label>
-              <button onClick={() => onChange("")} className="bg-red-500 text-white px-4 py-2 rounded-lg font-bold text-xs hover:scale-105 transition-transform">
-                Remove
-              </button>
-            </div>
-          </div>
-        ) : (
-          <label className="flex flex-col items-center justify-center aspect-video rounded-xl border-2 border-dashed border-slate-200 bg-slate-50/50 cursor-pointer hover:bg-slate-50 transition-colors">
-            {uploading ? (
-              <Loader2 className="w-8 h-8 animate-spin text-primary" />
-            ) : (
-              <>
-                <Upload className="w-8 h-8 text-slate-400 mb-2" />
-                <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Click to Upload Image</span>
-              </>
-            )}
-            <input type="file" className="hidden" accept="image/*" onChange={handleUpload} disabled={uploading} />
-          </label>
-        )}
-      </div>
-    </div>
-  );
-}
 
 export default function ServicesAdminPage() {
   const [data, setData] = useState<any>(null);
@@ -471,10 +410,11 @@ export default function ServicesAdminPage() {
                           placeholder="e.g. Craftsmanship Without Compromise."
                         />
                       </div>
-                      <ImageUpload 
+                      <ImageField 
                         label="Section Image"
-                        value={form.overviewImage}
+                        value={form.overviewImage || ""}
                         onChange={(val) => setForm({ ...form, overviewImage: val })}
+                        description="This image appears in the overview section of the service page."
                       />
                     </div>
                     

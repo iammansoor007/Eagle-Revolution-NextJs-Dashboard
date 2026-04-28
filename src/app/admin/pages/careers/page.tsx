@@ -116,9 +116,8 @@ export default function CareersPageEditor() {
         <motion.div
           initial={{ opacity: 0, y: -10 }}
           animate={{ opacity: 1, y: 0 }}
-          className={`p-4 rounded-2xl mb-6 text-center font-bold ${
-            message.includes("success") ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-red-50 text-red-600 border border-red-100"
-          }`}
+          className={`p-4 rounded-2xl mb-6 text-center font-bold ${message.includes("success") ? "bg-emerald-50 text-emerald-600 border border-emerald-100" : "bg-red-50 text-red-600 border border-red-100"
+            }`}
         >
           {message}
         </motion.div>
@@ -231,7 +230,7 @@ export default function CareersPageEditor() {
                 </motion.div>
               ))}
             </AnimatePresence>
-            
+
             {(!data.careers?.roles || data.careers.roles.length === 0) && (
               <div className="p-12 text-center border-2 border-dashed border-slate-200 rounded-3xl">
                 <p className="text-slate-400 font-medium">No roles defined. Click "Add Role" to start.</p>

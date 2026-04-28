@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Loader2, Star, Image as ImageIcon, ChevronRight, Save, X, Quote } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 
 export default function ReviewsAdminPage() {
   const [data, setData] = useState<any>(null);
@@ -141,48 +142,25 @@ export default function ReviewsAdminPage() {
               {/* Avatar Column */}
               <div className="space-y-6">
                 <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Client Identity</label>
-                <div className="flex items-center gap-6 p-6 bg-slate-50 border border-slate-200 rounded-2xl shadow-inner">
-                  <div className="relative">
-                    {form.avatar && (form.avatar.startsWith('http') || form.avatar.startsWith('/uploads')) ? (
-                      <img src={form.avatar} alt="Avatar" className="w-20 h-20 rounded-2xl object-cover border-2 border-white shadow-md" />
-                    ) : (
-                      <div className="w-20 h-20 rounded-2xl bg-primary/10 flex items-center justify-center text-primary font-bold text-2xl border-2 border-white shadow-md uppercase">
-                        {form.avatar || form.name.charAt(0) || "U"}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex-1 space-y-3">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
-                        try {
-                          const res = await fetch("/api/upload", { method: "POST", body: formData });
-                          if (res.ok) {
-                            const { url } = await res.json();
-                            setForm({ ...form, avatar: url });
-                          }
-                        } catch (err) {
-                          alert("Upload failed.");
-                        }
-                      }}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-slate-900 text-sm file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-[10px] file:font-bold file:bg-primary/10 file:text-primary transition-all cursor-pointer shadow-sm"
-                    />
+                <div className="space-y-4">
+                  <ImageField 
+                    label="Client Avatar"
+                    value={form.avatar || ""}
+                    onChange={(url) => setForm({ ...form, avatar: url })}
+                    description="Upload a photo or select from library. If empty, initials will be used."
+                  />
+                  <div className="space-y-2">
+                    <label className="text-[10px] uppercase tracking-widest text-slate-500 font-extrabold">Manual Initials / URL</label>
                     <input
                       type="text"
                       value={form.avatar}
                       onChange={(e) => setForm({ ...form, avatar: e.target.value })}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-2 text-slate-900 text-xs font-bold focus:ring-1 focus:ring-primary/20 outline-none transition-all shadow-sm"
-                      placeholder="Or enter initials / URL"
+                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 text-xs font-bold focus:ring-1 focus:ring-primary/20 outline-none transition-all shadow-inner"
+                      placeholder="Enter initials or paste URL"
                     />
                   </div>
                 </div>
-
-                <div className="grid grid-cols-2 gap-4">
+<div className="grid grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Rating (1-5)</label>
                     <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-inner">

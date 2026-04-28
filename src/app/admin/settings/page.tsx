@@ -5,6 +5,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { Save, Loader2, Settings, LayoutTemplate, Type, Image as ImageIcon, ChevronRight, Globe, Mail, Phone, MapPin, Share2, Plus, Trash2, List, ExternalLink, Search, Check, X, Upload } from "lucide-react";
 import Link from "next/link";
 import * as LucideIcons from "lucide-react";
+import ImageField from "@/components/admin/ImageField";
 
 const COMMON_ICONS = [
   "Home", "Info", "Briefcase", "Phone", "Mail", "MapPin", "Shield", "Star", "Check", "Award",
@@ -72,66 +73,7 @@ function IconPicker({ value, onChange }: { value: string, onChange: (val: string
   );
 }
 
-function ImageUpload({ value, onChange, label, placeholder }: { value: string, onChange: (val: string) => void, label: string, placeholder?: string }) {
-  const [uploading, setUploading] = useState(false);
-
-  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    setUploading(true);
-    try {
-      const formData = new FormData();
-      formData.append("file", file);
-      const res = await fetch("/api/upload", { method: "POST", body: formData });
-      if (res.ok) {
-        const { url } = await res.json();
-        onChange(url);
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-    } finally {
-      setUploading(false);
-    }
-  };
-
-  return (
-    <div className="space-y-2">
-      <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">{label}</label>
-      <div className="flex items-center gap-4">
-        <div className="w-16 h-16 rounded-xl bg-slate-100 border border-slate-200 flex items-center justify-center overflow-hidden shrink-0">
-          {value ? <img src={value} className="w-full h-full object-contain" /> : <ImageIcon className="w-6 h-6 text-slate-300" />}
-        </div>
-        <div className="flex-1 space-y-2">
-          <div className="flex gap-2">
-            <input
-              type="text"
-              value={value}
-              onChange={(e) => onChange(e.target.value)}
-              className="flex-1 bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-sm"
-              placeholder={placeholder || "https://..."}
-            />
-            <div className="relative">
-              <input
-                type="file"
-                id={`upload-${label.replace(/\s+/g, "-")}`}
-                className="hidden"
-                onChange={handleUpload}
-                accept="image/*"
-              />
-              <label
-                htmlFor={`upload-${label.replace(/\s+/g, "-")}`}
-                className="flex items-center justify-center gap-2 bg-white border border-slate-200 px-4 py-2 rounded-xl text-sm font-medium hover:bg-slate-50 cursor-pointer h-full whitespace-nowrap"
-              >
-                {uploading ? <Loader2 className="w-4 h-4 animate-spin text-primary" /> : <Upload className="w-4 h-4 text-primary" />}
-                <span>{uploading ? "..." : "Upload"}</span>
-              </label>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-}
+// Removed legacy ImageUpload component in favor of unified ImageField
 
 function PageSelector({ value, pages, onChange }: { value: string, pages: any[], onChange: (page: any) => void }) {
   const selectedPage = pages.find(p => p._id === value);
@@ -320,11 +262,11 @@ export default function SettingsEditor() {
                       className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium"
                     />
                   </div>
-                  <ImageUpload
+                  <ImageField
                     label="Favicon URL / Logo"
                     value={data.settings?.favicon || ""}
                     onChange={(val) => updateData("settings", "favicon", val)}
-                    placeholder="/favicon.ico"
+                    description="The small icon shown in browser tabs."
                   />
                 </div>
               </motion.div>
@@ -335,11 +277,11 @@ export default function SettingsEditor() {
                 <h2 className="text-xl font-medium text-slate-900 border-b border-slate-50 pb-6">Header & Navigation</h2>
 
                 <div className="space-y-6">
-                  <ImageUpload
+                  <ImageField
                     label="Navbar Logo"
                     value={data.navbar?.logo || ""}
                     onChange={(val) => updateData("navbar", "logo", val)}
-                    placeholder="/logo.png"
+                    description="Main logo appearing in the navigation bar."
                   />
 
                   <div className="grid grid-cols-2 gap-4">
@@ -515,11 +457,11 @@ export default function SettingsEditor() {
                       <input type="text" value={data.footer?.company?.tagline || ""} onChange={(e) => updateData("footer", "company", { ...data.footer.company, tagline: e.target.value })} className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900" />
                     </div>
                   </div>
-                  <ImageUpload
-                    label="Footer Logo (ER initials fallback)"
+                  <ImageField
+                    label="Footer Logo"
                     value={data.footer?.company?.logo || ""}
                     onChange={(val) => updateData("footer", "company", { ...data.footer.company, logo: val })}
-                    placeholder="/footer-logo.png"
+                    description="Brand logo for the footer section."
                   />
                   <div className="space-y-2">
                     <label className="text-xs uppercase tracking-widest text-slate-500 font-medium">Footer Description</label>

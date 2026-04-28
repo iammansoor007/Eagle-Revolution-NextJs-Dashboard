@@ -13,6 +13,7 @@ import {
 const navItems = [
   { label: "Dashboard",   href: "/admin",          icon: LayoutDashboard },
   { label: "Pages",       href: "/admin/pages",     icon: FileText },
+  { label: "Media",       href: "/admin/media",     icon: ImageIcon },
   { label: "Reviews",     href: "/admin/reviews",   icon: Star },
   { label: "Projects",    href: "/admin/projects",  icon: Folder },
   { label: "FAQ",         href: "/admin/faq",       icon: HelpCircle },

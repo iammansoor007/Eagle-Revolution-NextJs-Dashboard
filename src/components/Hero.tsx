@@ -71,7 +71,7 @@ const Hero = () => {
           ) : (
             <Image
               src={images?.[0] || bgfair}
-              alt=""
+              alt={hero.bgImageAlt || "Eagle Revolution Roofing"}
               className="w-full h-full object-cover scale-105"
               fill
               quality={100}

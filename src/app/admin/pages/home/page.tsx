@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, ChevronRight, Star, Phone, Plus, Trash2, Mail } from "lucide-react";
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 
 export default function HomeEditor() {
   const [data, setData] = useState<any>(null);
@@ -128,48 +129,19 @@ export default function HomeEditor() {
                 <h2 className="text-2xl font-extrabold text-slate-900 mb-8 border-b border-slate-100 pb-6">Hero Section</h2>
 
                 {/* Background Image */}
-                <div className="space-y-2">
-                  <label className="text-slate-600 font-bold tracking-widest uppercase text-[10px]">Background Image</label>
-
-                  {data.hero?.images?.[0] && (
-                    <div className="mb-2 relative w-full h-32 rounded-xl overflow-hidden border border-gray-200">
-                      <img src={data.hero.images[0]} alt="Hero background" className="w-full h-full object-cover" />
-                    </div>
-                  )}
-
-                  <input
-                    type="file"
-                    accept="image/*"
-                    onChange={async (e) => {
-                      const file = e.target.files?.[0];
-                      if (!file) return;
-
-                      // Upload file
-                      const formData = new FormData();
-                      formData.append("file", file);
-
-                      try {
-                        const res = await fetch("/api/upload", {
-                          method: "POST",
-                          body: formData,
-                        });
-                        if (res.ok) {
-                          const { url } = await res.json();
-                          const currentImages = Array.isArray(data.hero?.images) ? data.hero.images : [];
-                          const newImages = [...currentImages];
-                          newImages[0] = url;
-                          updateSection("hero", "images", newImages);
-                        } else {
-                          alert("Upload failed.");
-                        }
-                      } catch (err) {
-                        alert("Error uploading image.");
-                      }
-                    }}
-                    className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none shadow-sm transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
-                  />
-                  <p className="text-xs text-gray-500 mt-1">Upload an image from your computer to replace the hero background.</p>
-                </div>
+                <ImageField 
+                  label="Background Image"
+                  value={data.hero?.images?.[0] || ""}
+                  onChange={(url) => {
+                    const currentImages = Array.isArray(data.hero?.images) ? data.hero.images : [];
+                    const newImages = [...currentImages];
+                    newImages[0] = url;
+                    updateSection("hero", "images", newImages);
+                  }}
+                  altValue={data.hero?.bgImageAlt || ""}
+                  onAltChange={(alt) => updateSection("hero", "bgImageAlt", alt)}
+                  description="Choose a high-quality background for the homepage hero. Optimal size: 1920x1080px."
+                />
 
                 {/* Badge & Description */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -309,38 +281,32 @@ export default function HomeEditor() {
               <motion.div key="about" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-6">
                 <h2 className="text-xl font-bold text-slate-900 mb-6 border-b border-slate-200 pb-4">About Section</h2>
 
-                {/* Image Upload */}
+                {/* Image Selection */}
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-wider text-slate-500 font-bold">Left Side Image</label>
-                    {data.about?.image?.src && (
-                      <div className="mb-2 relative w-full h-32 rounded-xl overflow-hidden border border-gray-200">
-                        <img src={data.about.image.src} alt="About" className="w-full h-full object-cover" />
-                      </div>
-                    )}
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
-                        try {
-                          const res = await fetch("/api/upload", { method: "POST", body: formData });
-                          if (res.ok) {
-                            const { url } = await res.json();
-                            setData((prev: any) => ({ ...prev, about: { ...prev.about, image: { ...prev.about.image, src: url } } }));
-                          } else {
-                            alert("Upload failed.");
-                          }
-                        } catch (err) {
-                          alert("Error uploading image.");
+                  <ImageField 
+                    label="Left Side Image"
+                    value={data.about?.image?.src || ""}
+                    onChange={(url) => {
+                      setData((prev: any) => ({ 
+                        ...prev, 
+                        about: { 
+                          ...prev.about, 
+                          image: { ...prev.about.image, src: url } 
+                        } 
+                      }));
+                    }}
+                    altValue={data.about?.image?.alt || ""}
+                    onAltChange={(alt) => {
+                      setData((prev: any) => ({
+                        ...prev,
+                        about: {
+                          ...prev.about,
+                          image: { ...prev.about.image, alt: alt }
                         }
-                      }}
-                      className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none shadow-sm transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-primary/20 file:text-primary hover:file:bg-primary/30"
-                    />
-                  </div>
+                      }));
+                    }}
+                    description="This image appears on the left side of the About section."
+                  />
 
                   <div className="space-y-4">
                     <div className="space-y-2">
@@ -526,36 +492,30 @@ export default function HomeEditor() {
                     Right Side Media
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                    <div className="space-y-3">
-                      <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Image Upload</label>
-                      {data.services?.image?.src && (
-                        <div className="mb-3 relative w-full h-40 rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg group">
-                          <img src={data.services.image.src} alt="Services" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                        </div>
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const formData = new FormData();
-                          formData.append("file", file);
-                          try {
-                            const res = await fetch("/api/upload", { method: "POST", body: formData });
-                            if (res.ok) {
-                              const { url } = await res.json();
-                              setData((prev: any) => ({ ...prev, services: { ...prev.services, image: { ...prev.services.image, src: url } } }));
-                            } else {
-                              alert("Upload failed.");
-                            }
-                          } catch (err) {
-                            alert("Error uploading image.");
+                    <ImageField 
+                      label="Section Image"
+                      value={data.services?.image?.src || ""}
+                      onChange={(url) => {
+                        setData((prev: any) => ({ 
+                          ...prev, 
+                          services: { 
+                            ...prev.services, 
+                            image: { ...prev.services.image, src: url } 
+                          } 
+                        }));
+                      }}
+                      altValue={data.services?.image?.alt || ""}
+                      onAltChange={(alt) => {
+                        setData((prev: any) => ({
+                          ...prev,
+                          services: {
+                            ...prev.services,
+                            image: { ...prev.services.image, alt: alt }
                           }
-                        }}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none shadow-sm transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:tracking-wider file:bg-primary/10 text-primary border border-primary/20 hover:file:bg-primary/80 transition-colors"
-                      />
-                    </div>
+                        }));
+                      }}
+                      description="This image appears on the right side of the Services section."
+                    />
 
                     <div className="space-y-6">
                       <div className="space-y-3">
@@ -794,33 +754,35 @@ export default function HomeEditor() {
                   </h3>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                     <div className="space-y-3">
-                      <label className="text-xs uppercase tracking-widest text-gray-500 font-bold">Image Upload</label>
-                      {data.leadership?.ceo?.image?.src && (
-                        <div className="mb-3 relative w-full h-40 rounded-xl overflow-hidden border-2 border-gray-200 shadow-lg group">
-                          <img src={data.leadership.ceo.image.src} alt="CEO" className="w-full h-full object-cover transition-transform group-hover:scale-105" />
-                        </div>
-                      )}
-                      <input
-                        type="file"
-                        accept="image/*"
-                        onChange={async (e) => {
-                          const file = e.target.files?.[0];
-                          if (!file) return;
-                          const formData = new FormData();
-                          formData.append("file", file);
-                          try {
-                            const res = await fetch("/api/upload", { method: "POST", body: formData });
-                            if (res.ok) {
-                              const { url } = await res.json();
-                              setData((prev: any) => ({ ...prev, leadership: { ...prev.leadership, ceo: { ...prev.leadership.ceo, image: { ...prev.leadership.ceo.image, src: url } } } }));
-                            } else {
-                              alert("Upload failed.");
+                      <ImageField 
+                        label="Founder Portrait"
+                        value={data.leadership?.ceo?.image?.src || ""}
+                        onChange={(url) => {
+                          setData((prev: any) => ({
+                            ...prev,
+                            leadership: {
+                              ...prev.leadership,
+                              ceo: {
+                                ...prev.leadership.ceo,
+                                image: { ...prev.leadership.ceo.image, src: url }
+                              }
                             }
-                          } catch (err) {
-                            alert("Error uploading image.");
-                          }
+                          }));
                         }}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm focus:ring-2 focus:ring-primary/20 focus:border-primary focus:outline-none shadow-sm transition-all file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:tracking-wider file:bg-primary/10 text-primary border border-primary/20 hover:file:bg-primary/80 transition-colors"
+                        altValue={data.leadership?.ceo?.alt || ""}
+                        onAltChange={(alt) => {
+                          setData((prev: any) => ({
+                            ...prev,
+                            leadership: {
+                              ...prev.leadership,
+                              ceo: {
+                                ...prev.leadership.ceo,
+                                alt: alt
+                              }
+                            }
+                          }));
+                        }}
+                        description="Professional portrait of the CEO/Founder."
                       />
                     </div>
 

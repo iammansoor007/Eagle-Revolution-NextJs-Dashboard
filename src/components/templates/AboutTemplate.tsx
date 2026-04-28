@@ -207,7 +207,7 @@ const Hero = () => {
         <motion.div style={{ y: y1 }} className="absolute inset-0">
           <Image
             src={hero.bgImage || "https://images.unsplash.com/photo-1600585154340-be6161a56a0c?q=80&w=2070"}
-            alt="Modern Architecture"
+            alt={hero.bgImageAlt || "Eagle Revolution Interior"}
             fill
             quality={100}
             className="object-cover opacity-20 sm:opacity-30 scale-110 grayscale-[0.5]"
@@ -339,7 +339,7 @@ const FounderPortrait = () => {
         <div className="relative rounded-xl sm:rounded-2xl overflow-hidden shadow-2xl shadow-gray-300/50 h-[350px] xs:h-[400px] sm:h-[450px] md:h-[500px] lg:h-[600px]">
           <Image
             src={story.portrait?.image || owner}
-            alt="Founder"
+            alt={story.portrait?.alt || story.founder?.name || "Founder"}
             className="object-cover"
             fill
             quality={100}

@@ -1,0 +1,106 @@
+import { NextResponse } from 'next/server';
+import connectToDatabase from '@/lib/mongodb';
+import Media from '@/models/Media';
+import { writeFile, mkdir, unlink } from 'fs/promises';
+import path from 'path';
+import sizeOf from 'image-size';
+
+export async function GET() {
+  try {
+    await connectToDatabase();
+    const media = await Media.find({}).sort({ createdAt: -1 });
+    return NextResponse.json(media);
+  } catch (error: any) {
+    console.error('Media fetch error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function POST(req: Request) {
+  try {
+    await connectToDatabase();
+    const formData = await req.formData();
+    const file = formData.get('file') as File;
+
+    if (!file) {
+      return NextResponse.json({ error: 'No file uploaded' }, { status: 400 });
+    }
+
+    const bytes = await file.arrayBuffer();
+    const buffer = Buffer.from(bytes);
+
+    // Calculate dimensions
+    let width = 0;
+    let height = 0;
+    try {
+      const dimensions = sizeOf(buffer);
+      width = dimensions.width || 0;
+      height = dimensions.height || 0;
+    } catch (err) {
+      console.warn('Could not calculate image dimensions:', err);
+    }
+
+    // Create unique filename
+    const filename = `${Date.now()}-${file.name.replace(/\s+/g, '-')}`;
+    const uploadDir = path.join(process.cwd(), 'public', 'uploads');
+    
+    // Ensure upload directory exists
+    try {
+      await mkdir(uploadDir, { recursive: true });
+    } catch (err) {}
+
+    const filePath = path.join(uploadDir, filename);
+    await writeFile(filePath, buffer);
+
+    const url = `/uploads/${filename}`;
+
+    const newMedia = await Media.create({
+      url,
+      name: file.name,
+      type: file.type,
+      size: file.size,
+      width,
+      height,
+      alt: formData.get('alt') || '',
+      title: formData.get('title') || '',
+      description: formData.get('description') || '',
+    });
+
+    return NextResponse.json(newMedia);
+  } catch (error: any) {
+    console.error('Media upload error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    await connectToDatabase();
+    const { ids } = await req.json();
+    if (!ids || !Array.isArray(ids)) {
+      return NextResponse.json({ error: 'Invalid IDs' }, { status: 400 });
+    }
+
+    // Find all records to get URLs
+    const mediaItems = await Media.find({ _id: { $in: ids } });
+
+    // Bulk physical delete
+    for (const item of mediaItems) {
+      try {
+        const filename = item.url.split('/').pop();
+        if (filename) {
+          const filePath = path.join(process.cwd(), 'public', 'uploads', filename);
+          await unlink(filePath);
+        }
+      } catch (err) {
+        console.warn(`Failed to delete physical file for ${item._id}:`, err);
+      }
+    }
+
+    await Media.deleteMany({ _id: { $in: ids } });
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Media delete error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

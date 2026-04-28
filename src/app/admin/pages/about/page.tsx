@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, ChevronRight, Star, Phone, Plus, Trash2, Mail, Award, Target, Heart } from "lucide-react";
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 
 export default function AboutEditor() {
   const [data, setData] = useState<any>(null);
@@ -140,40 +141,14 @@ export default function AboutEditor() {
               <motion.div key="hero" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
                 <h2 className="text-2xl font-black text-slate-900 border-b border-slate-100 pb-6">Hero Section</h2>
 
-                <div className="space-y-4">
-                  <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Hero Background Image</label>
-                  <div className="relative group rounded-3xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 aspect-video flex items-center justify-center">
-                    {aboutPage.hero?.bgImage ? (
-                      <img src={aboutPage.hero.bgImage} alt="Hero Preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="text-center">
-                         <ImageIcon className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                         <p className="text-slate-400 text-sm font-bold">No background image</p>
-                      </div>
-                    )}
-                    <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                        <input
-                          type="file"
-                          id="hero-bg-upload"
-                          className="hidden"
-                          onChange={async (e) => {
-                            const file = e.target.files?.[0];
-                            if (!file) return;
-                            const formData = new FormData();
-                            formData.append("file", file);
-                            const res = await fetch("/api/upload", { method: "POST", body: formData });
-                            if (res.ok) {
-                              const { url } = await res.json();
-                              updateAbout("hero", "bgImage", url);
-                            }
-                          }}
-                        />
-                        <label htmlFor="hero-bg-upload" className="bg-white text-slate-900 px-6 py-2 rounded-full font-bold cursor-pointer hover:scale-105 transition-transform">
-                          Upload New Image
-                        </label>
-                    </div>
-                  </div>
-                </div>
+                <ImageField 
+                  label="Hero Background Image"
+                  value={aboutPage.hero?.bgImage || ""}
+                  onChange={(url) => updateAbout("hero", "bgImage", url)}
+                  altValue={aboutPage.hero?.bgImageAlt || ""}
+                  onAltChange={(alt) => updateAbout("hero", "bgImageAlt", alt)}
+                  description="Choose a high-quality background for the about page hero. Optimal size: 1920x1080px."
+                />
 
                 <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                    {["line1", "line2", "line3"].map((line) => (
@@ -322,40 +297,14 @@ export default function AboutEditor() {
                   <h3 className="text-lg font-black text-slate-800">Founder Portrait & Identity</h3>
                   
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-4">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Portrait Image</label>
-                      <div className="relative group rounded-3xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 h-[300px] flex items-center justify-center">
-                        {aboutPage.story?.portrait?.image ? (
-                          <img src={aboutPage.story.portrait.image} alt="Founder Portrait" className="w-full h-full object-cover" />
-                        ) : (
-                          <div className="text-center">
-                            <ImageIcon className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                            <p className="text-slate-400 text-sm font-bold">No portrait image</p>
-                          </div>
-                        )}
-                        <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                            <input
-                              type="file"
-                              id="portrait-upload"
-                              className="hidden"
-                              onChange={async (e) => {
-                                const file = e.target.files?.[0];
-                                if (!file) return;
-                                const formData = new FormData();
-                                formData.append("file", file);
-                                const res = await fetch("/api/upload", { method: "POST", body: formData });
-                                if (res.ok) {
-                                  const { url } = await res.json();
-                                  updateAbout("story", "portrait", { ...aboutPage.story?.portrait, image: url });
-                                }
-                              }}
-                            />
-                            <label htmlFor="portrait-upload" className="bg-white text-slate-900 px-6 py-2 rounded-full font-bold cursor-pointer hover:scale-105 transition-transform">
-                              Upload Portrait
-                            </label>
-                        </div>
-                      </div>
-                    </div>
+                    <ImageField 
+                      label="Portrait Image"
+                      value={aboutPage.story?.portrait?.image || ""}
+                      onChange={(url) => updateAbout("story", "portrait", { ...aboutPage.story?.portrait, image: url })}
+                      altValue={aboutPage.story?.portrait?.alt || ""}
+                      onAltChange={(alt) => updateAbout("story", "portrait", { ...aboutPage.story?.portrait, alt: alt })}
+                      description="Choose a professional portrait of the founder."
+                    />
 
                     <div className="space-y-6">
                       <div className="space-y-2">
@@ -575,7 +524,16 @@ export default function AboutEditor() {
               <motion.div key="mission" initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }} className="space-y-8">
                 <h2 className="text-2xl font-black text-slate-900 border-b border-slate-100 pb-6">Mission & Principles</h2>
 
-                <div className="space-y-4">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                  <ImageField 
+                    label="Mission Illustration"
+                    value={aboutPage.mission?.image || ""}
+                    onChange={(url) => updateAbout("mission", "image", url)}
+                    altValue={aboutPage.mission?.imageAlt || ""}
+                    onAltChange={(alt) => updateAbout("mission", "imageAlt", alt)}
+                    description="Visual representation of your company's mission."
+                  />
+                  <div className="space-y-4">
                     <div className="space-y-2">
                       <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Mission Headline</label>
                       <input
@@ -600,6 +558,18 @@ export default function AboutEditor() {
                         className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900"
                       />
                     </div>
+                  </div>
+                </div>
+
+                <div className="pt-8 border-t border-slate-100">
+                  <ImageField 
+                    label="Core Values Illustration"
+                    value={aboutPage.values?.image || ""}
+                    onChange={(url) => updateAbout("values", "image", url)}
+                    altValue={aboutPage.values?.imageAlt || ""}
+                    onAltChange={(alt) => updateAbout("values", "imageAlt", alt)}
+                    description="Visual representation of your company's core values."
+                  />
                 </div>
 
                 <div className="pt-8 border-t border-slate-100">

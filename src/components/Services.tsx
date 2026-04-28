@@ -431,13 +431,13 @@ const Services = () => {
                         servicesData.image.src.startsWith('http') || servicesData.image.src.startsWith('/uploads') ? (
                           <img
                             src={servicesData.image.src}
-                            alt="Eagle Revolution Services"
+                            alt={servicesData.image.alt || "Eagle Revolution Services"}
                             className="object-cover w-full h-full"
                           />
                         ) : (
                           <Image
                             src={servicesData.image.src}
-                            alt="Eagle Revolution Services"
+                            alt={servicesData.image.alt || "Eagle Revolution Services"}
                             fill
                             className="object-cover"
                             priority

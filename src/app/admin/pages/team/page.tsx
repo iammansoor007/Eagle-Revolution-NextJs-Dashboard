@@ -4,12 +4,12 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Save, Loader2, Type, ChevronRight, Users, Plus, Trash2, Image as ImageIcon, Briefcase, Quote, Star } from "lucide-react";
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 
 export default function TeamPageEditor() {
   const [data, setData] = useState<any>(null);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
-  const [uploading, setUploading] = useState<string | null>(null);
 
   useEffect(() => {
     fetch("/api/content")
@@ -122,30 +122,6 @@ export default function TeamPageEditor() {
       ...prev,
       team: { ...prev.team, members: newMembers }
     }));
-  };
-
-  const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>, index: number) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-
-    setUploading(`member-${index}`);
-    const formData = new FormData();
-    formData.append("file", file);
-
-    try {
-      const res = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
-      });
-      const data = await res.json();
-      if (data.url) {
-        updateMember(index, "image", data.url);
-      }
-    } catch (err) {
-      console.error("Upload failed:", err);
-    } finally {
-      setUploading(null);
-    }
   };
 
   if (!data) {
@@ -265,38 +241,12 @@ export default function TeamPageEditor() {
                 <div className="grid grid-cols-1 lg:grid-cols-12">
                   {/* Photo Column */}
                   <div className="lg:col-span-4 bg-slate-50 border-r border-slate-100 p-8 flex flex-col items-center justify-center text-center">
-                    <div className="relative group w-full aspect-square max-w-[240px] mb-6">
-                      {member.image ? (
-                        <img 
-                          src={member.image} 
-                          className="w-full h-full object-cover rounded-2xl shadow-xl" 
-                          alt={member.name} 
-                        />
-                      ) : (
-                        <div className="w-full h-full bg-slate-200 rounded-2xl flex flex-col items-center justify-center border-2 border-dashed border-slate-300">
-                          <ImageIcon className="w-10 h-10 text-slate-400 mb-2" />
-                          <span className="text-xs font-bold text-slate-400 uppercase">No Portrait</span>
-                        </div>
-                      )}
-                      <label className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center cursor-pointer rounded-2xl backdrop-blur-[2px]">
-                        <input 
-                          type="file" 
-                          className="hidden" 
-                          accept="image/*"
-                          onChange={(e) => handleImageUpload(e, mIdx)}
-                        />
-                        <div className="text-center">
-                          {uploading === `member-${mIdx}` ? (
-                            <Loader2 className="w-8 h-8 text-white animate-spin mx-auto" />
-                          ) : (
-                            <>
-                              <ImageIcon className="w-8 h-8 text-white mx-auto mb-1" />
-                              <span className="text-[10px] font-bold text-white uppercase tracking-widest">Update Photo</span>
-                            </>
-                          )}
-                        </div>
-                      </label>
-                    </div>
+                    <ImageField 
+                      label="Member Photo"
+                      value={member.image || ""}
+                      onChange={(url) => updateMember(mIdx, "image", url)}
+                      description="Upload a high-quality headshot."
+                    />
                     
                     <div className="space-y-4 w-full">
                       <div className="space-y-1">

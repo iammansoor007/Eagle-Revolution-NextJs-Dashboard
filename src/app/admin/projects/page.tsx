@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { Plus, Pencil, Trash2, Loader2, Folder, Image as ImageIcon, ChevronRight, Save, X, Calendar, MapPin, Star } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
+import ImageField from "@/components/admin/ImageField";
 
 export default function ProjectsAdminPage() {
   const [data, setData] = useState<any>(null);
@@ -143,43 +144,12 @@ export default function ProjectsAdminPage() {
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
               {/* Image Upload Column */}
-              <div className="space-y-4">
-                <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Showcase Image</label>
-                <div className="relative group">
-                  <div className="w-full h-64 rounded-2xl overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 flex items-center justify-center relative">
-                    {form.image ? (
-                      <img src={form.image} alt="Preview" className="w-full h-full object-cover" />
-                    ) : (
-                      <div className="text-center p-6">
-                        <ImageIcon className="w-12 h-12 text-slate-300 mx-auto mb-2" />
-                        <p className="text-slate-400 text-sm font-medium">No image selected</p>
-                      </div>
-                    )}
-                  </div>
-                  <div className="mt-4">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      onChange={async (e) => {
-                        const file = e.target.files?.[0];
-                        if (!file) return;
-                        const formData = new FormData();
-                        formData.append("file", file);
-                        try {
-                          const res = await fetch("/api/upload", { method: "POST", body: formData });
-                          if (res.ok) {
-                            const { url } = await res.json();
-                            setForm({ ...form, image: url });
-                          }
-                        } catch (err) {
-                          alert("Upload failed.");
-                        }
-                      }}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 text-sm file:mr-4 file:py-2 file:px-4 file:rounded-full file:border-0 file:text-xs file:font-bold file:bg-primary/10 file:text-primary hover:file:bg-primary/20 transition-all cursor-pointer"
-                    />
-                  </div>
-                </div>
-              </div>
+                <ImageField 
+                  label="Project Showcase Image"
+                  value={form.image || ""}
+                  onChange={(url) => setForm({ ...form, image: url })}
+                  description="Choose a high-quality showcase image for this project."
+                />
 
               {/* Details Column */}
               <div className="space-y-6">
