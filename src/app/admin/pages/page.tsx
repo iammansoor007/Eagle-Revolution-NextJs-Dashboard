@@ -233,8 +233,8 @@ export default function PagesDashboard() {
               <button
                 onClick={() => toggleSelect(page._id)}
                 className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${selectedIds.includes(page._id)
-                    ? "bg-primary border-primary text-white"
-                    : "border-slate-100 bg-white group-hover:border-slate-200"
+                  ? "bg-primary border-primary text-white"
+                  : "border-slate-100 bg-white group-hover:border-slate-200"
                   }`}
               >
                 {selectedIds.includes(page._id) && <Check className="w-4 h-4" />}
@@ -249,8 +249,8 @@ export default function PagesDashboard() {
                   <button
                     onClick={(e) => handleIndividualAction(e, 'status', page._id)}
                     className={`text-[8px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all flex items-center gap-2 ${page.status === 'published'
-                        ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                        : "bg-amber-50 text-amber-600 border-amber-100"
+                      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
+                      : "bg-amber-50 text-amber-600 border-amber-100"
                       }`}
                   >
                     {page.status === 'published' ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
@@ -368,7 +368,7 @@ export default function PagesDashboard() {
                     Layout Architecture
                   </label>
                   <div className="relative group">
-                    <select 
+                    <select
                       value={newPage.template}
                       onChange={(e) => setNewPage({ ...newPage, template: e.target.value })}
                       className="w-full bg-slate-50 border border-slate-100 rounded-xl px-8 py-4 text-sm font-bold text-slate-900 outline-none focus:bg-white focus:border-primary/40 transition-all shadow-sm appearance-none cursor-pointer"
@@ -384,7 +384,7 @@ export default function PagesDashboard() {
                       <option value="careers">Careers Hub Template</option>
                     </select>
                     <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-primary transition-colors">
-                       <ChevronRight className="w-4 h-4 rotate-90" />
+                      <ChevronRight className="w-4 h-4 rotate-90" />
                     </div>
                   </div>
                 </div>
@@ -402,8 +402,8 @@ export default function PagesDashboard() {
                         type="button"
                         onClick={() => setNewPage({ ...newPage, status: s })}
                         className={`px-8 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${newPage.status === s
-                            ? "bg-white text-slate-900 shadow-sm border border-slate-100"
-                            : "text-slate-400 hover:text-slate-600"
+                          ? "bg-white text-slate-900 shadow-sm border border-slate-100"
+                          : "text-slate-400 hover:text-slate-600"
                           }`}
                       >
                         {s}
