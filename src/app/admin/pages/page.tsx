@@ -4,9 +4,7 @@ import { useState, useEffect } from "react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
-  Plus, Home, Info, HelpCircle, Phone, ArrowRight, 
-  ChevronRight, Layout, Star, Folder, Briefcase, 
-  Loader2, Globe, Search, Trash2, X, LayoutTemplate
+  Plus, ChevronRight, Loader2, Search, Trash2, X, ExternalLink, Edit3, Check, Copy, MoreHorizontal
 } from "lucide-react";
 
 export default function PagesDashboard() {
@@ -14,6 +12,8 @@ export default function PagesDashboard() {
   const [loading, setLoading] = useState(true);
   const [showAddModal, setShowAddModal] = useState(false);
   const [search, setSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [actionLoading, setActionLoading] = useState(false);
   
   // New Page Form
   const [newPage, setNewPage] = useState({
@@ -56,158 +56,305 @@ export default function PagesDashboard() {
     }
   };
 
+  const handleBulkDelete = async () => {
+    if (!confirm(`Permanently delete ${selectedIds.length} pages?`)) return;
+    setActionLoading(true);
+    try {
+      const res = await fetch("/api/admin/pages", {
+        method: "DELETE",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ ids: selectedIds })
+      });
+      if (res.ok) {
+        setSelectedIds([]);
+        fetchPages();
+      }
+    } catch (err) {
+      alert("Bulk delete failed.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleBulkDuplicate = async () => {
+    setActionLoading(true);
+    try {
+      const res = await fetch("/api/admin/pages", {
+        method: "PATCH",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ action: 'duplicate', ids: selectedIds })
+      });
+      if (res.ok) {
+        setSelectedIds([]);
+        fetchPages();
+      }
+    } catch (err) {
+      alert("Duplication failed.");
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  const handleIndividualAction = async (e: React.MouseEvent, action: string, id: string) => {
+    e.preventDefault();
+    e.stopPropagation();
+    
+    if (action === 'delete') {
+      if (!confirm("Permanently delete this page?")) return;
+      try {
+        const res = await fetch(`/api/admin/pages/${id}`, { method: "DELETE" });
+        if (res.ok) fetchPages();
+      } catch (err) { alert("Delete failed."); }
+    }
+    
+    if (action === 'duplicate') {
+      try {
+        const res = await fetch("/api/admin/pages", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: 'duplicate', ids: [id] })
+        });
+        if (res.ok) fetchPages();
+      } catch (err) { alert("Duplication failed."); }
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    setSelectedIds(prev => 
+      prev.includes(id) ? prev.filter(i => i !== id) : [...prev, id]
+    );
+  };
+
   const filteredPages = pages.filter(p => 
     p.title.toLowerCase().includes(search.toLowerCase()) || 
     p.slug.toLowerCase().includes(search.toLowerCase())
   );
 
-  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-black" /></div>;
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
 
   return (
-    <div className="max-w-6xl mx-auto pb-20 px-4">
-      {/* Header */}
-      <div className="flex flex-wrap items-center justify-between gap-6 mb-12">
-        <div className="space-y-1">
-          <div className="flex items-center gap-2 text-[10px] font-bold text-black uppercase tracking-widest mb-2">
-            <Link href="/admin" className="hover:opacity-70 transition-opacity">Dashboard</Link>
+    <div className="w-full px-12 py-12 min-h-screen bg-[#F8FAFC]">
+      {/* Header Area */}
+      <div className="flex flex-wrap items-center justify-between gap-10 mb-16 px-4">
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em]">
+            <Link href="/admin" className="hover:text-primary transition-colors">Dashboard</Link>
             <ChevronRight className="w-3 h-3" />
-            <span>Content CMS</span>
+            <span className="text-slate-900">System Inventory</span>
           </div>
-          <h1 className="text-4xl font-extrabold text-black tracking-tight">Website Pages</h1>
-          <p className="text-slate-500 font-medium italic">Manage every page, layout, and route on your site.</p>
+          <h1 className="text-4xl font-medium text-slate-900 tracking-tight">Website Pages</h1>
         </div>
 
-        <button 
-          onClick={() => setShowAddModal(true)}
-          className="flex items-center gap-2 bg-black text-white px-6 py-3 rounded-2xl font-bold shadow-lg shadow-black/10 hover:scale-[1.02] active:scale-[0.98] transition-all"
-        >
-          <Plus className="w-5 h-5" />
-          Create New Page
-        </button>
-      </div>
-
-      {/* Filters & Search */}
-      <div className="flex items-center gap-4 mb-8">
-        <div className="relative flex-1 max-w-md">
-          <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
-          <input 
-            type="text" 
-            placeholder="Search pages..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full bg-white border border-slate-200 rounded-2xl pl-12 pr-4 py-3 text-sm font-medium focus:border-black outline-none transition-all shadow-sm"
-          />
+        <div className="flex items-center gap-6">
+          <div className="relative w-80">
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300" />
+            <input 
+              type="text" 
+              placeholder="Search by name or slug..."
+              value={search}
+              onChange={(e) => setSearch(e.target.value)}
+              className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-xs font-medium outline-none focus:border-primary/30 transition-all shadow-sm"
+            />
+          </div>
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="flex items-center gap-3 bg-primary text-white px-10 py-4 rounded-2xl text-sm font-medium hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-95"
+          >
+            <Plus className="w-4 h-4" />
+            New Page
+          </button>
         </div>
       </div>
 
-      {/* Pages Table/List */}
-      <div className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-sm">
-        <div className="divide-y divide-slate-100">
-          {filteredPages.length > 0 ? filteredPages.map((page, i) => (
-            <Link key={page._id} href={`/admin/pages/${page._id}`} className="group block">
-              <div className="px-8 py-6 flex items-center justify-between hover:bg-slate-50 transition-colors">
-                <div className="flex items-center gap-6">
-                  <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-black group-hover:text-white transition-all">
-                    <LayoutTemplate className="w-6 h-6 text-slate-400 group-hover:text-white transition-colors" />
-                  </div>
-                  <div>
-                    <h3 className="text-lg font-bold text-black group-hover:text-black transition-colors">{page.title}</h3>
-                    <div className="flex items-center gap-3 mt-1">
-                      <span className="text-slate-400 text-xs font-medium uppercase tracking-widest flex items-center gap-1.5">
-                        <Globe className="w-3 h-3" />
-                        /{page.slug}
-                      </span>
-                      <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                      <span className="bg-slate-100 text-black/60 px-2 py-0.5 rounded text-[10px] font-bold uppercase tracking-wider border border-slate-200/50">
-                        {page.template}
-                      </span>
-                    </div>
-                  </div>
+      {/* Bulk Action Bar */}
+      <AnimatePresence>
+        {selectedIds.length > 0 && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+            className="mb-8 bg-white border border-slate-900/5 rounded-3xl p-5 flex items-center justify-between px-10 shadow-2xl shadow-slate-200"
+          >
+            <div className="flex items-center gap-6">
+              <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full">
+                 <span className="text-[10px] font-medium text-primary uppercase tracking-widest">{selectedIds.length}</span>
+                 <span className="text-[10px] font-medium text-slate-400 uppercase tracking-widest">Selected</span>
+              </div>
+              <button 
+                onClick={() => setSelectedIds([])}
+                className="text-[10px] font-medium text-slate-300 hover:text-slate-900 uppercase tracking-widest transition-colors"
+              >
+                Clear All
+              </button>
+            </div>
+            
+            <div className="flex items-center gap-3">
+              <button 
+                onClick={handleBulkDuplicate}
+                disabled={actionLoading}
+                className="flex items-center gap-2 text-slate-600 px-6 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest hover:bg-slate-50 transition-all border border-slate-100"
+              >
+                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Copy className="w-3.5 h-3.5" />}
+                Duplicate
+              </button>
+              <button 
+                onClick={handleBulkDelete}
+                disabled={actionLoading}
+                className="flex items-center gap-2 bg-red-50 text-red-500 px-6 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border border-red-100"
+              >
+                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
+                Delete
+              </button>
+            </div>
+          </motion.div>
+        )}
+      </AnimatePresence>
+
+      {/* Pages Container */}
+      <div className="bg-white border border-slate-100 rounded-[2.5rem] shadow-sm overflow-hidden">
+        <div className="divide-y divide-slate-50">
+          {filteredPages.length > 0 ? filteredPages.map((page) => (
+            <div key={page._id} className="group relative px-12 py-10 hover:bg-slate-50/30 transition-all flex items-center gap-12">
+              
+              {/* Checkbox */}
+              <button 
+                onClick={() => toggleSelect(page._id)}
+                className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${
+                  selectedIds.includes(page._id) 
+                  ? "bg-primary border-primary text-white" 
+                  : "border-slate-100 bg-white group-hover:border-slate-200"
+                }`}
+              >
+                {selectedIds.includes(page._id) && <Check className="w-4 h-4" />}
+              </button>
+
+              <div className="flex-1">
+                <div className="flex items-center gap-4 mb-3">
+                  <h3 className="text-2xl font-medium text-slate-900 tracking-tight group-hover:text-primary transition-colors">{page.title}</h3>
+                  <span className="text-[10px] font-medium text-slate-300 uppercase tracking-[0.2em] bg-slate-50/50 px-3 py-1 rounded-full border border-slate-50">
+                    /{page.slug}
+                  </span>
                 </div>
-                <div className="flex items-center gap-4">
-                  <span className="text-[10px] font-bold text-slate-300 uppercase tracking-widest group-hover:text-black transition-colors">Edit Content</span>
-                  <ChevronRight className="w-5 h-5 text-slate-200 group-hover:text-black group-hover:translate-x-1 transition-all" />
+                
+                {/* Refined Actions Row */}
+                <div className="flex items-center gap-4 text-[10px] font-medium uppercase tracking-[0.15em]">
+                  <Link href={`/admin/pages/${page._id}`} className="text-primary/70 hover:text-primary transition-all">
+                    Edit
+                  </Link>
+                  <span className="text-slate-200">•</span>
+                  <Link href={`/${page.slug}`} target="_blank" className="text-slate-400 hover:text-slate-900 transition-all">
+                    Preview
+                  </Link>
+                  <span className="text-slate-200">•</span>
+                  <button 
+                    onClick={(e) => handleIndividualAction(e, 'duplicate', page._id)}
+                    className="text-slate-400 hover:text-slate-900 transition-all"
+                  >
+                    Duplicate
+                  </button>
+                  <span className="text-slate-200">•</span>
+                  <button 
+                    onClick={(e) => handleIndividualAction(e, 'delete', page._id)}
+                    className="text-slate-400 hover:text-red-500 transition-all"
+                  >
+                    Delete
+                  </button>
                 </div>
               </div>
-            </Link>
+              
+              <div className="text-right shrink-0">
+                 <div className="text-[10px] font-medium text-slate-300 uppercase tracking-widest bg-slate-50/50 px-4 py-1.5 rounded-xl border border-slate-50">
+                    {page.template}
+                 </div>
+              </div>
+            </div>
           )) : (
-            <div className="p-20 text-center">
-               <p className="text-slate-400 font-medium">No pages found matching your search.</p>
+            <div className="p-40 text-center">
+               <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-slate-50">
+                 <Search className="w-10 h-10 text-slate-200" />
+               </div>
+               <h2 className="text-xl font-medium text-slate-900 mb-2">No matching pages found</h2>
+               <p className="text-sm text-slate-400 max-w-sm mx-auto">Try refining your search keywords or create a new page to expand your inventory.</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Add Page Modal */}
+      {/* Initialize Page Modal */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
             <motion.div 
               initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
               onClick={() => setShowAddModal(false)}
-              className="absolute inset-0 bg-black/60 backdrop-blur-sm"
+              className="absolute inset-0 bg-slate-900/60 backdrop-blur-md"
             />
             <motion.div 
-              initial={{ opacity: 0, scale: 0.95, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 20 }}
-              className="relative w-full max-w-lg bg-white rounded-[2.5rem] shadow-2xl p-10 overflow-hidden"
+              initial={{ opacity: 0, scale: 0.98, y: 20 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.98, y: 20 }}
+              className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl p-12 overflow-hidden border border-slate-100"
             >
-              <button onClick={() => setShowAddModal(false)} className="absolute top-8 right-8 text-slate-400 hover:text-black transition-colors">
-                <X className="w-6 h-6" />
-              </button>
+              <div className="flex justify-between items-start mb-10">
+                 <div>
+                    <h2 className="text-2xl font-medium text-slate-900 tracking-tight">New Page</h2>
+                    <p className="text-xs text-slate-400 mt-1">Configure your new route and template.</p>
+                 </div>
+                 <button onClick={() => setShowAddModal(false)} className="p-2 hover:bg-slate-50 rounded-xl transition-all">
+                    <X className="w-5 h-5 text-slate-300 hover:text-slate-900" />
+                 </button>
+              </div>
               
-              <h2 className="text-2xl font-extrabold text-black tracking-tight mb-2">Create New Page</h2>
-              <p className="text-slate-500 font-medium mb-8 text-sm">Define your new page's identity and layout.</p>
-              
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-black uppercase tracking-widest">Page Title</label>
+              <div className="space-y-8">
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest px-1">Identity (Title)</label>
                   <input 
                     type="text" 
-                    placeholder="e.g. Our History"
+                    placeholder="e.g. Project Portfolio"
                     value={newPage.title}
                     onChange={(e) => {
                       const slug = e.target.value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, "-");
                       setNewPage({ ...newPage, title: e.target.value, slug });
                     }}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-black font-bold focus:bg-white focus:border-black outline-none transition-all"
+                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all"
                   />
                 </div>
                 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-black uppercase tracking-widest">URL Slug</label>
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest px-1">URL Pattern (Slug)</label>
                   <div className="relative">
-                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 font-bold">/</span>
+                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 text-xs">/</span>
                     <input 
                       type="text" 
                       value={newPage.slug}
                       onChange={(e) => setNewPage({ ...newPage, slug: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-10 pr-6 py-4 text-black font-bold focus:bg-white focus:border-black outline-none transition-all"
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl pl-10 pr-6 py-4 text-sm text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all"
                     />
                   </div>
                 </div>
 
-                <div className="space-y-2">
-                  <label className="text-[10px] font-bold text-black uppercase tracking-widest">Template Layout</label>
-                  <select 
-                    value={newPage.template}
-                    onChange={(e) => setNewPage({ ...newPage, template: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-black font-bold focus:bg-white focus:border-black outline-none transition-all appearance-none"
-                  >
-                    <option value="about">About Us</option>
-                    <option value="services">Services List</option>
-                    <option value="gallery">Gallery</option>
-                    <option value="team">Team Directory</option>
-                    <option value="faq">FAQ Page</option>
-                    <option value="contact">Contact Page</option>
-                    <option value="careers">Careers</option>
-                  </select>
+                <div className="space-y-2.5">
+                  <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest px-1">Layout Architecture</label>
+                  <div className="relative">
+                    <select 
+                      value={newPage.template}
+                      onChange={(e) => setNewPage({ ...newPage, template: e.target.value })}
+                      className="w-full bg-slate-50 border border-slate-100 rounded-2xl px-6 py-4 text-sm text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all appearance-none cursor-pointer"
+                    >
+                      <option value="about">About Us</option>
+                      <option value="services">Services Index</option>
+                      <option value="gallery">Portfolio Gallery</option>
+                      <option value="team">Leadership Roster</option>
+                      <option value="faq">Knowledge Base</option>
+                      <option value="contact">Inquiry Portal</option>
+                      <option value="careers">Careers Hub</option>
+                      <option value="service-detail">Specific Service</option>
+                    </select>
+                    <ChevronRight className="absolute right-6 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-300 rotate-90 pointer-events-none" />
+                  </div>
                 </div>
 
                 <button 
                   onClick={handleCreatePage}
-                  className="w-full bg-black text-white py-5 rounded-[1.5rem] font-bold shadow-xl shadow-black/20 hover:scale-[1.02] active:scale-[0.98] transition-all mt-4"
+                  className="w-full bg-primary text-white py-5 rounded-2xl text-sm font-medium shadow-xl shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all mt-6"
                 >
-                  Confirm & Create Page
+                  Create & Launch
                 </button>
               </div>
             </motion.div>

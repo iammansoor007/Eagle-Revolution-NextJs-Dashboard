@@ -72,18 +72,12 @@ export default function ReviewsEditor({ pageId, data, setData }: { pageId: strin
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => {
-           if (!json.reviews) {
-             json.reviews = {
-               section: { badge: "", headline: "", description: "" },
-               items: []
-             };
-           }
-           setData(json);
-        })
-        .catch(err => console.error("Failed to seed content:", err));
+       setData({
+         reviews: {
+           section: { badge: "", headline: "", description: "" },
+           items: []
+         }
+       });
     }
   }, [data, setData]);
 

@@ -72,10 +72,18 @@ export default function ServicesEditor({ pageId, data, setData }: { pageId: stri
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => setData(json))
-        .catch(err => console.error("Failed to seed content:", err));
+      setData({
+        services: {
+          hero: { headline: { prefix: "", highlight: "", suffix: "" }, description: [] },
+          badge: "",
+          headline: { prefix: "", highlight: "" },
+          description: [],
+          statsSection: { badge: "", headline: "", description: "" },
+          stats: [],
+          gridSection: { badge: "", headline: "", description: "" },
+          cta: { title: "", description: "", buttonText: "", buttonLink: "" }
+        }
+      });
     }
   }, [data, setData]);
 

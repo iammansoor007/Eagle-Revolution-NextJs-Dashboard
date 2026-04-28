@@ -14,20 +14,14 @@ export default function ContactEditor({ pageId, data, setData }: { pageId: strin
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => {
-           if (!json.contact) {
-             json.contact = {
-               section: { badge: "", headline: "", description: "" },
-               info: { address: "", phone: "", email: "", hours: "" },
-               social: { facebook: "", instagram: "", linkedin: "" },
-               form: { title: "", success: "" }
-             };
-           }
-           setData(json);
-        })
-        .catch(err => console.error("Failed to seed content:", err));
+       setData({
+         contact: {
+           section: { badge: "", headline: "", description: "" },
+           info: { address: "", phone: "", email: "", hours: "" },
+           social: { facebook: "", instagram: "", linkedin: "" },
+           form: { title: "", success: "" }
+         }
+       });
     }
   }, [data, setData]);
 

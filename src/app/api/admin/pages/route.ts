@@ -32,3 +32,49 @@ export async function POST(req: Request) {
     return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
   }
 }
+
+export async function PATCH(req: Request) {
+  try {
+    await connectToDatabase();
+    const { action, ids } = await req.json();
+    
+    if (action === 'duplicate' && ids && Array.isArray(ids)) {
+      const sourcePages = await Page.find({ _id: { $in: ids } });
+      const newPages = [];
+      
+      for (const source of sourcePages) {
+        const timestamp = Date.now();
+        const duplicate = await Page.create({
+          title: `${source.title} (Copy)`,
+          slug: `${source.slug}-copy-${timestamp}`,
+          template: source.template,
+          content: source.content,
+          metadata: source.metadata,
+          status: 'published'
+        });
+        newPages.push(duplicate);
+      }
+      return NextResponse.json(newPages);
+    }
+    
+    return NextResponse.json({ error: 'Invalid Action' }, { status: 400 });
+  } catch (error: any) {
+    console.error('Bulk action error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}
+
+export async function DELETE(req: Request) {
+  try {
+    await connectToDatabase();
+    const { ids } = await req.json();
+    if (!ids || !Array.isArray(ids)) {
+      return NextResponse.json({ error: 'Invalid IDs' }, { status: 400 });
+    }
+    await Page.deleteMany({ _id: { $in: ids } });
+    return NextResponse.json({ success: true });
+  } catch (error: any) {
+    console.error('Bulk delete error:', error);
+    return NextResponse.json({ error: 'Internal Server Error' }, { status: 500 });
+  }
+}

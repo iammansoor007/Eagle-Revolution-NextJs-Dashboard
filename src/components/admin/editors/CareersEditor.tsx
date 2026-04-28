@@ -14,20 +14,14 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => {
-           if (!json.careers) {
-             json.careers = {
-               section: { badge: "", headline: "", description: "" },
-               roles: [],
-               success: { title: "", description: "" },
-               labels: {}
-             };
-           }
-           setData(json);
-        })
-        .catch(err => console.error("Failed to seed content:", err));
+       setData({
+         careers: {
+           section: { badge: "", headline: "", description: "" },
+           roles: [],
+           success: { title: "", description: "" },
+           labels: {}
+         }
+       });
     }
   }, [data, setData]);
 

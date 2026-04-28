@@ -72,10 +72,13 @@ export default function AboutEditor({ pageId, data, setData }: { pageId: string,
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => setData(json))
-        .catch(err => console.error("Failed to seed content:", err));
+      setData({
+        aboutPage: {
+          hero: { badge: "", headline: "", description: [], images: { main: "" } },
+          story: { title: "", content: [] },
+          mission: { badge: "", title: "", items: [] }
+        }
+      });
     }
   }, [data, setData]);
 

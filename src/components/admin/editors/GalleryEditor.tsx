@@ -72,18 +72,12 @@ export default function GalleryEditor({ pageId, data, setData }: { pageId: strin
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => {
-           if (!json.portfolio) {
-             json.portfolio = {
-               section: { badge: "", headline: "", description: "" },
-               projects: []
-             };
-           }
-           setData(json);
-        })
-        .catch(err => console.error("Failed to seed content:", err));
+       setData({
+         portfolio: {
+           section: { badge: "", headline: "", description: "" },
+           projects: []
+         }
+       });
     }
   }, [data, setData]);
 

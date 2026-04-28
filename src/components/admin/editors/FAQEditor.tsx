@@ -14,19 +14,13 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => {
-           if (!json.faq) {
-             json.faq = {
-               section: { badge: "", headline: "", description: "" },
-               categories: [],
-               items: []
-             };
-           }
-           setData(json);
-        })
-        .catch(err => console.error("Failed to seed content:", err));
+       setData({
+         faq: {
+           section: { badge: "", headline: "", description: "" },
+           categories: [],
+           items: []
+         }
+       });
     }
   }, [data, setData]);
 

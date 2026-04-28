@@ -71,10 +71,13 @@ export default function HomeEditor({ pageId, data, setData }: { pageId: string, 
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => setData(json))
-        .catch(err => console.error("Failed to seed content:", err));
+      setData({
+        hero: { badge: "", headlines: [], description: "", images: {} },
+        about: { badge: "", headline: {}, description: "", image: {} },
+        whyChooseUs: { badge: "", title: "", reasons: [] },
+        faq: { questions: [] },
+        quote: { title: "", description: "", buttonText: "", buttonLink: "" }
+      });
     }
   }, [data, setData]);
 

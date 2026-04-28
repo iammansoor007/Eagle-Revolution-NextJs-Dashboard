@@ -72,18 +72,12 @@ export default function TeamEditor({ pageId, data, setData }: { pageId: string, 
 
   useEffect(() => {
     if (data && Object.keys(data).length === 0) {
-      fetch("/api/content")
-        .then(res => res.json())
-        .then(json => {
-           if (!json.team) {
-             json.team = {
-               section: { badge: "", headline: "", description: "" },
-               members: []
-             };
-           }
-           setData(json);
-        })
-        .catch(err => console.error("Failed to seed content:", err));
+       setData({
+         team: {
+           section: { badge: "", headline: "", description: "" },
+           members: []
+         }
+       });
     }
   }, [data, setData]);
 
