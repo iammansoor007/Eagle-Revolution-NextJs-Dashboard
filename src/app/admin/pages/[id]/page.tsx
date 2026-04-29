@@ -10,6 +10,7 @@ import {
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { TemplateEditors } from "@/components/admin/editors";
+import SeoEditor from "@/components/admin/SeoEditor";
 
 const EDITOR_TEMPLATES = [
   { id: 'home', label: 'Home Page', icon: LayoutTemplate },
@@ -30,6 +31,8 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
 
   const [page, setPage] = useState<any>(null);
   const [content, setContent] = useState<any>(null);
+  const [seo, setSeo] = useState<any>({});
+  const [activeTab, setActiveTab] = useState<'content' | 'seo'>('content');
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
@@ -45,6 +48,7 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
         const data = await res.json();
         setPage(data);
         setContent(data.content || {});
+        setSeo(data.seo || {});
       } else {
         router.push('/admin/pages');
       }
@@ -86,7 +90,7 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
         body: JSON.stringify({
           title: page.title,
           slug: page.slug,
-          metadata: page.metadata,
+          seo: seo,
           content: content
         }),
       });
@@ -213,25 +217,61 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
         </div>
 
         {/* Full Width Main Editor Area */}
-        <div className="bg-white border border-slate-100 rounded-3xl shadow-sm min-h-[800px] overflow-hidden">
-          {TemplateEditors[page.template] ? (
-            <div className="animate-in fade-in duration-500">
-              {(() => {
-                const Editor = TemplateEditors[page.template];
-                return <Editor pageId={id} data={content} setData={setContent} />;
-              })()}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center p-20 text-center h-[800px]">
-              <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
-                <LayoutTemplate className="w-8 h-8 text-slate-200" />
+        <div className="bg-white border border-slate-100 rounded-3xl shadow-sm min-h-[800px] overflow-hidden flex flex-col">
+          {/* Internal Tabs */}
+          <div className="flex items-center gap-8 px-10 py-5 border-b border-slate-50 bg-slate-50/30">
+            <button
+              onClick={() => setActiveTab('content')}
+              className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative py-2 ${
+                activeTab === 'content' ? "text-primary" : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              Page Content
+              {activeTab === 'content' && <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
+            </button>
+            <button
+              onClick={() => setActiveTab('seo')}
+              className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative py-2 ${
+                activeTab === 'seo' ? "text-primary" : "text-slate-400 hover:text-slate-600"
+              }`}
+            >
+              SEO Settings
+              {activeTab === 'seo' && <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
+            </button>
+          </div>
+
+          <div className="flex-1 overflow-hidden">
+            {activeTab === 'content' ? (
+              TemplateEditors[page.template] ? (
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
+                  {(() => {
+                    const Editor = TemplateEditors[page.template];
+                    return <Editor pageId={id} data={content} setData={setContent} />;
+                  })()}
+                </div>
+              ) : (
+                <div className="flex flex-col items-center justify-center p-20 text-center h-[700px]">
+                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
+                    <LayoutTemplate className="w-8 h-8 text-slate-200" />
+                  </div>
+                  <h2 className="text-xl font-medium text-slate-900 mb-2">Editor Template Ready</h2>
+                  <p className="text-slate-400 max-w-sm text-xs leading-relaxed">
+                    Select a template from the configuration row above to initialize the content canvas.
+                  </p>
+                </div>
+              )
+            ) : (
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 h-full">
+                <SeoEditor 
+                  data={seo} 
+                  setData={setSeo} 
+                  pageSlug={page.slug} 
+                  pageTitle={page.title} 
+                  pageContent={content}
+                />
               </div>
-              <h2 className="text-xl font-medium text-slate-900 mb-2">Editor Template Ready</h2>
-              <p className="text-slate-400 max-w-sm text-xs leading-relaxed">
-                Select a template from the configuration row above to initialize the content canvas.
-              </p>
-            </div>
-          )}
+            )}
+          </div>
         </div>
       </div>
 

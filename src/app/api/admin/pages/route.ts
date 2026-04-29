@@ -49,7 +49,7 @@ export async function PATCH(req: Request) {
           slug: `${source.slug}-copy-${timestamp}`,
           template: source.template,
           content: source.content,
-          metadata: source.metadata,
+          seo: source.seo,
           status: 'published'
         });
         newPages.push(duplicate);

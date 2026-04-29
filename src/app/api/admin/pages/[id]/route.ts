@@ -24,7 +24,7 @@ export async function PATCH(
   try {
     const { id } = await params;
     const body = await req.json();
-    const { slug, title, template, status, metadata, content } = body;
+    const { slug, title, template, status, seo, content } = body;
 
     await connectToDatabase();
     
@@ -33,7 +33,7 @@ export async function PATCH(
     if (title !== undefined) updateData.title = title;
     if (template !== undefined) updateData.template = template;
     if (status !== undefined) updateData.status = status;
-    if (metadata !== undefined) updateData.metadata = metadata;
+    if (seo !== undefined) updateData.seo = seo;
     if (content !== undefined) updateData.content = content;
 
     const updatedPage = await Page.findByIdAndUpdate(
