@@ -25,7 +25,7 @@ const LOCATION_LABELS: Record<string, { label: string; color: string; bg: string
 
 const EMPTY_FORM = { name: "", location: "head" as Script["location"], code: "", active: true };
 
-// ── Modal ────────────────────────────────────────────────────────────
+// ── WordPress-Style Modal ────────────────────────────────────────────
 function ScriptModal({
   initial,
   onSave,
@@ -45,108 +45,91 @@ function ScriptModal({
       <motion.div
         initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
         onClick={onClose}
-        className="absolute inset-0 bg-slate-900/50 backdrop-blur-sm"
+        className="absolute inset-0 bg-[#00000066]"
       />
       <motion.div
-        initial={{ scale: 0.96, opacity: 0, y: 12 }}
-        animate={{ scale: 1, opacity: 1, y: 0 }}
-        exit={{ scale: 0.96, opacity: 0, y: 12 }}
-        className="relative w-full max-w-2xl bg-white rounded-xl shadow-2xl overflow-hidden"
+        initial={{ y: -10, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        exit={{ y: -10, opacity: 0 }}
+        className="relative w-full max-w-2xl bg-[#f1f1f1] border border-[#c3c4c7] shadow-lg rounded-[3px] overflow-hidden flex flex-col"
       >
-        {/* Header */}
-        <div className="flex items-center justify-between px-5 py-3 border-b border-slate-100 bg-slate-50/50">
-          <div className="flex items-center gap-2">
-            <div className="w-6 h-6 rounded border border-primary/20 bg-primary/10 flex items-center justify-center">
-              <Code2 className="w-3 h-3 text-primary" />
-            </div>
-            <h2 className="text-xs font-bold text-slate-900 tracking-tight">
-              {initial.id ? "Edit Script" : "Add New Script"}
-            </h2>
-          </div>
-          <button onClick={onClose} className="w-6 h-6 rounded bg-white border border-slate-200 flex items-center justify-center text-slate-400 hover:text-slate-900 transition-colors">
-            <X className="w-3 h-3" />
+        {/* WP-Style Header */}
+        <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-[#c3c4c7]">
+          <h2 className="text-[#1d2327] text-lg font-normal font-serif">
+            {initial.id ? "Edit Script" : "Add New Script"}
+          </h2>
+          <button onClick={onClose} className="text-[#787c82] hover:text-[#d63638]">
+            <X className="w-5 h-5" />
           </button>
         </div>
 
-        {/* Body */}
-        <div className="p-5 space-y-4">
+        {/* WP-Style Body */}
+        <div className="p-4 space-y-4 bg-[#f0f0f1] flex-1 overflow-y-auto">
           {/* Name */}
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Script Name</label>
+          <div>
+            <label className="block text-[#1d2327] text-sm font-semibold mb-1">Title</label>
             <input
               type="text"
               value={form.name}
               onChange={(e) => set("name", e.target.value)}
-              placeholder="e.g. Google Analytics, Facebook Pixel…"
-              className="w-full border border-slate-200 rounded-lg px-3 py-1.5 text-xs font-medium text-slate-900 outline-none focus:border-primary/40 transition-all"
+              placeholder="Enter script title here"
+              className="w-full border border-[#8c8f94] bg-white px-3 py-1.5 text-[14px] text-[#2c3338] rounded-[3px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none"
             />
           </div>
 
           {/* Location */}
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Inject Location</label>
-            <div className="grid grid-cols-3 gap-2">
-              {(["head", "body_start", "body_end"] as const).map((loc) => {
-                const meta = LOCATION_LABELS[loc];
-                return (
-                  <button
-                    key={loc}
-                    onClick={() => set("location", loc)}
-                    className={`px-2 py-1.5 rounded-lg border text-[10px] font-bold transition-all ${
-                      form.location === loc
-                        ? `${meta.bg} ${meta.color} border-current`
-                        : "bg-slate-50 border-slate-200 text-slate-500 hover:bg-slate-100"
-                    }`}
-                  >
-                    {meta.label}
-                  </button>
-                );
-              })}
-            </div>
+          <div>
+            <label className="block text-[#1d2327] text-sm font-semibold mb-1">Insert Location</label>
+            <select
+              value={form.location}
+              onChange={(e) => set("location", e.target.value)}
+              className="w-full max-w-xs border border-[#8c8f94] bg-white px-2 py-1.5 text-[14px] text-[#2c3338] rounded-[3px] focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none"
+            >
+              <option value="head">Header (&lt;head&gt;)</option>
+              <option value="body_start">Body Start (Top of &lt;body&gt;)</option>
+              <option value="body_end">Footer (End of &lt;body&gt;)</option>
+            </select>
           </div>
 
           {/* Code */}
-          <div className="space-y-1">
-            <label className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Script Code</label>
+          <div>
+            <label className="block text-[#1d2327] text-sm font-semibold mb-1">Code Snippet</label>
             <textarea
               value={form.code}
               onChange={(e) => set("code", e.target.value)}
-              placeholder={`Paste your full <script> tag or raw JS code here…`}
-              rows={6}
-              className="w-full border border-slate-200 rounded-lg px-3 py-2 text-[11px] font-mono text-slate-700 outline-none focus:border-primary/40 transition-all resize-y leading-tight"
+              placeholder="<!-- Paste HTML/JS code here -->"
+              rows={8}
+              className="w-full border border-[#8c8f94] bg-[#f0f0f1] font-mono px-3 py-2 text-[13px] text-[#2c3338] rounded-[3px] focus:bg-white focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none"
             />
           </div>
 
-          {/* Active toggle */}
-          <div className="flex items-center justify-between py-1.5 px-3 bg-slate-50 rounded-lg border border-slate-100">
-            <div>
-              <p className="text-[10px] font-bold text-slate-900">Status</p>
-            </div>
-            <button
-              onClick={() => set("active", !form.active)}
-              className="flex items-center gap-1.5 transition-all"
-            >
-              {form.active ? (
-                <><ToggleRight className="w-5 h-5 text-emerald-500" /><span className="text-[9px] font-black text-emerald-600 uppercase tracking-widest">Active</span></>
-              ) : (
-                <><ToggleLeft className="w-5 h-5 text-slate-300" /><span className="text-[9px] font-black text-slate-400 uppercase tracking-widest">Off</span></>
-              )}
-            </button>
+          {/* Status Checkbox */}
+          <div className="flex items-center gap-2 mt-2">
+            <input
+              type="checkbox"
+              id="active-checkbox"
+              checked={form.active}
+              onChange={(e) => set("active", e.target.checked)}
+              className="w-4 h-4 text-[#2271b1] border-[#8c8f94] rounded-[3px] focus:ring-[#2271b1]"
+            />
+            <label htmlFor="active-checkbox" className="text-[#1d2327] text-sm cursor-pointer">
+              Active (Inject this snippet into the site)
+            </label>
           </div>
         </div>
 
-        {/* Footer */}
-        <div className="flex items-center justify-end gap-2 px-5 py-3 border-t border-slate-100 bg-slate-50">
-          <button onClick={onClose} className="text-[10px] font-bold text-slate-500 uppercase tracking-widest hover:text-slate-900 transition-colors px-3 py-1.5">
-            Cancel
+        {/* WP-Style Footer */}
+        <div className="flex items-center justify-between px-4 py-3 bg-[#f6f7f7] border-t border-[#c3c4c7]">
+          <button onClick={onClose} className="text-[#d63638] text-[13px] hover:underline px-2 py-1">
+            Move to Trash
           </button>
           <button
             onClick={() => onSave(form)}
             disabled={saving || !form.name.trim() || !form.code.trim()}
-            className="flex items-center gap-1.5 bg-primary text-white text-[10px] font-bold uppercase tracking-widest px-3 py-1.5 rounded-lg hover:bg-primary/90 disabled:opacity-50 transition-all shadow-sm"
+            className="bg-[#2271b1] text-white text-[13px] px-4 py-1.5 rounded-[3px] border border-[#2271b1] hover:bg-[#135e96] hover:border-[#135e96] transition-colors disabled:opacity-50 flex items-center gap-2"
           >
-            {saving ? <Loader2 className="w-3 h-3 animate-spin" /> : <Save className="w-3 h-3" />}
-            {initial.id ? "Save" : "Add Script"}
+            {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+            {initial.id ? "Update" : "Publish"}
           </button>
         </div>
       </motion.div>
@@ -161,7 +144,10 @@ export default function AdminScriptsPage() {
   const [saving, setSaving] = useState(false);
   const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [modal, setModal] = useState<{ open: boolean; data: Partial<Script> }>({ open: false, data: {} });
-  const [deletingId, setDeletingId] = useState<string | null>(null);
+  
+  // Bulk actions state
+  const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
+  const [bulkAction, setBulkAction] = useState("");
 
   const showToast = (type: "ok" | "err", msg: string) => {
     setToast({ type, msg });
@@ -197,7 +183,7 @@ export default function AdminScriptsPage() {
       if (!res.ok) throw new Error();
       await load();
       closeModal();
-      showToast("ok", form.id ? "Script updated!" : "Script added!");
+      showToast("ok", form.id ? "Script updated." : "Script published.");
     } catch {
       showToast("err", "Save failed. Try again.");
     } finally {
@@ -207,172 +193,207 @@ export default function AdminScriptsPage() {
 
   const handleToggle = async (s: Script) => {
     try {
-      await fetch("/api/admin/scripts", {
+      const toggled = { ...s, active: !s.active };
+      const res = await fetch("/api/admin/scripts", {
         method: "PUT",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ...s, active: !s.active }),
+        body: JSON.stringify(toggled),
       });
-      setScripts((prev) => prev.map((x) => x.id === s.id ? { ...x, active: !x.active } : x));
+      if (!res.ok) throw new Error();
+      setScripts((prev) => prev.map((x) => x.id === s.id ? toggled : x));
+      showToast("ok", `Script ${toggled.active ? 'activated' : 'deactivated'}.`);
     } catch {
       showToast("err", "Toggle failed.");
     }
   };
 
   const handleDelete = async (id: string) => {
-    if (!confirm("Delete this script? This cannot be undone.")) return;
-    setDeletingId(id);
+    if (!confirm("Are you sure you want to delete this script?")) return;
     try {
       await fetch(`/api/admin/scripts?id=${id}`, { method: "DELETE" });
       setScripts((prev) => prev.filter((s) => s.id !== id));
       showToast("ok", "Script deleted.");
     } catch {
       showToast("err", "Delete failed.");
-    } finally {
-      setDeletingId(null);
     }
   };
 
-  return (
-    <div className="max-w-4xl mx-auto py-8 px-6 space-y-6">
+  const handleDuplicate = async (s: Script) => {
+    try {
+      const duplicated = { ...s, id: undefined, name: s.name + " (Copy)", active: false };
+      const res = await fetch("/api/admin/scripts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(duplicated),
+      });
+      if (!res.ok) throw new Error();
+      await load();
+      showToast("ok", "Script duplicated.");
+    } catch {
+      showToast("err", "Duplicate failed.");
+    }
+  };
 
-      {/* Toast */}
+  const handleBulkApply = async () => {
+    if (bulkAction === "delete" && selectedIds.size > 0) {
+      if (!confirm(`Are you sure you want to delete ${selectedIds.size} script(s)?`)) return;
+      try {
+        for (const id of Array.from(selectedIds)) {
+          await fetch(`/api/admin/scripts?id=${id}`, { method: "DELETE" });
+        }
+        setScripts((prev) => prev.filter((s) => !selectedIds.has(s.id)));
+        setSelectedIds(new Set());
+        showToast("ok", "Scripts deleted.");
+      } catch {
+        showToast("err", "Bulk delete encountered an error.");
+      }
+    }
+  };
+
+  const toggleSelectAll = () => {
+    if (selectedIds.size === scripts.length) {
+      setSelectedIds(new Set());
+    } else {
+      setSelectedIds(new Set(scripts.map((s) => s.id)));
+    }
+  };
+
+  const toggleSelect = (id: string) => {
+    const next = new Set(selectedIds);
+    if (next.has(id)) next.delete(id);
+    else next.add(id);
+    setSelectedIds(next);
+  };
+
+  return (
+    <div className="max-w-6xl mx-auto py-6 px-4 space-y-4">
+
+      {/* WP-Style Toast */}
       <AnimatePresence>
         {toast && (
           <motion.div
-            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -10 }}
-            className={`fixed top-6 right-6 z-[300] flex items-center gap-2 px-4 py-3 rounded-xl shadow-lg border text-xs font-bold ${
-              toast.type === "ok"
-                ? "bg-emerald-50 border-emerald-200 text-emerald-700"
-                : "bg-red-50 border-red-200 text-red-700"
+            initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className={`flex items-center gap-2 px-4 py-2 bg-white border-l-4 text-[13px] shadow-sm ${
+              toast.type === "ok" ? "border-[#00a32a]" : "border-[#d63638]"
             }`}
           >
-            {toast.type === "ok" ? <CheckCircle2 className="w-4 h-4" /> : <AlertCircle className="w-4 h-4" />}
-            {toast.msg}
+            <p className="text-[#1d2327] m-0">{toast.msg}</p>
           </motion.div>
         )}
       </AnimatePresence>
 
-      {/* Header */}
-      <div className="flex items-center justify-between">
-        <div>
-          <h1 className="text-xl font-bold text-slate-900 flex items-center gap-2">
-            <Code2 className="w-5 h-5 text-primary" /> Scripts &amp; Tracking
-          </h1>
-          <p className="text-xs text-slate-400 font-medium mt-0.5">
-            Inject analytics, pixels, and custom scripts — changes take effect on next page load.
-          </p>
-        </div>
+      {/* WP-Style Header */}
+      <div className="flex items-center gap-4 mb-2">
+        <h1 className="text-[23px] font-normal text-[#1d2327] font-serif m-0">Scripts</h1>
         <button
           onClick={openAdd}
-          className="flex items-center gap-2 bg-primary text-white text-xs font-bold uppercase tracking-widest px-4 py-2.5 rounded-xl hover:bg-primary/90 transition-all shadow-lg shadow-primary/20"
+          className="bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f6f7f7] hover:text-[#135e96] hover:border-[#135e96] px-2 py-1 text-[13px] rounded-[3px] transition-colors"
         >
-          <Plus className="w-3.5 h-3.5" /> Add Script
+          Add New Script
         </button>
       </div>
 
-      {/* List */}
-      {loading ? (
-        <div className="flex items-center justify-center h-48">
-          <Loader2 className="w-7 h-7 animate-spin text-primary/30" />
-        </div>
-      ) : scripts.length === 0 ? (
-        <div className="flex flex-col items-center justify-center h-48 gap-4 border-2 border-dashed border-slate-200 rounded-2xl bg-slate-50">
-          <Code2 className="w-8 h-8 text-slate-200" />
-          <div className="text-center">
-            <p className="text-sm font-bold text-slate-400">No scripts yet</p>
-            <p className="text-xs text-slate-300 font-medium mt-0.5">Click "Add Script" to get started</p>
-          </div>
-          <button onClick={openAdd} className="flex items-center gap-1.5 text-xs font-black text-primary uppercase tracking-widest hover:underline">
-            <Plus className="w-3.5 h-3.5" /> Add your first script
-          </button>
-        </div>
-      ) : (
-        <div className="space-y-2">
-          {/* Column Headers */}
-          <div className="grid grid-cols-12 gap-4 px-4 py-2">
-            <div className="col-span-5 text-[9px] font-black text-slate-400 uppercase tracking-widest">Script Name</div>
-            <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">Location</div>
-            <div className="col-span-2 text-[9px] font-black text-slate-400 uppercase tracking-widest">Status</div>
-            <div className="col-span-3 text-[9px] font-black text-slate-400 uppercase tracking-widest text-right">Actions</div>
-          </div>
+      {/* Bulk Actions */}
+      <div className="flex items-center gap-2 mb-2">
+        <select
+          value={bulkAction}
+          onChange={(e) => setBulkAction(e.target.value)}
+          className="border border-[#8c8f94] bg-white text-[#2c3338] px-2 py-1 text-[13px] rounded-[3px] outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+        >
+          <option value="">Bulk actions</option>
+          <option value="delete">Delete</option>
+        </select>
+        <button
+          onClick={handleBulkApply}
+          className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7] transition-colors"
+        >
+          Apply
+        </button>
+        <span className="text-[#50575e] text-[13px] ml-auto">
+          {scripts.length} items
+        </span>
+      </div>
 
-          {scripts.map((s, i) => {
-            const loc = LOCATION_LABELS[s.location] || LOCATION_LABELS.head;
-            return (
-              <motion.div
-                key={s.id}
-                initial={{ opacity: 0, y: 8 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: i * 0.04 }}
-                className="grid grid-cols-12 gap-4 items-center bg-white border border-slate-100 rounded-xl px-4 py-3.5 hover:border-slate-200 hover:shadow-sm transition-all"
-              >
-                {/* Name */}
-                <div className="col-span-5 min-w-0">
-                  <p className="text-sm font-bold text-slate-900 truncate">{s.name}</p>
-                  <p className="text-[10px] text-slate-400 font-mono truncate mt-0.5 max-w-xs">
-                    {s.code.slice(0, 60)}{s.code.length > 60 ? "…" : ""}
-                  </p>
-                </div>
-
-                {/* Location badge */}
-                <div className="col-span-2">
-                  <span className={`inline-flex items-center px-2.5 py-1 rounded-lg border text-[10px] font-black ${loc.bg} ${loc.color}`}>
-                    {loc.label}
-                  </span>
-                </div>
-
-                {/* Status toggle */}
-                <div className="col-span-2">
-                  <button
-                    onClick={() => handleToggle(s)}
-                    className="flex items-center gap-1.5 group"
-                  >
-                    {s.active ? (
-                      <>
-                        <ToggleRight className="w-5 h-5 text-emerald-500 group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] font-black text-emerald-600 uppercase tracking-widest">Active</span>
-                      </>
-                    ) : (
-                      <>
-                        <ToggleLeft className="w-5 h-5 text-slate-300 group-hover:scale-110 transition-transform" />
-                        <span className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Off</span>
-                      </>
-                    )}
-                  </button>
-                </div>
-
-                {/* Actions */}
-                <div className="col-span-3 flex items-center justify-end gap-1">
-                  <button
-                    onClick={() => openEdit(s)}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-slate-600 hover:bg-slate-100 hover:text-slate-900 transition-all uppercase tracking-widest"
-                  >
-                    <Pencil className="w-3 h-3" /> Edit
-                  </button>
-                  <button
-                    onClick={() => handleDelete(s.id)}
-                    disabled={deletingId === s.id}
-                    className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-[10px] font-bold text-red-400 hover:bg-red-50 hover:text-red-600 transition-all uppercase tracking-widest disabled:opacity-50"
-                  >
-                    {deletingId === s.id
-                      ? <Loader2 className="w-3 h-3 animate-spin" />
-                      : <Trash2 className="w-3 h-3" />
-                    }
-                    Delete
-                  </button>
-                </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      )}
-
-      {/* Info note */}
-      <div className="flex items-start gap-2 bg-amber-50 border border-amber-100 rounded-xl p-3.5">
-        <AlertCircle className="w-3.5 h-3.5 text-amber-500 shrink-0 mt-0.5" />
-        <p className="text-[10px] text-amber-700 font-medium leading-relaxed">
-          Scripts are injected server-side on every page request. Only paste code from trusted sources. Inactive scripts are stored but not loaded.
-        </p>
+      {/* WP-Style Table */}
+      <div className="bg-white border border-[#c3c4c7] rounded-sm overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-[#c3c4c7] text-[#1d2327]">
+              <th className="w-8 py-2 px-3">
+                <input
+                  type="checkbox"
+                  checked={scripts.length > 0 && selectedIds.size === scripts.length}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 border-[#8c8f94] rounded-[3px] text-[#2271b1] focus:ring-[#2271b1]"
+                />
+              </th>
+              <th className="py-2 px-3 text-[14px] font-semibold">Title</th>
+              <th className="py-2 px-3 text-[14px] font-semibold w-40">Location</th>
+              <th className="py-2 px-3 text-[14px] font-semibold w-32">Status</th>
+              <th className="py-2 px-3 text-[14px] font-semibold w-32">Date</th>
+            </tr>
+          </thead>
+          <tbody className="text-[13px] text-[#2c3338]">
+            {loading ? (
+              <tr>
+                <td colSpan={5} className="py-8 text-center text-[#50575e]">
+                  <Loader2 className="w-5 h-5 animate-spin mx-auto" />
+                </td>
+              </tr>
+            ) : scripts.length === 0 ? (
+              <tr>
+                <td colSpan={5} className="py-6 px-4 text-[#50575e]">
+                  No scripts found.
+                </td>
+              </tr>
+            ) : (
+              scripts.map((s, idx) => (
+                <tr
+                  key={s.id}
+                  className={`border-b border-[#f0f0f1] group ${idx % 2 === 0 ? "bg-[#f9f9f9]" : "bg-white"} hover:bg-[#f0f0f1] transition-colors`}
+                >
+                  <td className="py-3 px-3 align-top">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.has(s.id)}
+                      onChange={() => toggleSelect(s.id)}
+                      className="w-4 h-4 border-[#8c8f94] rounded-[3px] text-[#2271b1] focus:ring-[#2271b1]"
+                    />
+                  </td>
+                  <td className="py-3 px-3 align-top">
+                    <strong className="text-[#2271b1] block text-[14px]">{s.name}</strong>
+                    <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <button onClick={() => openEdit(s)} className="text-[#2271b1] hover:underline text-[12px]">Edit</button>
+                      <span className="text-[#a7aaad]">|</span>
+                      <button onClick={() => handleDuplicate(s)} className="text-[#2271b1] hover:underline text-[12px]">Duplicate</button>
+                      <span className="text-[#a7aaad]">|</span>
+                      <button onClick={() => handleToggle(s)} className="text-[#2271b1] hover:underline text-[12px]">
+                        {s.active ? "Deactivate" : "Activate"}
+                      </button>
+                      <span className="text-[#a7aaad]">|</span>
+                      <button onClick={() => handleDelete(s.id)} className="text-[#d63638] hover:underline text-[12px]">Delete</button>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3 align-top">
+                    {LOCATION_LABELS[s.location]?.label || "Unknown"}
+                  </td>
+                  <td className="py-3 px-3 align-top">
+                    <button onClick={() => handleToggle(s)} className="hover:underline text-left">
+                      {s.active ? (
+                        <span className="text-[#00a32a] font-semibold">Active</span>
+                      ) : (
+                        <span className="text-[#50575e]">Inactive</span>
+                      )}
+                    </button>
+                  </td>
+                  <td className="py-3 px-3 align-top text-[#50575e]">
+                    {new Date(s.createdAt).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
       </div>
 
       {/* Modal */}

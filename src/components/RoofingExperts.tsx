@@ -163,7 +163,16 @@ export default function AboutSection() {
     const sectionRef = useRef<HTMLElement>(null);
     const shouldReduceMotion = useReducedMotion();
 
-    const { badge, headline, description, image, stats = [], buttons = [], trustBadges = [], coreValues } = about;
+    const { 
+        badge = "", 
+        headline = { prefix: "", highlight: "", suffix: "" }, 
+        description = "", 
+        image = {}, 
+        stats = [], 
+        buttons = [], 
+        trustBadges = [], 
+        coreValues = [] 
+    } = about || {};
 
     const variants = useMemo(
         () => ({
@@ -266,16 +275,16 @@ export default function AboutSection() {
 
                         <div className="relative rounded-3xl overflow-hidden shadow-2xl shadow-gray-300/50">
                             <div className="relative aspect-[4/5] lg:aspect-[3/4]">
-                                {image.src && (image.src.startsWith('http') || image.src.startsWith('/uploads')) ? (
+                                {image?.src && (image.src.startsWith('http') || image.src.startsWith('/uploads')) ? (
                                     <img
                                         src={image.src}
-                                        alt={image.alt}
+                                        alt={image.alt || "About Eagle Revolution"}
                                         className="absolute inset-0 w-full h-full object-cover transition-transform duration-700 group-hover:scale-105"
                                     />
                                 ) : (
                                     <Image
                                         src={EagleAboutImg}
-                                        alt={image.alt}
+                                        alt={image?.alt || "About Eagle Revolution"}
                                         className="object-cover transition-transform duration-700 group-hover:scale-105"
                                         fill
                                         quality={100}
@@ -295,7 +304,7 @@ export default function AboutSection() {
                                     <div className="bg-card/95 backdrop-blur-sm px-5 py-2.5 rounded-full shadow-xl border border-border">
                                         <span className="flex items-center gap-2 text-sm font-bold text-primary">
                                             <span className="text-lg">🇺🇸</span>
-                                            {image.badge}
+                                            {image?.badge || "Veteran Owned & Operated"}
                                         </span>
                                     </div>
                                 </motion.div>

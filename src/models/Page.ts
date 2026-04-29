@@ -20,9 +20,22 @@ const PageSchema = new mongoose.Schema({
     ] 
   },
   status: { type: String, enum: ['draft', 'published'], default: 'published' },
-  metadata: {
-    title: String,
-    description: String,
+  seo: {
+    metaTitle: { type: String },
+    metaDescription: { type: String },
+    focusKeyword: { type: String },
+    canonicalUrl: { type: String },
+    metaRobotsIndex: { type: String, enum: ['index', 'noindex'], default: 'index' },
+    metaRobotsFollow: { type: String, enum: ['follow', 'nofollow'], default: 'follow' },
+    ogTitle: { type: String },
+    ogDescription: { type: String },
+    ogImage: { type: String },
+    twitterCard: { type: String, enum: ['summary', 'summary_large_image'], default: 'summary_large_image' },
+    twitterTitle: { type: String },
+    twitterDescription: { type: String },
+    twitterImage: { type: String },
+    schemaData: { type: String }, // JSON string for structured data
+    breadcrumbTitle: { type: String },
   },
   // This could store page-specific overrides if needed later
   content: { type: mongoose.Schema.Types.Mixed, default: {} },
