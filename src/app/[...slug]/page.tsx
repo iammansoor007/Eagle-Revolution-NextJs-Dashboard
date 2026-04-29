@@ -9,6 +9,32 @@ interface PageProps {
   params: Promise<{ slug: string[] }>;
 }
 
+const BASE_URL = process.env.NEXT_PUBLIC_BASE_URL || "https://www.eaglerevolution.com";
+
+function getAbsoluteUrl(path: string | undefined) {
+  if (!path) return undefined;
+  if (path.startsWith('http')) return path;
+  return `${BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
+}
+
+function generateAutoSchema(page: any) {
+  let type = "WebPage";
+  if (page.template === 'about') type = "AboutPage";
+  if (page.template === 'contact') type = "ContactPage";
+  if (page.template === 'gallery') type = "CollectionPage";
+
+  return {
+    "@context": "https://schema.org",
+    "@type": type,
+    "name": page.seo?.metaTitle || page.title,
+    "description": page.seo?.metaDescription || "",
+    "url": `${BASE_URL}/${page.slug}`,
+    "publisher": {
+      "@id": `${BASE_URL}/#organization`
+    }
+  };
+}
+
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
   const slug = resolvedParams.slug.join('/');
@@ -19,12 +45,13 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
   if (!page) return {};
 
   const seo = page.seo || {};
+  const pageUrl = `${BASE_URL}/${slug}`;
 
   return {
     title: seo.metaTitle || page.title,
     description: seo.metaDescription,
     alternates: {
-      canonical: seo.canonicalUrl || undefined,
+      canonical: seo.canonicalUrl || pageUrl,
     },
     robots: {
       index: seo.metaRobotsIndex === 'index',
@@ -33,13 +60,16 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     openGraph: {
       title: seo.ogTitle || seo.metaTitle || page.title,
       description: seo.ogDescription || seo.metaDescription,
-      images: seo.ogImage ? [{ url: seo.ogImage }] : [],
+      url: pageUrl,
+      siteName: "Eagle Revolution",
+      type: "website",
+      images: seo.ogImage ? [{ url: getAbsoluteUrl(seo.ogImage) || "" }] : [],
     },
     twitter: {
-      card: seo.twitterCard || 'summary_large_image',
+      card: (seo.twitterCard as any) || 'summary_large_image',
       title: seo.twitterTitle || seo.ogTitle || seo.metaTitle || page.title,
       description: seo.twitterDescription || seo.ogDescription || seo.metaDescription,
-      images: seo.twitterImage ? [seo.twitterImage] : [],
+      images: seo.twitterImage ? [getAbsoluteUrl(seo.twitterImage) || ""] : (seo.ogImage ? [getAbsoluteUrl(seo.ogImage) || ""] : []),
     },
   };
 }
@@ -63,19 +93,20 @@ export default async function DynamicPage({ params }: PageProps) {
 
   // Convert to plain object to avoid Mongoose serialization issues in Client Components
   const page = JSON.parse(JSON.stringify(pageDoc));
+  
+  // Use manual schema if provided, otherwise generate automatically
+  const schema = page.seo?.schemaData ? JSON.parse(page.seo.schemaData) : generateAutoSchema(page);
 
   // Use TemplateWrapper to handle local content context overrides
   const { TemplateWrapper } = await import('@/components/templates/TemplateRegistry');
 
   return (
     <main>
-      {page.seo?.schemaData && (
-        <Script
-          id="page-schema"
-          type="application/ld+json"
-          dangerouslySetInnerHTML={{ __html: page.seo.schemaData }}
-        />
-      )}
+      <Script
+        id="page-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
       <TemplateWrapper 
         templateName={page.template} 
         pageData={page} 

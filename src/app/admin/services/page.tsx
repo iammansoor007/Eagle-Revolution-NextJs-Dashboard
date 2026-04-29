@@ -15,6 +15,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import ImageField from "@/components/admin/ImageField";
+import SeoEditor from "@/components/admin/SeoEditor";
 
 const ICON_LIST = [
   "Home", "Layout", "Building2", "Building", "Droplets", "Shield", "ShieldCheck", 
@@ -87,6 +88,7 @@ export default function ServicesAdminPage() {
   const [services, setServices] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState<number | null>(null);
   const [activeTab, setActiveTab] = useState("general"); 
+  const [seo, setSeo] = useState<any>({});
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
 
@@ -171,6 +173,7 @@ export default function ServicesAdminPage() {
     const newServices = [...services];
     const serviceData = { 
       ...form, 
+      seo: seo,
       id: form.id || Date.now().toString(),
       number: form.number || (services.length + 1).toString().padStart(2, '0')
     };
@@ -202,6 +205,7 @@ export default function ServicesAdminPage() {
       overviewTitle: service.overviewTitle || "Craftsmanship Without Compromise.",
       cta: service.cta || { text: "Start Your Project", link: "/contact" }
     });
+    setSeo(service.seo || {});
     setIsEditing(idx);
     setActiveTab("general");
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -310,7 +314,8 @@ export default function ServicesAdminPage() {
                 { id: "content", label: "Page Content", icon: Layout },
                 { id: "features", label: "Stats & Benefits", icon: Shield },
                 { id: "steps", label: "Process Steps", icon: CheckCircle },
-                { id: "faq", label: "Service FAQs", icon: FaqIcon }
+                { id: "faq", label: "Service FAQs", icon: FaqIcon },
+                { id: "seo", label: "SEO Management", icon: Globe }
               ].map(tab => (
                 <button
                   key={tab.id}
@@ -562,6 +567,18 @@ export default function ServicesAdminPage() {
                       </div>
                     </div>
                   ))}
+                </div>
+              )}
+
+              {activeTab === "seo" && (
+                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px]">
+                  <SeoEditor 
+                    data={seo}
+                    setData={setSeo}
+                    pageSlug={form.slug}
+                    pageTitle={form.title}
+                    pageContent={form}
+                  />
                 </div>
               )}
             </div>
