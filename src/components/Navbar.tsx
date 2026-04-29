@@ -94,6 +94,7 @@ const Navbar = () => {
                   priority
                   quality={100}
                 />
+
               </div>
             </Link>
 
@@ -331,7 +332,7 @@ const Navbar = () => {
                               </button>
                             )}
                           </div>
-                          
+
                           <AnimatePresence>
                             {hasSubLinks && isExpanded && (
                               <motion.div

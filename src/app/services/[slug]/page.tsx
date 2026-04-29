@@ -3,6 +3,7 @@ import { Metadata } from "next";
 import connectToDatabase from "@/lib/mongodb";
 import SiteContent from "@/models/Content";
 import Script from "next/script";
+import { generateSchema } from "@/lib/schema-generator";
 
 export const dynamic = 'force-dynamic';
 export const revalidate = 0;
@@ -15,22 +16,7 @@ function getAbsoluteUrl(path: string | undefined) {
   return `${BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
-function generateServiceSchema(service: any) {
-  return {
-    "@context": "https://schema.org",
-    "@type": "Service",
-    "name": service.title,
-    "description": service.seo?.metaDescription || service.description,
-    "provider": {
-      "@id": `${BASE_URL}/#organization`
-    },
-    "serviceType": service.tag || "Home Improvement",
-    "areaServed": {
-      "@type": "State",
-      "name": "Missouri"
-    }
-  };
-}
+// Auto-schema logic moved to centralized generator
 
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
@@ -78,13 +64,43 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
   const content = await SiteContent.findOne({ key: "complete_data" }).lean() as any;
   const serviceDoc = content?.data?.services?.services?.find((s: any) => s.slug === resolvedParams.slug);
   const service = JSON.parse(JSON.stringify(serviceDoc));
+  const globalData = content?.data || {};
+  
+  // Helper to validate FAQ items
+  const isValidFaq = (items: any) => Array.isArray(items) && items.length > 0 && items.every((i: any) => i.question && i.answer);
 
-  const schema = service?.seo?.schemaData ? JSON.parse(service.seo.schemaData) : generateServiceSchema(service);
+  // Detect FAQs in service content
+  let faqs = [];
+  if (isValidFaq(service?.content?.faqs)) {
+    faqs = service.content.faqs;
+  } else if (isValidFaq(service?.content?.items)) {
+    faqs = service.content.items;
+  } else if (isValidFaq(service?.faq?.items)) {
+    faqs = service.faq.items;
+  } else if (isValidFaq(service?.faqs)) {
+    faqs = service.faqs;
+  }
+
+  // If no service-specific FAQs, check if there's a global FAQ section that should be linked
+  if (faqs.length === 0 && globalData.faq?.items && Array.isArray(globalData.faq.items)) {
+    // Only include global FAQs if they are relevant (optional, but requested for automation)
+    // faqs = globalData.faq.items; 
+  }
+
+  const schema = generateSchema({
+    title: service?.seo?.metaTitle || service?.title || "",
+    description: service?.seo?.metaDescription || service?.description || "",
+    slug: `services/${resolvedParams.slug}`,
+    type: "Service",
+    faqs: faqs,
+    breadcrumbTitle: service?.seo?.breadcrumbTitle,
+    isService: true
+  });
 
   return (
     <>
       <Script
-        id="service-schema"
+        id="json-ld-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />

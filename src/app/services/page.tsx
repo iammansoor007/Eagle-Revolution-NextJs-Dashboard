@@ -1,5 +1,41 @@
 import ServicesTemplate from "@/components/templates/ServicesTemplate";
+import { Metadata } from "next";
+import connectToDatabase from "@/lib/mongodb";
+import SiteContent from "@/models/Content";
+import Script from "next/script";
+import { generateSchema } from "@/lib/schema-generator";
 
-export default function ServicesPage() {
-  return <ServicesTemplate />;
+export async function generateMetadata(): Promise<Metadata> {
+  await connectToDatabase();
+  const content = await SiteContent.findOne({ key: "complete_data" }).lean() as any;
+  const servicesData = content?.data?.services;
+  
+  return {
+    title: servicesData?.section?.headline || "Our Services | Eagle Revolution",
+    description: servicesData?.section?.description || "Expert roofing, decking, siding, and home improvement services in St. Louis.",
+  };
+}
+
+export default async function ServicesPage() {
+  await connectToDatabase();
+  const content = await SiteContent.findOne({ key: "complete_data" }).lean() as any;
+  const servicesData = content?.data?.services;
+
+  const schema = generateSchema({
+    title: servicesData?.section?.headline || "Our Services",
+    description: servicesData?.section?.description || "",
+    slug: "/services",
+    type: "CollectionPage"
+  });
+
+  return (
+    <>
+      <Script
+        id="json-ld-schema"
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
+      />
+      <ServicesTemplate />
+    </>
+  );
 }

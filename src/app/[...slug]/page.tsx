@@ -1,9 +1,11 @@
 import { notFound } from 'next/navigation';
 import connectToDatabase from '@/lib/mongodb';
 import Page from '@/models/Page';
+import SiteContent from '@/models/Content';
 import { getTemplate } from '@/components/templates/TemplateRegistry';
 import { Metadata } from 'next';
 import Script from 'next/script';
+import { generateSchema } from '@/lib/schema-generator';
 
 interface PageProps {
   params: Promise<{ slug: string[] }>;
@@ -17,23 +19,7 @@ function getAbsoluteUrl(path: string | undefined) {
   return `${BASE_URL}${path.startsWith('/') ? '' : '/'}${path}`;
 }
 
-function generateAutoSchema(page: any) {
-  let type = "WebPage";
-  if (page.template === 'about') type = "AboutPage";
-  if (page.template === 'contact') type = "ContactPage";
-  if (page.template === 'gallery') type = "CollectionPage";
-
-  return {
-    "@context": "https://schema.org",
-    "@type": type,
-    "name": page.seo?.metaTitle || page.title,
-    "description": page.seo?.metaDescription || "",
-    "url": `${BASE_URL}/${page.slug}`,
-    "publisher": {
-      "@id": `${BASE_URL}/#organization`
-    }
-  };
-}
+// Auto-schema logic moved to centralized generator
 
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const resolvedParams = await params;
@@ -79,11 +65,11 @@ export default async function DynamicPage({ params }: PageProps) {
   const slug = resolvedParams.slug.join('/');
 
   await connectToDatabase();
-  
+
   // Find the page in MongoDB
-  const pageDoc = await Page.findOne({ 
-    slug: slug, 
-    status: 'published' 
+  const pageDoc = await Page.findOne({
+    slug: slug,
+    status: 'published'
   }).lean();
 
   if (!pageDoc) {
@@ -93,9 +79,44 @@ export default async function DynamicPage({ params }: PageProps) {
 
   // Convert to plain object to avoid Mongoose serialization issues in Client Components
   const page = JSON.parse(JSON.stringify(pageDoc));
-  
-  // Use manual schema if provided, otherwise generate automatically
-  const schema = page.seo?.schemaData ? JSON.parse(page.seo.schemaData) : generateAutoSchema(page);
+
+  // Fetch global content for FAQ detection if needed
+  const globalContent = await SiteContent.findOne({ key: 'complete_data' }).lean() as any;
+  const globalData = globalContent?.data || {};
+
+  // Helper to validate FAQ items
+  const isValidFaq = (items: any) => Array.isArray(items) && items.length > 0 && items.every((i: any) => i.question && i.answer);
+
+  // Detect FAQs ONLY if this is the FAQ template (as requested)
+  let faqs = undefined;
+  if (page.template === 'faq') {
+    if (isValidFaq(page.content?.items)) {
+      faqs = page.content.items;
+    } else if (isValidFaq(page.content?.faqs)) {
+      faqs = page.content.faqs;
+    } else if (isValidFaq(page.content?.faq?.items)) {
+      faqs = page.content.faq.items;
+    } else if (isValidFaq(globalData.faq?.items)) {
+      faqs = globalData.faq.items;
+    } else if (isValidFaq(globalData.faqPage?.items)) {
+      faqs = globalData.faqPage.items;
+    }
+  }
+
+  // Determine page type for schema
+  let pageType: any = "WebPage";
+  if (page.template === 'about') pageType = "AboutPage";
+  if (page.template === 'contact') pageType = "ContactPage";
+  if (page.template === 'gallery') pageType = "CollectionPage";
+
+  const schema = generateSchema({
+    title: page.seo?.metaTitle || page.title,
+    description: page.seo?.metaDescription || "",
+    slug: page.slug,
+    type: pageType,
+    faqs: faqs,
+    breadcrumbTitle: page.seo?.breadcrumbTitle
+  });
 
   // Use TemplateWrapper to handle local content context overrides
   const { TemplateWrapper } = await import('@/components/templates/TemplateRegistry');
@@ -103,14 +124,14 @@ export default async function DynamicPage({ params }: PageProps) {
   return (
     <main>
       <Script
-        id="page-schema"
+        id="json-ld-schema"
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(schema) }}
       />
-      <TemplateWrapper 
-        templateName={page.template} 
-        pageData={page} 
-        params={resolvedParams} 
+      <TemplateWrapper
+        templateName={page.template}
+        pageData={page}
+        params={resolvedParams}
       />
     </main>
   );
@@ -121,7 +142,7 @@ export async function generateStaticParams() {
   try {
     await connectToDatabase();
     const pages = await Page.find({ status: 'published' }).select('slug');
-    
+
     return pages.map((page: any) => ({
       slug: page.slug.split('/'),
     }));
