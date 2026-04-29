@@ -93,6 +93,7 @@ export async function generateMetadata(): Promise<Metadata> {
         "Veteran-owned roofing & home improvement company. Expert residential & commercial roofing, siding, windows, decks & gutters in St. Louis, MO.",
       images: [settings.favicon || `${BASE_URL}/eagle-logo.png`],
       creator: "@EagleRevolution",
+      site: "@EagleRevolution",
     },
 
     other: {

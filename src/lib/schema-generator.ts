@@ -9,13 +9,14 @@ interface SchemaOptions {
   faqs?: Array<{ question: string; answer: string }>;
   breadcrumbTitle?: string;
   isService?: boolean;
+  image?: string;
 }
 
 export function generateSchema(options: SchemaOptions) {
-  const { title, description, slug = "", type = "WebPage", faqs, breadcrumbTitle, isService } = options;
+  const { title, description, slug = "", type = "WebPage", faqs, breadcrumbTitle, isService, image } = options;
   const normalizedSlug = slug.startsWith('/') ? slug : `/${slug}`;
   const pageUrl = `${BASE_URL}${normalizedSlug === '/' ? '' : normalizedSlug}`;
-  
+
   // 1. Organization Schema
   const organizationSchema = {
     "@type": "Organization",
@@ -111,7 +112,14 @@ export function generateSchema(options: SchemaOptions) {
     "name": title,
     "description": description,
     "isPartOf": { "@id": `${BASE_URL}/#website` },
-    "breadcrumb": { "@id": `${pageUrl}/#breadcrumb` }
+    "breadcrumb": { "@id": `${pageUrl}/#breadcrumb` },
+    "image": image ? {
+      "@type": "ImageObject",
+      "url": image
+    } : undefined,
+    "primaryImageOfPage": image ? {
+      "@id": `${pageUrl}/#primaryimage`
+    } : undefined
   };
 
   if (isService) {
@@ -142,6 +150,15 @@ export function generateSchema(options: SchemaOptions) {
     breadcrumbList,
     mainEntitySchema
   ];
+
+  if (image) {
+    graph.push({
+      "@type": "ImageObject",
+      "@id": `${pageUrl}/#primaryimage`,
+      "url": image,
+      "contentUrl": image
+    });
+  }
 
   if (faqSchema) {
     graph.push(faqSchema);

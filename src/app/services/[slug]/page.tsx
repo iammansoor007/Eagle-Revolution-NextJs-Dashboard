@@ -45,47 +45,37 @@ export async function generateMetadata({ params }: { params: Promise<{ slug: str
       url: pageUrl,
       siteName: "Eagle Revolution",
       type: "article",
-      images: seo.ogImage ? [{ url: getAbsoluteUrl(seo.ogImage) || "" }] : [],
+      images: seo.featuredImage ? [{ url: getAbsoluteUrl(seo.featuredImage) || "" }] : (seo.ogImage ? [{ url: getAbsoluteUrl(seo.ogImage) || "" }] : []),
     },
     twitter: {
       card: (seo.twitterCard as any) || 'summary_large_image',
       title: seo.twitterTitle || seo.ogTitle || seo.metaTitle || service.title,
       description: seo.twitterDescription || seo.ogDescription || seo.metaDescription || service.description,
-      images: seo.twitterImage ? [getAbsoluteUrl(seo.twitterImage) || ""] : (seo.ogImage ? [getAbsoluteUrl(seo.ogImage) || ""] : []),
+      images: seo.featuredImage ? [getAbsoluteUrl(seo.featuredImage) || ""] : (seo.twitterImage ? [getAbsoluteUrl(seo.twitterImage) || ""] : (seo.ogImage ? [getAbsoluteUrl(seo.ogImage) || ""] : [])),
+      site: "@EagleRevolution",
     },
   };
 }
 
 export default async function Page({ params }: { params: Promise<{ slug: string }> }) {
   const resolvedParams = await params;
-  
+
   // Fetch service for schema injection
   await connectToDatabase();
   const content = await SiteContent.findOne({ key: "complete_data" }).lean() as any;
   const serviceDoc = content?.data?.services?.services?.find((s: any) => s.slug === resolvedParams.slug);
   const service = JSON.parse(JSON.stringify(serviceDoc));
   const globalData = content?.data || {};
-  
-  // Helper to validate FAQ items
-  const isValidFaq = (items: any) => Array.isArray(items) && items.length > 0 && items.every((i: any) => i.question && i.answer);
+  const allFaqs = globalData.faq?.items || [];
 
-  // Detect FAQs in service content
-  let faqs = [];
-  if (isValidFaq(service?.content?.faqs)) {
-    faqs = service.content.faqs;
-  } else if (isValidFaq(service?.content?.items)) {
-    faqs = service.content.items;
-  } else if (isValidFaq(service?.faq?.items)) {
-    faqs = service.faq.items;
-  } else if (isValidFaq(service?.faqs)) {
-    faqs = service.faqs;
-  }
+  // Detect FAQs relevant to this specific service
+  const faqs = allFaqs.filter((item: any) =>
+    item.visibility === 'global' ||
+    (item.visibility === 'specific' && item.targetPages?.includes(resolvedParams.slug))
+  );
 
-  // If no service-specific FAQs, check if there's a global FAQ section that should be linked
-  if (faqs.length === 0 && globalData.faq?.items && Array.isArray(globalData.faq.items)) {
-    // Only include global FAQs if they are relevant (optional, but requested for automation)
-    // faqs = globalData.faq.items; 
-  }
+  // Determine featured image for schema (Manual SEO Featured Image > OG Image > Service Main Image)
+  const featuredImage = getAbsoluteUrl(service?.seo?.featuredImage || service?.seo?.ogImage || service?.seo?.twitterImage || service?.image);
 
   const schema = generateSchema({
     title: service?.seo?.metaTitle || service?.title || "",
@@ -94,7 +84,8 @@ export default async function Page({ params }: { params: Promise<{ slug: string 
     type: "Service",
     faqs: faqs,
     breadcrumbTitle: service?.seo?.breadcrumbTitle,
-    isService: true
+    isService: true,
+    image: featuredImage
   });
 
   return (

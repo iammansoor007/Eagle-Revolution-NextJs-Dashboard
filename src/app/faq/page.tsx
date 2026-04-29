@@ -20,14 +20,20 @@ export default async function FAQPage() {
   await connectToDatabase();
   const content = await SiteContent.findOne({ key: "complete_data" }).lean() as any;
   const faqData = content?.data?.faqPage;
-  const globalFaqItems = content?.data?.faq?.items || [];
+  const allFaqs = content?.data?.faq?.items || [];
+  
+  // Filter FAQs for the FAQ page
+  const faqs = allFaqs.filter((item: any) => 
+    item.visibility === 'global' || 
+    (item.visibility === 'specific' && item.targetPages?.includes('faq'))
+  );
 
   const schema = generateSchema({
     title: faqData?.title || "Frequently Asked Questions",
     description: faqData?.description || "",
     slug: "/faq",
     type: "WebPage",
-    faqs: globalFaqItems
+    faqs: faqs
   });
 
   return (

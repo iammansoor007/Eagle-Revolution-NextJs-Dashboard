@@ -16,6 +16,9 @@ export async function generateMetadata(): Promise<Metadata> {
   return {
     title: homeData?.hero?.headline || settings?.siteTitle || "Eagle Revolution",
     description: homeData?.hero?.subheadline || "Veteran-owned roofing & home improvement in St. Louis, MO.",
+    twitter: {
+      site: "@EagleRevolution",
+    }
   };
 }
 
@@ -28,20 +31,20 @@ export default async function Index() {
   // Helper to validate FAQ items
   const isValidFaq = (items: any) => Array.isArray(items) && items.length > 0 && items.every((i: any) => i.question && i.answer);
 
-  // Detect FAQs in Home content
-  let faqs = [];
-  if (isValidFaq(homeData?.faq?.items)) {
-    faqs = homeData.faq.items;
-  } else if (isValidFaq(homeData?.faqs)) {
-    faqs = homeData.faqs;
-  }
+  // Detect FAQs for Homepage (Global + specific to home)
+  const allFaqs = content?.data?.faq?.items || [];
+  const faqs = allFaqs.filter((item: any) => 
+    item.visibility === 'global' || 
+    (item.visibility === 'specific' && item.targetPages?.includes('home'))
+  );
 
   const schema = generateSchema({
     title: settings?.siteTitle || "Eagle Revolution",
     description: homeData?.hero?.subheadline || "Veteran-owned roofing & home improvement in St. Louis, MO.",
     slug: "/",
     type: "WebPage",
-    faqs: faqs
+    faqs: faqs,
+    image: `${BASE_URL}/eagle-logo.png`
   });
 
   return (

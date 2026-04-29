@@ -49,13 +49,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       url: pageUrl,
       siteName: "Eagle Revolution",
       type: "website",
-      images: seo.ogImage ? [{ url: getAbsoluteUrl(seo.ogImage) || "" }] : [],
+      images: seo.featuredImage ? [{ url: getAbsoluteUrl(seo.featuredImage) || "" }] : (seo.ogImage ? [{ url: getAbsoluteUrl(seo.ogImage) || "" }] : []),
     },
     twitter: {
       card: (seo.twitterCard as any) || 'summary_large_image',
       title: seo.twitterTitle || seo.ogTitle || seo.metaTitle || page.title,
       description: seo.twitterDescription || seo.ogDescription || seo.metaDescription,
-      images: seo.twitterImage ? [getAbsoluteUrl(seo.twitterImage) || ""] : (seo.ogImage ? [getAbsoluteUrl(seo.ogImage) || ""] : []),
+      images: seo.featuredImage ? [getAbsoluteUrl(seo.featuredImage) || ""] : (seo.twitterImage ? [getAbsoluteUrl(seo.twitterImage) || ""] : (seo.ogImage ? [getAbsoluteUrl(seo.ogImage) || ""] : [])),
+      site: "@EagleRevolution",
     },
   };
 }
@@ -90,17 +91,11 @@ export default async function DynamicPage({ params }: PageProps) {
   // Detect FAQs ONLY if this is the FAQ template (as requested)
   let faqs = undefined;
   if (page.template === 'faq') {
-    if (isValidFaq(page.content?.items)) {
-      faqs = page.content.items;
-    } else if (isValidFaq(page.content?.faqs)) {
-      faqs = page.content.faqs;
-    } else if (isValidFaq(page.content?.faq?.items)) {
-      faqs = page.content.faq.items;
-    } else if (isValidFaq(globalData.faq?.items)) {
-      faqs = globalData.faq.items;
-    } else if (isValidFaq(globalData.faqPage?.items)) {
-      faqs = globalData.faqPage.items;
-    }
+    const allFaqs = globalData.faq?.items || [];
+    faqs = allFaqs.filter((item: any) => 
+      item.visibility === 'global' || 
+      (item.visibility === 'specific' && item.targetPages?.includes(slug))
+    );
   }
 
   // Determine page type for schema
@@ -109,13 +104,17 @@ export default async function DynamicPage({ params }: PageProps) {
   if (page.template === 'contact') pageType = "ContactPage";
   if (page.template === 'gallery') pageType = "CollectionPage";
 
+  // Determine featured image for schema (Manual SEO Featured Image > OG Image > Hero Image)
+  const featuredImage = getAbsoluteUrl(page.seo?.featuredImage || page.seo?.ogImage || page.seo?.twitterImage || page.content?.hero?.image);
+
   const schema = generateSchema({
     title: page.seo?.metaTitle || page.title,
     description: page.seo?.metaDescription || "",
     slug: page.slug,
     type: pageType,
     faqs: faqs,
-    breadcrumbTitle: page.seo?.breadcrumbTitle
+    breadcrumbTitle: page.seo?.breadcrumbTitle,
+    image: featuredImage
   });
 
   // Use TemplateWrapper to handle local content context overrides

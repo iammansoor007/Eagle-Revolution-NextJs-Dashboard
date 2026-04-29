@@ -26,6 +26,7 @@ interface SeoData {
   schemaData?: string;
   breadcrumbTitle?: string;
   secondaryKeywords?: string;
+  featuredImage?: string;
 }
 
 interface SeoEditorProps {
@@ -254,6 +255,15 @@ export default function SeoEditor({ data, setData, pageSlug, pageTitle, pageCont
                       className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3.5 text-sm text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all shadow-sm"
                     />
                   </div>
+                </div>
+
+                <div className="pt-4 border-t border-slate-100">
+                  <ImageField
+                    label="Page Featured Image"
+                    value={data.featuredImage || ""}
+                    onChange={(url) => updateField('featuredImage', url)}
+                    description="The primary image used for this page in Google Search and Structured Data. If left blank, we will try to use the Hero image."
+                  />
                 </div>
 
                 <div className="space-y-2">
