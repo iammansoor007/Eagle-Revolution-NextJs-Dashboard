@@ -15,6 +15,7 @@ export default function PagesDashboard() {
   const [search, setSearch] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [actionLoading, setActionLoading] = useState(false);
+  const [filter, setFilter] = useState("all");
 
   // New Page Form
   const [newPage, setNewPage] = useState({
@@ -58,42 +59,22 @@ export default function PagesDashboard() {
     }
   };
 
-  const handleBulkDelete = async () => {
-    if (!confirm(`Permanently delete ${selectedIds.length} pages?`)) return;
-    setActionLoading(true);
-    try {
-      const res = await fetch("/api/admin/pages", {
-        method: "DELETE",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ ids: selectedIds })
-      });
-      if (res.ok) {
-        setSelectedIds([]);
-        fetchPages();
-      }
-    } catch (err) {
-      alert("Bulk delete failed.");
-    } finally {
-      setActionLoading(false);
-    }
-  };
-
-  const handleBulkDuplicate = async () => {
-    setActionLoading(true);
-    try {
-      const res = await fetch("/api/admin/pages", {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ action: 'duplicate', ids: selectedIds })
-      });
-      if (res.ok) {
-        setSelectedIds([]);
-        fetchPages();
-      }
-    } catch (err) {
-      alert("Duplication failed.");
-    } finally {
-      setActionLoading(false);
+  const handleBulkAction = async (action: string) => {
+    if (action === 'delete') {
+      if (!confirm(`Permanently delete ${selectedIds.length} pages?`)) return;
+      setActionLoading(true);
+      try {
+        const res = await fetch("/api/admin/pages", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ ids: selectedIds })
+        });
+        if (res.ok) {
+          setSelectedIds([]);
+          fetchPages();
+        }
+      } catch (err) { alert("Bulk delete failed."); }
+      finally { setActionLoading(false); }
     }
   };
 
@@ -119,19 +100,11 @@ export default function PagesDashboard() {
         if (res.ok) fetchPages();
       } catch (err) { alert("Duplication failed."); }
     }
+  };
 
-    if (action === 'status') {
-      const currentStatus = pages.find(p => p._id === id)?.status || 'draft';
-      const newStatus = currentStatus === 'published' ? 'draft' : 'published';
-      try {
-        const res = await fetch(`/api/admin/pages/${id}`, {
-          method: "PATCH",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ status: newStatus })
-        });
-        if (res.ok) fetchPages();
-      } catch (err) { alert("Status update failed."); }
-    }
+  const toggleSelectAll = () => {
+    if (selectedIds.length === filteredPages.length) setSelectedIds([]);
+    else setSelectedIds(filteredPages.map(p => p._id));
   };
 
   const toggleSelect = (id: string) => {
@@ -140,288 +113,203 @@ export default function PagesDashboard() {
     );
   };
 
-  const filteredPages = pages.filter(p =>
-    p.title.toLowerCase().includes(search.toLowerCase()) ||
-    p.slug.toLowerCase().includes(search.toLowerCase())
-  );
+  const filteredPages = pages.filter(p => {
+    const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase()) || p.slug.toLowerCase().includes(search.toLowerCase());
+    const matchesFilter = filter === "all" || p.status === filter;
+    return matchesSearch && matchesFilter;
+  });
 
-  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (loading) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-[#2271b1]" /></div>;
 
   return (
-    <div className="w-full px-12 py-12 min-h-screen bg-[#F8FAFC]">
-      {/* Header Area */}
-      <div className="flex flex-wrap items-center justify-between gap-10 mb-16 px-4">
-        <div className="space-y-1.5">
-          <div className="flex items-center gap-2 text-[10px] font-medium text-slate-600 uppercase tracking-[0.2em]">
-            <Link href="/admin" className="hover:text-primary transition-colors">Dashboard</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-900">System Inventory</span>
-          </div>
-          <h1 className="text-2xl font-medium text-slate-900 tracking-tight">Website Pages</h1>
+    <div className="space-y-4">
+      {/* WP Header Area */}
+      <div className="flex items-center gap-4 mb-2">
+        <h1 className="text-[23px] font-normal text-[#1d2327] font-serif m-0">Pages</h1>
+        <button
+          onClick={() => setShowAddModal(true)}
+          className="bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f6f7f7] hover:text-[#135e96] hover:border-[#135e96] px-2 py-1 text-[13px] rounded-[3px] transition-colors"
+        >
+          Add New Page
+        </button>
+      </div>
+
+      {/* Filter Links */}
+      <div className="flex items-center gap-2 text-[13px]">
+        <button onClick={() => setFilter("all")} className={`${filter === 'all' ? 'text-black font-bold' : 'text-[#2271b1] hover:text-[#135e96] underline decoration-transparent hover:decoration-current'}`}>
+          All <span className="text-[#646970] font-normal">({pages.length})</span>
+        </button>
+        <span className="text-[#c3c4c7]">|</span>
+        <button onClick={() => setFilter("published")} className={`${filter === 'published' ? 'text-black font-bold' : 'text-[#2271b1] hover:text-[#135e96] underline decoration-transparent hover:decoration-current'}`}>
+          Published <span className="text-[#646970] font-normal">({pages.filter(p => p.status === 'published').length})</span>
+        </button>
+        <span className="text-[#c3c4c7]">|</span>
+        <button onClick={() => setFilter("draft")} className={`${filter === 'draft' ? 'text-black font-bold' : 'text-[#2271b1] hover:text-[#135e96] underline decoration-transparent hover:decoration-current'}`}>
+          Drafts <span className="text-[#646970] font-normal">({pages.filter(p => p.status === 'draft').length})</span>
+        </button>
+      </div>
+
+      {/* Top Bar: Bulk Actions & Search */}
+      <div className="flex items-center justify-between gap-4">
+        <div className="flex items-center gap-2">
+          <select 
+            className="border border-[#8c8f94] bg-white text-[#2c3338] px-2 py-1 text-[13px] rounded-[3px] outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+            onChange={(e) => handleBulkAction(e.target.value)}
+          >
+            <option value="">Bulk actions</option>
+            <option value="delete">Delete Permanently</option>
+          </select>
+          <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7] transition-colors">Apply</button>
         </div>
 
-        <div className="flex items-center gap-6">
-          <div className="relative w-80">
-            <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-600" />
-            <input
-              type="text"
-              placeholder="Search by name or slug..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full bg-white border border-slate-100 rounded-2xl pl-12 pr-6 py-4 text-[11px] font-medium outline-none focus:border-primary/30 transition-all shadow-sm"
-            />
-          </div>
-          <button
-            onClick={() => setShowAddModal(true)}
-            className="flex items-center gap-3 bg-primary text-white px-10 py-4 rounded-2xl text-xs font-medium hover:shadow-xl hover:shadow-primary/20 hover:-translate-y-0.5 transition-all active:scale-95"
-          >
-            <Plus className="w-4 h-4" />
-            New Page
-          </button>
+        <div className="flex items-center gap-2">
+           <input
+             type="text"
+             placeholder="Search Pages"
+             value={search}
+             onChange={(e) => setSearch(e.target.value)}
+             className="border border-[#8c8f94] bg-white px-3 py-1 text-[13px] rounded-[3px] outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
+           />
+           <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7] transition-colors">Search Pages</button>
         </div>
       </div>
 
-      {/* Bulk Action Bar */}
-      <AnimatePresence>
-        {selectedIds.length > 0 && (
-          <motion.div
-            initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
-            className="mb-8 bg-white border border-slate-900/5 rounded-3xl p-5 flex items-center justify-between px-10 shadow-2xl shadow-slate-200"
-          >
-            <div className="flex items-center gap-6">
-              <div className="flex items-center gap-2 px-4 py-1.5 bg-slate-50 rounded-full">
-                <span className="text-[10px] font-medium text-primary uppercase tracking-widest">{selectedIds.length}</span>
-                <span className="text-[10px] font-medium text-slate-800 uppercase tracking-widest">Selected</span>
-              </div>
-              <button
-                onClick={() => setSelectedIds([])}
-                className="text-[10px] font-medium text-slate-600 hover:text-slate-900 uppercase tracking-widest transition-colors"
-              >
-                Clear All
-              </button>
-            </div>
-
-            <div className="flex items-center gap-3">
-              <button
-                onClick={handleBulkDuplicate}
-                disabled={actionLoading}
-                className="flex items-center gap-2 text-slate-600 px-6 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest hover:bg-slate-50 transition-all border border-slate-100"
-              >
-                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Copy className="w-3.5 h-3.5" />}
-                Duplicate
-              </button>
-              <button
-                onClick={handleBulkDelete}
-                disabled={actionLoading}
-                className="flex items-center gap-2 bg-red-50 text-red-500 px-6 py-2.5 rounded-xl text-[10px] font-medium uppercase tracking-widest hover:bg-red-500 hover:text-white transition-all border border-red-100"
-              >
-                {actionLoading ? <Loader2 className="w-3.5 h-3.5 animate-spin" /> : <Trash2 className="w-3.5 h-3.5" />}
-                Delete
-              </button>
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
-
-      {/* Pages Container */}
-      <div className="bg-white border border-slate-100 rounded-[2.5rem] shadow-sm overflow-hidden">
-        <div className="divide-y divide-slate-50">
-          {filteredPages.length > 0 ? filteredPages.map((page) => (
-            <div key={page._id} className="group relative px-12 py-10 hover:bg-slate-50/30 transition-all flex items-center gap-12">
-
-              {/* Checkbox */}
-              <button
-                onClick={() => toggleSelect(page._id)}
-                className={`w-7 h-7 rounded-xl border-2 flex items-center justify-center transition-all shrink-0 ${selectedIds.includes(page._id)
-                  ? "bg-primary border-primary text-white"
-                  : "border-slate-100 bg-white group-hover:border-slate-200"
-                  }`}
-              >
-                {selectedIds.includes(page._id) && <Check className="w-4 h-4" />}
-              </button>
-
-              <div className="flex-1">
-                <div className="flex items-center gap-4 mb-3">
-                  <h3 className="text-lg font-medium text-slate-900 tracking-tight group-hover:text-primary transition-colors">{page.title}</h3>
-                  <span className="text-[9px] font-bold text-slate-600 uppercase tracking-[0.2em] bg-slate-50/50 px-3 py-1 rounded-full border border-slate-100">
-                    /{page.slug}
-                  </span>
-                  <button
-                    onClick={(e) => handleIndividualAction(e, 'status', page._id)}
-                    className={`text-[8px] font-bold uppercase tracking-widest px-3 py-1 rounded-full border transition-all flex items-center gap-2 ${page.status === 'published'
-                      ? "bg-emerald-50 text-emerald-600 border-emerald-100"
-                      : "bg-amber-50 text-amber-600 border-amber-100"
-                      }`}
-                  >
-                    {page.status === 'published' ? <Eye className="w-3 h-3" /> : <EyeOff className="w-3 h-3" />}
-                    {page.status || 'draft'}
-                  </button>
-                </div>
-
-                {/* Refined Actions Row */}
-                <div className="flex items-center gap-4 text-[10px] font-medium uppercase tracking-[0.15em]">
-                  <Link href={`/admin/pages/${page._id}`} className="text-primary/70 hover:text-primary transition-all text-[9px]">
-                    Edit
-                  </Link>
-                  <span className="text-slate-300">•</span>
-                  <Link href={`/${page.slug}`} target="_blank" className="text-slate-600 hover:text-slate-900 transition-all text-[9px]">
-                    Preview
-                  </Link>
-                  <span className="text-slate-300">•</span>
-                  <button
-                    onClick={(e) => handleIndividualAction(e, 'duplicate', page._id)}
-                    className="text-slate-600 hover:text-slate-900 transition-all text-[9px]"
-                  >
-                    Duplicate
-                  </button>
-                  <span className="text-slate-300">•</span>
-                  <button
-                    onClick={(e) => handleIndividualAction(e, 'delete', page._id)}
-                    className="text-slate-600 hover:text-red-500 transition-all text-[9px]"
-                  >
-                    Delete
-                  </button>
-                </div>
-              </div>
-
-              <div className="text-right shrink-0">
-                <div className="text-[9px] font-bold text-slate-700 uppercase tracking-widest bg-slate-50 px-4 py-1.5 rounded-xl border border-slate-100">
-                  {page.template}
-                </div>
-              </div>
-            </div>
-          )) : (
-            <div className="p-40 text-center">
-              <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto mb-8 border border-slate-50">
-                <Search className="w-10 h-10 text-slate-200" />
-              </div>
-              <h2 className="text-lg font-medium text-slate-900 mb-2">No matching pages found</h2>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">Try refining your search keywords or create a new page to expand your inventory.</p>
-            </div>
-          )}
-        </div>
+      {/* Table Pagination Info */}
+      <div className="flex justify-end text-[13px] text-[#50575e]">
+         {filteredPages.length} items
       </div>
 
-      {/* High-End Initialize Page Modal */}
+      {/* WP-Style Table */}
+      <div className="bg-white border border-[#c3c4c7] rounded-sm overflow-hidden shadow-[0_1px_1px_rgba(0,0,0,0.04)]">
+        <table className="w-full text-left border-collapse">
+          <thead>
+            <tr className="border-b border-[#c3c4c7] text-[#1d2327]">
+              <th className="w-8 py-2 px-3">
+                <input
+                  type="checkbox"
+                  checked={filteredPages.length > 0 && selectedIds.length === filteredPages.length}
+                  onChange={toggleSelectAll}
+                  className="w-4 h-4 border-[#8c8f94] rounded-[3px] text-[#2271b1] focus:ring-[#2271b1]"
+                />
+              </th>
+              <th className="py-2 px-3 text-[14px] font-semibold">Title</th>
+              <th className="py-2 px-3 text-[14px] font-semibold w-40">Template</th>
+              <th className="py-2 px-3 text-[14px] font-semibold w-40">Status</th>
+              <th className="py-2 px-3 text-[14px] font-semibold w-32">Date</th>
+            </tr>
+          </thead>
+          <tbody className="text-[13px] text-[#2c3338]">
+            {filteredPages.length === 0 ? (
+              <tr><td colSpan={5} className="py-6 px-4 text-[#50575e]">No pages found.</td></tr>
+            ) : (
+              filteredPages.map((page, idx) => (
+                <tr
+                  key={page._id}
+                  className={`border-b border-[#f0f0f1] group ${idx % 2 === 0 ? "bg-[#f9f9f9]" : "bg-white"} hover:bg-[#f0f0f1] transition-colors`}
+                >
+                  <td className="py-3 px-3 align-top">
+                    <input
+                      type="checkbox"
+                      checked={selectedIds.includes(page._id)}
+                      onChange={() => toggleSelect(page._id)}
+                      className="w-4 h-4 border-[#8c8f94] rounded-[3px] text-[#2271b1] focus:ring-[#2271b1]"
+                    />
+                  </td>
+                  <td className="py-3 px-3 align-top">
+                    <strong className="text-[#2271b1] block text-[14px]">{page.title} — {page.status === 'draft' ? <span className="text-[#646970] font-normal italic">Draft</span> : <span className="text-[#00a32a] font-normal italic">Published</span>}</strong>
+                    <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                      <Link href={`/admin/pages/${page._id}`} className="text-[#2271b1] hover:underline text-[12px]">Edit</Link>
+                      <span className="text-[#a7aaad]">|</span>
+                      <button onClick={(e) => handleIndividualAction(e, 'duplicate', page._id)} className="text-[#2271b1] hover:underline text-[12px]">Duplicate</button>
+                      <span className="text-[#a7aaad]">|</span>
+                      <Link href={`/${page.slug}`} target="_blank" className="text-[#2271b1] hover:underline text-[12px]">View</Link>
+                      <span className="text-[#a7aaad]">|</span>
+                      <button onClick={(e) => handleIndividualAction(e, 'delete', page._id)} className="text-[#d63638] hover:underline text-[12px]">Trash</button>
+                    </div>
+                  </td>
+                  <td className="py-3 px-3 align-top capitalize text-[#50575e]">
+                    {page.template}
+                  </td>
+                  <td className="py-3 px-3 align-top">
+                    <span className={`font-semibold ${page.status === 'published' ? 'text-[#00a32a]' : 'text-[#d63638]'}`}>
+                      {page.status === 'published' ? 'Active' : 'Draft'}
+                    </span>
+                  </td>
+                  <td className="py-3 px-3 align-top text-[#50575e]">
+                    {new Date(page.createdAt || Date.now()).toLocaleDateString("en-US", { year: 'numeric', month: 'short', day: 'numeric' })}
+                  </td>
+                </tr>
+              ))
+            )}
+          </tbody>
+        </table>
+      </div>
+
+      {/* WP-Style Modal for Add New Page */}
       <AnimatePresence>
         {showAddModal && (
-          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 sm:p-12">
-            <motion.div
-              initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
-              onClick={() => setShowAddModal(false)}
-              className="absolute inset-0 bg-slate-900/40 backdrop-blur-xl"
-            />
-            <motion.div
-              initial={{ opacity: 0, scale: 0.95, y: 30 }} animate={{ opacity: 1, scale: 1, y: 0 }} exit={{ opacity: 0, scale: 0.95, y: 30 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="relative w-full max-w-2xl bg-white rounded-[3rem] shadow-2xl overflow-hidden border border-white/20"
-            >
-              {/* Modal Header */}
-              <div className="bg-slate-50/50 px-12 py-10 border-b border-slate-100 flex justify-between items-center">
-                <div className="space-y-1">
-                  <h2 className="text-2xl font-bold text-slate-900 tracking-tight">Initialize New Page</h2>
-                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest">Route configuration & template assignment</p>
+          <div className="fixed inset-0 z-[200] flex items-center justify-center p-4">
+             <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={() => setShowAddModal(false)} className="absolute inset-0 bg-[#00000066]" />
+             <motion.div
+               initial={{ y: -10, opacity: 0 }} animate={{ y: 0, opacity: 1 }} exit={{ y: -10, opacity: 0 }}
+               className="relative w-full max-w-xl bg-[#f1f1f1] border border-[#c3c4c7] shadow-lg rounded-[3px] overflow-hidden flex flex-col"
+             >
+                <div className="flex items-center justify-between px-4 py-3 bg-white border-b border-[#c3c4c7]">
+                   <h2 className="text-[#1d2327] text-lg font-normal font-serif">Add New Page</h2>
+                   <button onClick={() => setShowAddModal(false)} className="text-[#787c82] hover:text-[#d63638]"><X className="w-5 h-5" /></button>
                 </div>
-                <button onClick={() => setShowAddModal(false)} className="w-10 h-10 rounded-2xl bg-white border border-slate-100 flex items-center justify-center text-slate-400 hover:text-slate-900 hover:border-primary/20 transition-all shadow-sm">
-                  <X className="w-5 h-5" />
-                </button>
-              </div>
-
-              <div className="p-10 space-y-7">
-
-                {/* Section 1: Identity */}
-                <div className="grid grid-cols-2 gap-6">
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">Page Identity</label>
-                    <input
-                      type="text"
-                      placeholder="e.g. Project Portfolio"
-                      value={newPage.title}
-                      onChange={(e) => {
-                        const slug = e.target.value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, "-");
-                        setNewPage({ ...newPage, title: e.target.value, slug });
-                      }}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-6 py-3.5 text-sm font-medium text-slate-900 outline-none focus:bg-white focus:border-primary/40 transition-all shadow-sm"
-                    />
-                  </div>
-
-                  <div className="space-y-2">
-                    <label className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1">URL Endpoint</label>
-                    <div className="relative group">
-                      <div className="absolute left-6 top-1/2 -translate-y-1/2 flex items-center gap-2 pointer-events-none">
-                        <span className="text-slate-300 font-bold text-sm">/</span>
-                      </div>
+                <div className="p-4 space-y-4 bg-[#f0f0f1]">
+                   <div>
+                      <label className="block text-[#1d2327] text-sm font-semibold mb-1">Title</label>
+                      <input
+                        type="text"
+                        value={newPage.title}
+                        onChange={(e) => {
+                          const slug = e.target.value.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, "-");
+                          setNewPage({ ...newPage, title: e.target.value, slug });
+                        }}
+                        placeholder="Enter page title here"
+                        className="w-full border border-[#8c8f94] bg-white px-3 py-1.5 text-[14px] rounded-[3px] shadow-[inset_0_1px_2px_rgba(0,0,0,0.07)] focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none"
+                      />
+                   </div>
+                   <div>
+                      <label className="block text-[#1d2327] text-sm font-semibold mb-1">Slug</label>
                       <input
                         type="text"
                         value={newPage.slug}
                         onChange={(e) => setNewPage({ ...newPage, slug: e.target.value })}
-                        className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-10 pr-6 py-3.5 text-sm font-bold text-primary outline-none focus:bg-white focus:border-primary/40 transition-all shadow-sm"
+                        className="w-full border border-[#8c8f94] bg-white px-3 py-1.5 text-[14px] rounded-[3px] focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1] outline-none"
                       />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 2: Architecture */}
-                <div className="space-y-3">
-                  <label className="text-[9px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-                    <Edit3 className="w-3 h-3" />
-                    Layout Architecture
-                  </label>
-                  <div className="relative group">
-                    <select
-                      value={newPage.template}
-                      onChange={(e) => setNewPage({ ...newPage, template: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-xl px-8 py-4 text-sm font-bold text-slate-900 outline-none focus:bg-white focus:border-primary/40 transition-all shadow-sm appearance-none cursor-pointer"
-                    >
-                      <option value="home">Home Page Template</option>
-                      <option value="about">About Us Template</option>
-                      <option value="services">Services Index Template</option>
-                      <option value="gallery">Gallery Showcase Template</option>
-                      <option value="reviews">Reviews & Testimonials Template</option>
-                      <option value="team">Team Leadership Template</option>
-                      <option value="faq">Knowledge Base Template</option>
-                      <option value="contact">Inquiry Portal Template</option>
-                      <option value="careers">Careers Hub Template</option>
-                    </select>
-                    <div className="absolute right-8 top-1/2 -translate-y-1/2 pointer-events-none text-slate-300 group-hover:text-primary transition-colors">
-                      <ChevronRight className="w-4 h-4 rotate-90" />
-                    </div>
-                  </div>
-                </div>
-
-                {/* Section 3: Visibility */}
-                <div className="pt-5 border-t border-slate-100 flex items-center justify-between">
-                  <div className="space-y-1">
-                    <p className="text-[9px] font-bold text-slate-900 uppercase tracking-widest">Initial Visibility</p>
-                    <p className="text-[9px] text-slate-400 font-medium">Draft pages are hidden from navigation.</p>
-                  </div>
-                  <div className="bg-slate-50 p-1 rounded-xl flex gap-1 border border-slate-100">
-                    {['draft', 'published'].map((s) => (
-                      <button
-                        key={s}
-                        type="button"
-                        onClick={() => setNewPage({ ...newPage, status: s })}
-                        className={`px-8 py-2.5 rounded-lg text-[9px] font-bold uppercase tracking-widest transition-all ${newPage.status === s
-                          ? "bg-white text-slate-900 shadow-sm border border-slate-100"
-                          : "text-slate-400 hover:text-slate-600"
-                          }`}
+                   </div>
+                   <div>
+                      <label className="block text-[#1d2327] text-sm font-semibold mb-1">Template</label>
+                      <select
+                        value={newPage.template}
+                        onChange={(e) => setNewPage({ ...newPage, template: e.target.value })}
+                        className="w-full border border-[#8c8f94] bg-white px-2 py-1.5 text-[14px] rounded-[3px] outline-none"
                       >
-                        {s}
-                      </button>
-                    ))}
-                  </div>
+                        <option value="home">Home Page</option>
+                        <option value="about">About Us</option>
+                        <option value="services">Services Index</option>
+                        <option value="service-detail">Service Detail (Single)</option>
+                        <option value="team">Team / Staff</option>
+                        <option value="careers">Careers / Jobs</option>
+                        <option value="gallery">Gallery Showcase</option>
+                        <option value="reviews">Reviews</option>
+                        <option value="faq">Knowledge Base</option>
+                        <option value="contact">Contact Portal</option>
+                      </select>
+                   </div>
                 </div>
-
-                {/* Action */}
-                <button
-                  onClick={handleCreatePage}
-                  className="w-full bg-primary text-white py-5 rounded-2xl text-[10px] font-bold uppercase tracking-[0.2em] shadow-xl shadow-primary/20 hover:scale-[1.01] active:scale-95 transition-all flex items-center justify-center gap-4 group"
-                >
-                  Initialize Route
-                  <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
-                </button>
-              </div>
-            </motion.div>
+                <div className="flex items-center justify-end px-4 py-3 bg-[#f6f7f7] border-t border-[#c3c4c7]">
+                   <button
+                     onClick={handleCreatePage}
+                     className="bg-[#2271b1] text-white text-[13px] px-4 py-1.5 rounded-[3px] border border-[#2271b1] hover:bg-[#135e96] hover:border-[#135e96] transition-colors"
+                   >
+                     Publish
+                   </button>
+                </div>
+             </motion.div>
           </div>
         )}
       </AnimatePresence>

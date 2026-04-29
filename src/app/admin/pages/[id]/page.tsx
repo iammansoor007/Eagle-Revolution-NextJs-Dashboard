@@ -5,7 +5,8 @@ import { motion, AnimatePresence } from "framer-motion";
 import {
   Save, Loader2, LayoutTemplate, ChevronRight,
   Settings, Type, Image as ImageIcon, Briefcase,
-  Star, HelpCircle, Phone, Users, Globe, ArrowUpRight, Trash2, ArrowLeft, ExternalLink
+  Star, HelpCircle, Phone, Users, Globe, ArrowUpRight, Trash2, ArrowLeft, ExternalLink,
+  ChevronDown, Calendar, Eye
 } from "lucide-react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -59,28 +60,6 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
     }
   };
 
-  const handleUpdateTemplate = async (newTemplate: string) => {
-    if (!confirm(`Switching to "${newTemplate}" will change the editor fields. Continue?`)) return;
-
-    setSaving(true);
-    try {
-      const res = await fetch(`/api/admin/pages/${id}`, {
-        method: "PATCH",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ template: newTemplate }),
-      });
-      if (res.ok) {
-        setPage({ ...page, template: newTemplate });
-        setMessage("Template switched successfully!");
-        setTimeout(() => setMessage(""), 3000);
-      }
-    } catch (err) {
-      console.error("Failed to update template:", err);
-    } finally {
-      setSaving(false);
-    }
-  };
-
   const handleSave = async () => {
     setSaving(true);
     try {
@@ -90,12 +69,14 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
         body: JSON.stringify({
           title: page.title,
           slug: page.slug,
+          template: page.template,
+          status: page.status,
           seo: seo,
           content: content
         }),
       });
       if (res.ok) {
-        setMessage("Changes saved successfully!");
+        setMessage("Page updated.");
         setTimeout(() => setMessage(""), 3000);
       }
     } catch (err) {
@@ -106,7 +87,7 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
   };
 
   const handleDelete = async () => {
-    if (!confirm("Permanently delete this page?")) return;
+    if (!confirm("Are you sure you want to move this page to Trash?")) return;
     try {
       const res = await fetch(`/api/admin/pages/${id}`, { method: "DELETE" });
       if (res.ok) router.push("/admin/pages");
@@ -115,176 +96,171 @@ export default function DynamicPageEditor({ params }: { params: Promise<{ id: st
     }
   };
 
-  if (loading) return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (loading) return <div className="flex h-64 items-center justify-center text-[#646970] font-serif">Loading...</div>;
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC]">
-      {/* Precision Top Bar - Now True Full Width */}
-      <div className="bg-white border-b border-slate-100 sticky top-0 z-[50]">
-        <div className="w-full px-10 h-20 flex items-center justify-between">
-          <div className="flex flex-col">
-            <div className="flex items-center gap-2 text-[10px] font-medium text-slate-400 uppercase tracking-[0.2em] mb-1">
-              <Link href="/admin/pages" className="hover:text-primary transition-colors">Pages</Link>
-              <ChevronRight className="w-3 h-3" />
-              <span className="text-slate-900">Dynamic Editor</span>
-            </div>
-            <h1 className="text-2xl font-medium text-slate-900 tracking-tight flex items-center gap-4">
-              {page.title || "Untitled Page"}
-              <span className="text-[10px] font-medium px-3 py-1 bg-slate-100 rounded-full text-slate-400 uppercase tracking-widest">{page.template}</span>
-            </h1>
-          </div>
-
-          <div className="flex items-center gap-3">
-             <button
-            onClick={handleDelete}
-            className="px-6 py-3 text-[10px] font-medium text-slate-400 uppercase tracking-widest hover:text-red-500 transition-colors"
-          >
-            Delete Page
-          </button>
-
-          <button
-            onClick={() => window.open(`/${page.slug}`, "_blank")}
-            className="px-6 py-3 text-[10px] font-medium text-slate-600 uppercase tracking-widest border border-slate-200 rounded-xl hover:bg-slate-50 transition-all flex items-center gap-2"
-          >
-            Live Preview
-            <ArrowUpRight className="w-3 h-3" />
-          </button>
-
-          <button
-            onClick={handleSave}
-            disabled={saving}
-            className="flex items-center gap-3 bg-primary text-white px-8 py-3.5 rounded-xl font-medium shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
-          >
-            {saving ? <Loader2 className="w-4 h-4 animate-spin" /> : <Save className="w-4 h-4" />}
-            {saving ? "Publishing..." : "Update Page"}
-          </button>
-          </div>
+    <div className="bg-[#f0f0f1] font-sans pb-10 max-w-full overflow-hidden">
+      {/* WP Header Area */}
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <h1 className="text-[20px] font-normal text-[#1d2327] font-serif">Edit Page</h1>
+          <Link href="/admin/pages" className="bg-white border border-[#2271b1] text-[#2271b1] text-[12px] px-1.5 py-0.5 rounded-[3px] hover:bg-[#f0f6fb] transition-colors">Add New</Link>
         </div>
       </div>
 
-      {/* Main Workspace: Vertically Stacked & True Full Width */}
-      <div className="w-full px-10 py-6 space-y-6">
-        
-        {/* Core Configuration Grid: Above Editor */}
-        <div className="bg-white border border-slate-100 rounded-3xl p-6 shadow-sm">
-           <div className="grid grid-cols-12 gap-8 items-end">
-              <div className="col-span-3 space-y-2">
-                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
-                   <LayoutTemplate className="w-3 h-3" />
-                   Template Layout
-                 </label>
-                 <select
-                   value={page.template}
-                   onChange={(e) => handleUpdateTemplate(e.target.value)}
-                   className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all appearance-none cursor-pointer"
-                 >
-                   {EDITOR_TEMPLATES.map((t) => (
-                     <option key={t.id} value={t.id}>{t.label}</option>
-                   ))}
-                 </select>
-              </div>
+      <div className="flex flex-col lg:flex-row gap-4 items-start">
+        {/* Main Content (Left Column) */}
+        <div className="flex-1 min-w-0 w-full space-y-4">
+          {/* Title Input Field */}
+          <div className="bg-white">
+            <input
+              type="text"
+              value={page.title}
+              onChange={(e) => setPage({ ...page, title: e.target.value })}
+              className="w-full border border-[#c3c4c7] px-3 py-1.5 text-[16px] font-medium text-[#1d2327] focus:border-[#2271b1] focus:ring-0 outline-none placeholder:text-[#c3c4c7]"
+              placeholder="Enter title here"
+            />
+          </div>
 
-              <div className="col-span-3 space-y-2">
-                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
-                   <Globe className="w-3 h-3" />
-                   Public Slug
-                 </label>
-                 <div className="relative">
-                    <span className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-300 text-xs">/</span>
-                    <input
-                      type="text"
-                      value={page.slug}
-                      onChange={(e) => setPage({ ...page, slug: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-100 rounded-xl pl-7 pr-4 py-3 text-xs text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all"
-                    />
-                 </div>
-              </div>
-
-              <div className="col-span-6 space-y-2">
-                 <label className="text-[10px] font-medium text-slate-400 uppercase tracking-widest flex items-center gap-2 px-1">
-                   <Type className="w-3 h-3" />
-                   Display Title
-                 </label>
-                 <input
-                   type="text"
-                   value={page.title}
-                   onChange={(e) => setPage({ ...page, title: e.target.value })}
-                   className="w-full bg-slate-50 border border-slate-100 rounded-xl px-4 py-3 text-xs text-slate-900 outline-none focus:bg-white focus:border-primary/30 transition-all"
-                   placeholder="Enter page title..."
-                 />
-              </div>
-           </div>
-        </div>
-
-        {/* Full Width Main Editor Area */}
-        <div className="bg-white border border-slate-100 rounded-3xl shadow-sm min-h-[800px] overflow-hidden flex flex-col">
-          {/* Internal Tabs */}
-          <div className="flex items-center gap-8 px-10 py-5 border-b border-slate-50 bg-slate-50/30">
-            <button
-              onClick={() => setActiveTab('content')}
-              className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative py-2 ${
-                activeTab === 'content' ? "text-primary" : "text-slate-400 hover:text-slate-600"
-              }`}
+          {/* Permalink / Slug Area */}
+          <div className="flex flex-wrap items-center gap-1 text-[12px] text-[#646970] px-1">
+            <strong>Permalink:</strong>
+            <span className="bg-[#f0f0f1] border border-[#c3c4c7] px-1 rounded-sm text-[#1d2327] break-all">
+              https://eaglerevolution.com/{page.slug}
+            </span>
+            <button 
+              onClick={() => {
+                const ns = prompt("Enter new slug:", page.slug);
+                if(ns) setPage({...page, slug: ns});
+              }}
+              className="bg-white border border-[#c3c4c7] px-1.5 py-0.5 rounded-[3px] text-[#2c3338] hover:bg-[#f6f7f7]"
             >
-              Page Content
-              {activeTab === 'content' && <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
-            </button>
-            <button
-              onClick={() => setActiveTab('seo')}
-              className={`text-[10px] font-bold uppercase tracking-[0.2em] transition-all relative py-2 ${
-                activeTab === 'seo' ? "text-primary" : "text-slate-400 hover:text-slate-600"
-              }`}
-            >
-              SEO Settings
-              {activeTab === 'seo' && <motion.div layoutId="tab-underline" className="absolute bottom-0 left-0 right-0 h-0.5 bg-primary rounded-full" />}
+              Edit
             </button>
           </div>
 
-          <div className="flex-1 overflow-hidden">
-            {activeTab === 'content' ? (
-              TemplateEditors[page.template] ? (
-                <div className="animate-in fade-in slide-in-from-bottom-2 duration-500">
-                  {(() => {
-                    const Editor = TemplateEditors[page.template];
-                    return <Editor pageId={id} data={content} setData={setContent} />;
-                  })()}
-                </div>
-              ) : (
-                <div className="flex flex-col items-center justify-center p-20 text-center h-[700px]">
-                  <div className="w-16 h-16 bg-slate-50 rounded-2xl flex items-center justify-center mb-6">
-                    <LayoutTemplate className="w-8 h-8 text-slate-200" />
+          {/* Main Editor Tabs */}
+          <div className="bg-white border border-[#c3c4c7] shadow-sm overflow-hidden">
+             <div className="flex border-b border-[#f0f0f1] bg-[#f6f7f7]">
+                <button
+                  onClick={() => setActiveTab('content')}
+                  className={`px-3 py-2 text-[12px] font-semibold border-r border-[#c3c4c7] transition-all ${
+                    activeTab === 'content' ? "bg-white text-[#1d2327]" : "text-[#2271b1] hover:text-[#135e96]"
+                  }`}
+                >
+                  Page Content
+                </button>
+                <button
+                  onClick={() => setActiveTab('seo')}
+                  className={`px-3 py-2 text-[12px] font-semibold border-r border-[#c3c4c7] transition-all ${
+                    activeTab === 'seo' ? "bg-white text-[#1d2327]" : "text-[#2271b1] hover:text-[#135e96]"
+                  }`}
+                >
+                  SEO Settings
+                </button>
+             </div>
+
+             <div className="p-0 overflow-x-auto">
+                {activeTab === 'content' ? (
+                  <div className="p-4 sm:p-5">
+                    {TemplateEditors[page.template] ? (
+                       (() => {
+                         const Editor = TemplateEditors[page.template];
+                         return <Editor pageId={id} data={content} setData={setContent} />;
+                       })()
+                    ) : (
+                      <div className="p-10 text-center text-[#646970] text-[13px]">
+                        Select a template in the right sidebar to start editing.
+                      </div>
+                    )}
                   </div>
-                  <h2 className="text-xl font-medium text-slate-900 mb-2">Editor Template Ready</h2>
-                  <p className="text-slate-400 max-w-sm text-xs leading-relaxed">
-                    Select a template from the configuration row above to initialize the content canvas.
-                  </p>
-                </div>
-              )
-            ) : (
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-500 h-full">
-                <SeoEditor 
-                  data={seo} 
-                  setData={setSeo} 
-                  pageSlug={page.slug} 
-                  pageTitle={page.title} 
-                  pageContent={content}
-                />
+                ) : (
+                  <SeoEditor 
+                    data={seo} 
+                    setData={setSeo} 
+                    pageSlug={page.slug} 
+                    pageTitle={page.title} 
+                    pageContent={content}
+                  />
+                )}
+             </div>
+          </div>
+        </div>
+
+        {/* Sidebar (Right Column) */}
+        <div className="w-full lg:w-[260px] flex-shrink-0 space-y-4">
+          {/* Publish Box */}
+          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+            <div className="px-3 py-1.5 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+              <h2 className="text-[13px] font-semibold text-[#1d2327]">Publish</h2>
+            </div>
+            <div className="p-3 space-y-2 text-[12px] text-[#2c3338]">
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5"><Eye className="w-3.5 h-3.5 text-[#82878c]" /> Status:</span>
+                <select 
+                  value={page.status || "published"}
+                  onChange={(e) => setPage({ ...page, status: e.target.value })}
+                  className="bg-white border border-[#8c8f94] text-[12px] px-1 py-0.5 rounded-[3px] outline-none focus:border-[#2271b1]"
+                >
+                  <option value="published">Published</option>
+                  <option value="draft">Draft</option>
+                  <option value="pending">Pending Review</option>
+                </select>
               </div>
-            )}
+              <div className="flex items-center justify-between">
+                <span className="flex items-center gap-1.5"><Calendar className="w-3.5 h-3.5 text-[#82878c]" /> Date:</span>
+                <strong>{new Date().toLocaleDateString()}</strong>
+              </div>
+            </div>
+            <div className="bg-[#f6f7f7] border-t border-[#c3c4c7] px-3 py-2 flex items-center justify-between">
+              <button onClick={handleDelete} className="text-[#d63638] underline text-[12px] hover:text-[#b32d2e]">Trash</button>
+              <button 
+                onClick={handleSave} 
+                disabled={saving}
+                className="bg-[#2271b1] text-white text-[12px] font-semibold px-3 py-1 rounded-[3px] border border-[#135e96] shadow-[0_1px_0_#135e96] hover:bg-[#135e96] disabled:opacity-50"
+              >
+                {saving ? "..." : "Update"}
+              </button>
+            </div>
+          </div>
+
+          {/* Page Attributes Box */}
+          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+            <div className="px-3 py-1.5 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+              <h2 className="text-[13px] font-semibold text-[#1d2327]">Attributes</h2>
+            </div>
+            <div className="p-3 space-y-3">
+              <div className="space-y-1">
+                <label className="text-[11px] font-semibold text-[#1d2327]">Template</label>
+                <select 
+                  value={page.template}
+                  onChange={(e) => setPage({...page, template: e.target.value})}
+                  className="w-full border border-[#8c8f94] bg-white px-2 py-1 text-[12px] rounded-[3px] outline-none focus:border-[#2271b1]"
+                >
+                  {EDITOR_TEMPLATES.map(t => <option key={t.id} value={t.id}>{t.label}</option>)}
+                </select>
+              </div>
+            </div>
+          </div>
+
+          {/* Featured Image Box */}
+          <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+            <div className="px-3 py-1.5 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+              <h2 className="text-[13px] font-semibold text-[#1d2327]">Featured Image</h2>
+            </div>
+            <div className="p-3">
+              <button className="text-[#2271b1] underline text-[12px] hover:text-[#135e96]">Set image</button>
+            </div>
           </div>
         </div>
       </div>
 
-      {/* Notifications */}
+      {/* Toast Notification */}
       <AnimatePresence>
         {message && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: 20 }}
-            className={`fixed bottom-10 right-10 z-[100] px-6 py-3 rounded-2xl font-medium text-xs shadow-2xl ${
-              message.includes("Error") ? "bg-red-500 text-white" : "bg-primary text-white"
-            }`}
-          >
-            {message}
+          <motion.div initial={{ opacity: 0, y: 10 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}
+            className={`fixed bottom-10 right-10 z-[100] px-4 py-2 bg-white border-l-4 text-[12px] shadow-lg ${message.includes("Error") ? "border-[#d63638]" : "border-[#00a32a]"}`}>
+            <p className="text-[#1d2327] m-0">{message}</p>
           </motion.div>
         )}
       </AnimatePresence>

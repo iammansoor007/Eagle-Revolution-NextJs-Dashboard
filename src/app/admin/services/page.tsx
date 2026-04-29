@@ -38,25 +38,19 @@ function IconSelector({ value, onChange }: { value: string, onChange: (v: string
   const SelectedIcon = IconComponentMap[value] || HelpCircle;
 
   return (
-    <div className="relative">
+    <div className="relative inline-block">
       <button
         type="button"
         onClick={() => setIsOpen(!isOpen)}
-        className="flex items-center gap-3 w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
+        className="flex items-center gap-2 bg-white border border-[#8c8f94] rounded-[3px] px-3 py-1 text-[13px] hover:border-[#2271b1] transition-all"
       >
-        <SelectedIcon className="w-5 h-5 text-primary" />
-        <span className="flex-1 text-left">{value || "Select Icon"}</span>
-        <ChevronRight className={`w-4 h-4 transition-transform ${isOpen ? "rotate-90" : ""}`} />
+        <SelectedIcon className="w-3.5 h-3.5 text-[#50575e]" />
+        <span>{value || "Select Icon"}</span>
       </button>
 
-      <AnimatePresence>
-        {isOpen && (
-          <motion.div
-            initial={{ opacity: 0, y: 5 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: 5 }}
-            className="absolute z-50 mt-2 w-full bg-white border border-slate-200 rounded-2xl shadow-2xl p-4 grid grid-cols-6 gap-2 max-h-64 overflow-y-auto"
-          >
+      {isOpen && (
+        <div className="absolute z-50 mt-1 w-64 bg-white border border-[#c3c4c7] shadow-md p-3 rounded-[3px]">
+          <div className="grid grid-cols-6 gap-1 max-h-48 overflow-y-auto">
             {ICON_LIST.map((iconName) => {
               const IconComp = IconComponentMap[iconName];
               return (
@@ -66,22 +60,19 @@ function IconSelector({ value, onChange }: { value: string, onChange: (v: string
                     onChange(iconName);
                     setIsOpen(false);
                   }}
-                  className={`p-3 rounded-xl flex items-center justify-center transition-all ${
-                    value === iconName ? "bg-primary text-white" : "bg-slate-50 text-slate-400 hover:bg-slate-100"
-                  }`}
+                  className={`p-1.5 rounded hover:bg-[#f0f0f1] ${value === iconName ? "bg-[#2271b1] text-white" : "text-[#50575e]"}`}
                   title={iconName}
                 >
-                  <IconComp className="w-5 h-5" />
+                  <IconComp className="w-4 h-4" />
                 </button>
               );
             })}
-          </motion.div>
-        )}
-      </AnimatePresence>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
-
 
 export default function ServicesAdminPage() {
   const [data, setData] = useState<any>(null);
@@ -90,549 +81,309 @@ export default function ServicesAdminPage() {
   const [activeTab, setActiveTab] = useState("general"); 
   const [seo, setSeo] = useState<any>({});
   const [saving, setSaving] = useState(false);
-  const [message, setMessage] = useState("");
+  const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+  const [filter, setFilter] = useState("all");
+  const [search, setSearch] = useState("");
 
-  // Form State
   const [form, setForm] = useState<any>({
-    title: "",
-    slug: "",
-    tagline: "",
-    description: "",
-    overviewTitle: "",
-    overview: "",
-    overviewImage: "",
-    cta: { text: "Start Your Project", link: "/contact" },
-    icon: "Layout",
-    tag: "",
-    features: [] as any[], 
-    stats: [] as any[],
-    benefits: [] as any[],
-    process: [] as any[],
-    faq: [] as any[]
+    title: "", slug: "", tagline: "", description: "", overviewTitle: "", overview: "", overviewImage: "",
+    cta: { text: "Start Your Project", link: "/contact" }, icon: "Layout", tag: "", features: [], stats: [], benefits: [], process: [], faq: []
   });
 
   useEffect(() => {
-    fetch("/api/content")
-      .then(res => res.json())
-      .then(json => {
+    fetch("/api/content").then(res => res.json()).then(json => {
         setData(json);
         setServices(json.services?.services || []);
       });
   }, []);
 
-  // Slug Generation Logic
   useEffect(() => {
-    if (isEditing !== null && form.title) {
-      const generatedSlug = form.title
-        .toLowerCase()
-        .replace(/[^a-z0-9 ]/g, "")
-        .replace(/\s+/g, "-");
-      
-      if (form.slug !== generatedSlug) {
-        setForm((prev: any) => ({ ...prev, slug: generatedSlug }));
-      }
+    if (isEditing !== null && form.title && !form.id) { // Only auto-slug for new ones
+      const generatedSlug = form.title.toLowerCase().replace(/[^a-z0-9 ]/g, "").replace(/\s+/g, "-");
+      if (form.slug !== generatedSlug) setForm((prev: any) => ({ ...prev, slug: generatedSlug }));
     }
   }, [form.title]);
 
   const saveToDb = async (newServices: any[]) => {
     setSaving(true);
-    const updatedData = {
-      ...data,
-      services: {
-        ...data.services,
-        services: newServices
-      }
-    };
-
+    const updatedData = { ...data, services: { ...data.services, services: newServices } };
     try {
-      const res = await fetch("/api/content", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData),
-      });
+      const res = await fetch("/api/content", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedData) });
       if (res.ok) {
         setData(updatedData);
         setServices(newServices);
-        setMessage("Services updated successfully!");
-        setTimeout(() => setMessage(""), 3000);
+        setToast({ type: "ok", msg: "Services updated." });
+        setTimeout(() => setToast(null), 3000);
         setIsEditing(null);
       }
-    } catch (err) {
-      setMessage("Failed to save changes.");
-    } finally {
-      setSaving(false);
-    }
+    } catch {
+      setToast({ type: "err", msg: "Failed to save." });
+    } finally { setSaving(false); }
   };
 
   const handleSaveService = () => {
-    if (!form.title || !form.slug) {
-      alert("Title is required.");
-      return;
-    }
-
+    if (!form.title || !form.slug) return alert("Title and slug are required.");
     const newServices = [...services];
-    const serviceData = { 
-      ...form, 
-      seo: seo,
-      id: form.id || Date.now().toString(),
-      number: form.number || (services.length + 1).toString().padStart(2, '0')
-    };
-
-    if (isEditing !== null && isEditing < services.length) {
-      newServices[isEditing] = serviceData;
-    } else {
-      newServices.push(serviceData);
-    }
-
-    saveToDb(newServices);
-  };
-
-  const handleDeleteService = (idx: number) => {
-    if (!confirm("Are you sure you want to delete this service? All page content for this service will be lost.")) return;
-    const newServices = services.filter((_, i) => i !== idx);
+    const serviceData = { ...form, seo: seo, id: form.id || Date.now().toString(), number: form.number || (services.length + 1).toString().padStart(2, '0') };
+    if (isEditing !== null && isEditing < services.length) newServices[isEditing] = serviceData;
+    else newServices.push(serviceData);
     saveToDb(newServices);
   };
 
   const handleEdit = (idx: number) => {
     const service = services[idx];
-    const normalizedFeatures = (service.features || []).map((f: any) => 
-      typeof f === 'string' ? { text: f, icon: "CheckCircle" } : f
-    );
-    
-    setForm({
-      ...service,
-      features: normalizedFeatures,
-      overviewTitle: service.overviewTitle || "Craftsmanship Without Compromise.",
-      cta: service.cta || { text: "Start Your Project", link: "/contact" }
-    });
+    setForm({ ...service, overviewTitle: service.overviewTitle || "Craftsmanship Without Compromise.", cta: service.cta || { text: "Start Your Project", link: "/contact" } });
     setSeo(service.seo || {});
     setIsEditing(idx);
     setActiveTab("general");
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const addNewItem = (field: string, template: any) => {
-    setForm({ ...form, [field]: [...(form[field] || []), template] });
-  };
+  const filteredServices = services.filter(s => s.title.toLowerCase().includes(search.toLowerCase()));
 
-  const removeItem = (field: string, idx: number) => {
-    const newList = [...form[field]];
-    newList.splice(idx, 1);
-    setForm({ ...form, [field]: newList });
-  };
-
-  const updateListItem = (field: string, idx: number, key: string, value: any) => {
-    const newList = [...form[field]];
-    newList[idx] = { ...newList[idx], [key]: value };
-    setForm({ ...form, [field]: newList });
-  };
-
-  if (!data) return <div className="flex h-screen items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
+  if (!data) return <div className="flex h-screen items-center justify-center text-[#646970] font-serif">Loading...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto pb-20">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-2 font-medium">
-            <Link href="/admin/pages" className="hover:text-primary transition-colors font-bold">Dashboard</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-900 font-bold">Services Management</span>
-          </div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight">Manage Services</h1>
-          <p className="text-slate-500 font-medium mt-1">Create and customize every detail of your service offerings.</p>
-        </div>
-        
+    <div className="space-y-4">
+      {/* WP Header Area */}
+      <div className="flex items-center gap-4 mb-2">
+        <h1 className="text-[23px] font-normal text-[#1d2327] font-serif m-0">Services</h1>
         {isEditing === null && (
           <button
             onClick={() => {
               setIsEditing(services.length);
-              setForm({
-                title: "", slug: "", tagline: "", description: "", overviewTitle: "Craftsmanship Without Compromise.", overview: "", overviewImage: "",
-                cta: { text: "Start Your Project", link: "/contact" },
-                icon: "Layout", tag: "", features: [], stats: [], benefits: [], process: [], faq: []
-              });
+              setForm({ title: "", slug: "", tagline: "", description: "", overviewTitle: "Craftsmanship Without Compromise.", overview: "", overviewImage: "", cta: { text: "Start Your Project", link: "/contact" }, icon: "Layout", tag: "", features: [], stats: [], benefits: [], process: [], faq: [] });
+              setSeo({});
               setActiveTab("general");
             }}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-3.5 rounded-2xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all"
+            className="bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f6f7f7] hover:text-[#135e96] hover:border-[#135e96] px-2 py-1 text-[13px] rounded-[3px] transition-colors"
           >
-            <Plus className="w-5 h-5" />
-            Add New Service
+            Add New
           </button>
         )}
       </div>
 
-      {message && (
-        <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="p-4 bg-emerald-50 text-emerald-600 border border-emerald-100 rounded-2xl mb-8 text-center font-bold shadow-sm shadow-emerald-100/50">
-          {message}
-        </motion.div>
+      {toast && (
+        <div className={`px-4 py-2 border-l-4 text-[13px] bg-white shadow-sm mb-4 ${toast.type === 'ok' ? 'border-[#00a32a]' : 'border-[#d63638]'}`}>
+          {toast.msg}
+        </div>
       )}
 
-      <AnimatePresence mode="wait">
-        {isEditing !== null ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-slate-200 rounded-[2.5rem] overflow-hidden shadow-2xl mb-12"
-          >
-            {/* Editor Header */}
-            <div className="bg-slate-50 border-b border-slate-200 p-8 flex items-center justify-between">
-              <div className="flex items-center gap-4">
-                <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20">
-                  <Settings className="w-6 h-6" />
-                </div>
-                <div>
-                  <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight">
-                    {isEditing < services.length ? `Edit Service: ${form.title}` : "Create New Service"}
-                  </h2>
-                  <p className="text-slate-500 font-medium text-sm">Fill in all details to build a premium service page.</p>
-                </div>
-              </div>
-              <div className="flex items-center gap-3">
-                <button
-                  onClick={() => setIsEditing(null)}
-                  className="px-6 py-3 rounded-xl font-bold text-slate-600 hover:bg-slate-100 transition-all"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleSaveService}
-                  disabled={saving}
-                  className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-xl font-bold shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-[0.98] transition-all disabled:opacity-50"
-                >
-                  {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                  Save Service
-                </button>
-              </div>
-            </div>
+      {isEditing !== null ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+           {/* Left Form Content */}
+           <div className="lg:col-span-3 space-y-6">
+              <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm p-6">
+                 <input
+                   type="text"
+                   value={form.title}
+                   onChange={(e) => setForm({ ...form, title: e.target.value })}
+                   className="w-full border border-[#8c8f94] px-3 py-2 text-[18px] font-medium rounded-[3px] focus:border-[#2271b1] outline-none mb-4"
+                   placeholder="Enter service title here"
+                 />
 
-            {/* Tabs */}
-            <div className="flex border-b border-slate-200 px-8 bg-white sticky top-0 z-10 overflow-x-auto">
-              {[
-                { id: "general", label: "General Info", icon: Info },
-                { id: "content", label: "Page Content", icon: Layout },
-                { id: "features", label: "Stats & Benefits", icon: Shield },
-                { id: "steps", label: "Process Steps", icon: CheckCircle },
-                { id: "faq", label: "Service FAQs", icon: FaqIcon },
-                { id: "seo", label: "SEO Management", icon: Globe }
-              ].map(tab => (
-                <button
-                  key={tab.id}
-                  onClick={() => setActiveTab(tab.id)}
-                  className={`flex items-center gap-2 px-6 py-5 font-bold text-sm transition-all relative whitespace-nowrap ${
-                    activeTab === tab.id ? "text-primary" : "text-slate-400 hover:text-slate-600"
-                  }`}
-                >
-                  <tab.icon className="w-4 h-4" />
-                  {tab.label}
-                  {activeTab === tab.id && (
-                    <motion.div layoutId="activeTab" className="absolute bottom-0 left-0 right-0 h-1 bg-primary rounded-t-full" />
-                  )}
-                </button>
-              ))}
-            </div>
-
-            {/* Form Content */}
-            <div className="p-10 bg-slate-50/30 min-h-[500px]">
-              {activeTab === "general" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Service Title</label>
-                      <input
-                        type="text"
-                        value={form.title}
-                        onChange={(e) => setForm({ ...form, title: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
-                        placeholder="e.g. Residential Roofing"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">URL Slug (Auto-generated)</label>
-                      <input
-                        type="text"
-                        value={form.slug}
-                        readOnly
-                        className="w-full bg-slate-100 border border-slate-200 rounded-xl px-4 py-3 text-slate-400 font-bold outline-none cursor-not-allowed"
-                        placeholder="Generated from title..."
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Service Icon</label>
-                      <IconSelector 
-                        value={form.icon} 
-                        onChange={(val) => setForm({ ...form, icon: val })} 
-                      />
-                    </div>
-                  </div>
-                  <div className="space-y-6">
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Category Tag</label>
-                      <input
-                        type="text"
-                        value={form.tag}
-                        onChange={(e) => setForm({ ...form, tag: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
-                        placeholder="e.g. Roofing"
-                      />
-                    </div>
-                    <div className="space-y-2">
-                      <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Brief Description (Card View)</label>
-                      <textarea
-                        rows={4}
-                        value={form.description}
-                        onChange={(e) => setForm({ ...form, description: e.target.value })}
-                        className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 outline-none"
-                        placeholder="A short summary for the services list page..."
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "content" && (
-                <div className="space-y-10">
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
-                    <div className="space-y-6">
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Page Tagline</label>
-                        <input
-                          type="text"
-                          value={form.tagline}
-                          onChange={(e) => setForm({ ...form, tagline: e.target.value })}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
-                          placeholder="e.g. Military Grade Protection"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Section Heading</label>
-                        <input
-                          type="text"
-                          value={form.overviewTitle}
-                          onChange={(e) => setForm({ ...form, overviewTitle: e.target.value })}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
-                          placeholder="e.g. Craftsmanship Without Compromise."
-                        />
-                      </div>
-                      <ImageField 
-                        label="Section Image"
-                        value={form.overviewImage || ""}
-                        onChange={(val) => setForm({ ...form, overviewImage: val })}
-                        description="This image appears in the overview section of the service page."
-                      />
-                    </div>
-                    
-                    <div className="space-y-6">
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">CTA Button Text</label>
-                        <input
-                          type="text"
-                          value={form.cta?.text}
-                          onChange={(e) => setForm({ ...form, cta: { ...form.cta, text: e.target.value } })}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">CTA Button Link</label>
-                        <input
-                          type="text"
-                          value={form.cta?.link}
-                          onChange={(e) => setForm({ ...form, cta: { ...form.cta, link: e.target.value } })}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 outline-none"
-                        />
-                      </div>
-                      <div className="space-y-2">
-                        <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Overview Description</label>
-                        <textarea
-                          rows={4}
-                          value={form.overview}
-                          onChange={(e) => setForm({ ...form, overview: e.target.value })}
-                          className="w-full bg-white border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 outline-none leading-relaxed"
-                        />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="pt-8 border-t border-slate-200">
-                    <div className="flex items-center justify-between mb-6">
-                      <h3 className="font-extrabold text-slate-900 uppercase tracking-tight">Key Points (Bullet List)</h3>
-                      <button onClick={() => addNewItem("features", { text: "", icon: "CheckCircle" })} className="text-sm font-bold text-primary hover:underline">+ Add Key Point</button>
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {form.features?.map((f: any, idx: number) => (
-                        <div key={idx} className="bg-white p-4 rounded-2xl border border-slate-200 flex gap-4 items-center shadow-sm">
-                          <div className="w-1/3">
-                            <IconSelector value={f.icon} onChange={(val) => updateListItem("features", idx, "icon", val)} />
-                          </div>
-                          <input 
-                            placeholder="Point Text" 
-                            value={f.text} 
-                            onChange={(e) => updateListItem("features", idx, "text", e.target.value)} 
-                            className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-3 text-sm font-bold" 
-                          />
-                          <button onClick={() => removeItem("features", idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "features" && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-12">
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-extrabold text-slate-900 uppercase tracking-tight text-sm">Service Stats</h3>
-                      <button onClick={() => addNewItem("stats", { value: "", label: "", icon: "Star" })} className="text-xs text-primary font-bold hover:underline">+ Add Stat</button>
-                    </div>
-                    <div className="space-y-4">
-                      {form.stats?.map((stat: any, idx: number) => (
-                        <div key={idx} className="bg-white p-4 rounded-xl border border-slate-200 space-y-3 shadow-sm">
-                          <div className="flex gap-2">
-                             <input placeholder="Value" value={stat.value} onChange={(e) => updateListItem("stats", idx, "value", e.target.value)} className="w-24 bg-slate-50 border-none rounded-lg p-2 text-xs font-bold" />
-                             <input placeholder="Label" value={stat.label} onChange={(e) => updateListItem("stats", idx, "label", e.target.value)} className="flex-1 bg-slate-50 border-none rounded-lg p-2 text-xs" />
-                             <button onClick={() => removeItem("stats", idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                          </div>
-                          <IconSelector value={stat.icon} onChange={(val) => updateListItem("stats", idx, "icon", val)} />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                  <div className="space-y-6">
-                    <div className="flex items-center justify-between">
-                      <h3 className="font-extrabold text-slate-900 uppercase tracking-tight text-sm">Key Benefits</h3>
-                      <button onClick={() => addNewItem("benefits", { title: "", description: "", icon: "Shield" })} className="text-xs text-primary font-bold hover:underline">+ Add Benefit</button>
-                    </div>
-                    <div className="space-y-4">
-                      {form.benefits?.map((benefit: any, idx: number) => (
-                        <div key={idx} className="bg-white p-5 rounded-2xl border border-slate-200 space-y-4 shadow-sm">
-                          <div className="flex items-center gap-3">
-                            <input placeholder="Title" value={benefit.title} onChange={(e) => updateListItem("benefits", idx, "title", e.target.value)} className="flex-1 bg-slate-50 border-none rounded-xl px-4 py-2.5 text-sm font-bold" />
-                            <button onClick={() => removeItem("benefits", idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                          </div>
-                          <IconSelector value={benefit.icon} onChange={(val) => updateListItem("benefits", idx, "icon", val)} />
-                          <textarea placeholder="Description" rows={2} value={benefit.description} onChange={(e) => updateListItem("benefits", idx, "description", e.target.value)} className="w-full bg-slate-50 border-none rounded-xl px-4 py-2.5 text-xs font-medium" />
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {activeTab === "steps" && (
-                <div className="max-w-3xl mx-auto space-y-8">
-                  <div className="flex items-center justify-between">
-                    <h3 className="font-extrabold text-slate-900 uppercase tracking-tight">Installation Process</h3>
-                    <button onClick={() => addNewItem("process", { title: "", description: "", icon: "Hammer" })} className="bg-primary text-white px-4 py-2 rounded-lg text-xs font-bold shadow-md shadow-primary/20 hover:scale-105 transition-all">
-                      Add Step
-                    </button>
-                  </div>
-                  <div className="space-y-6">
-                    {form.process?.map((step: any, idx: number) => (
-                      <div key={idx} className="flex gap-6 items-start group">
-                        <div className="w-12 h-12 bg-white border-2 border-primary/20 rounded-2xl flex items-center justify-center flex-shrink-0 text-primary font-bold group-hover:bg-primary group-hover:text-white transition-all shadow-sm">
-                          {idx + 1}
-                        </div>
-                        <div className="flex-1 bg-white p-6 rounded-3xl border border-slate-200 shadow-sm relative space-y-4">
-                           <div className="flex items-center gap-4">
-                             <input value={step.title} onChange={(e) => updateListItem("process", idx, "title", e.target.value)} className="flex-1 border-none bg-slate-50 font-bold p-3 rounded-xl" placeholder="Step Title" />
-                             <button onClick={() => removeItem("process", idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
-                           </div>
-                           <IconSelector value={step.icon} onChange={(val) => updateListItem("process", idx, "icon", val)} />
-                           <textarea value={step.description} onChange={(e) => updateListItem("process", idx, "description", e.target.value)} className="w-full border-none bg-slate-50 text-sm p-4 rounded-xl h-24" placeholder="Describe the work done in this step..." />
-                        </div>
-                      </div>
+                 {/* WP-Style Tabs for Service Editor */}
+                 <div className="flex border-b border-[#c3c4c7] mb-6">
+                    {[
+                      { id: "general", label: "General" },
+                      { id: "content", label: "Page Details" },
+                      { id: "features", label: "Stats & Benefits" },
+                      { id: "steps", label: "Process" },
+                      { id: "faq", label: "FAQs" },
+                      { id: "seo", label: "SEO" }
+                    ].map(tab => (
+                      <button key={tab.id} onClick={() => setActiveTab(tab.id)} className={`px-4 py-2 text-[13px] border-b-2 transition-all ${activeTab === tab.id ? 'border-[#2271b1] text-[#1d2327] font-bold' : 'border-transparent text-[#2271b1] hover:text-[#135e96]'}`}>
+                        {tab.label}
+                      </button>
                     ))}
-                  </div>
-                </div>
-              )}
+                 </div>
 
-              {activeTab === "faq" && (
-                <div className="max-w-3xl mx-auto space-y-6">
-                  <div className="flex items-center justify-between mb-8">
-                    <h3 className="font-extrabold text-slate-900 uppercase tracking-tight">Service-Specific FAQs</h3>
-                    <button onClick={() => addNewItem("faq", { question: "", answer: "" })} className="text-primary font-bold text-sm">+ Add FAQ Item</button>
-                  </div>
-                  {form.faq?.map((item: any, idx: number) => (
-                    <div key={idx} className="bg-white rounded-3xl p-8 border border-slate-200 shadow-sm space-y-6">
-                      <div className="flex items-center gap-4">
-                        <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center text-primary font-bold text-sm">Q</div>
-                        <input value={item.question} onChange={(e) => updateListItem("faq", idx, "question", e.target.value)} className="flex-1 border-none bg-slate-50 p-4 rounded-xl text-sm font-bold" placeholder="The question..." />
-                        <button onClick={() => removeItem("faq", idx)} className="text-slate-300 hover:text-red-500"><Trash2 className="w-4 h-4" /></button>
+                 <div className="space-y-6 min-h-[400px]">
+                    {activeTab === "general" && (
+                      <div className="space-y-4">
+                        <div className="grid grid-cols-2 gap-4">
+                           <div className="space-y-1">
+                              <label className="text-[13px] font-bold">Category Tag</label>
+                              <input type="text" value={form.tag} onChange={(e) => setForm({ ...form, tag: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" />
+                           </div>
+                           <div className="space-y-1">
+                              <label className="text-[13px] font-bold">Icon</label>
+                              <IconSelector value={form.icon} onChange={(v) => setForm({ ...form, icon: v })} />
+                           </div>
+                        </div>
+                        <div className="space-y-1">
+                           <label className="text-[13px] font-bold">Short Description (Card View)</label>
+                           <textarea rows={3} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" />
+                        </div>
                       </div>
-                      <div className="flex items-start gap-4">
-                        <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 font-bold text-sm">A</div>
-                        <textarea value={item.answer} onChange={(e) => updateListItem("faq", idx, "answer", e.target.value)} className="flex-1 border-none bg-slate-50 p-4 rounded-xl text-sm h-32 leading-relaxed" placeholder="The answer..." />
+                    )}
+
+                    {activeTab === "content" && (
+                      <div className="space-y-6">
+                         <div className="grid grid-cols-2 gap-4">
+                            <div className="space-y-1">
+                               <label className="text-[13px] font-bold">Page Tagline</label>
+                               <input type="text" value={form.tagline} onChange={(e) => setForm({ ...form, tagline: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" />
+                            </div>
+                            <div className="space-y-1">
+                               <label className="text-[13px] font-bold">Overview Heading</label>
+                               <input type="text" value={form.overviewTitle} onChange={(e) => setForm({ ...form, overviewTitle: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" />
+                            </div>
+                         </div>
+                         <ImageField label="Section Image" value={form.overviewImage || ""} onChange={(v) => setForm({ ...form, overviewImage: v })} />
+                         <div className="space-y-1">
+                            <label className="text-[13px] font-bold">Overview Detailed Text</label>
+                            <textarea rows={5} value={form.overview} onChange={(e) => setForm({ ...form, overview: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" />
+                         </div>
                       </div>
-                    </div>
-                  ))}
-                </div>
-              )}
+                    )}
 
-              {activeTab === "seo" && (
-                <div className="bg-white rounded-3xl border border-slate-200 shadow-sm overflow-hidden min-h-[600px]">
-                  <SeoEditor 
-                    data={seo}
-                    setData={setSeo}
-                    pageSlug={form.slug}
-                    pageTitle={form.title}
-                    pageContent={form}
-                  />
-                </div>
-              )}
-            </div>
-          </motion.div>
-        ) : (
-          /* Services List */
-          <div className="space-y-4">
-            {services.map((service, idx) => {
-              const ServiceIcon = IconComponentMap[service.icon] || Layout;
-              return (
-                <motion.div
-                  key={service.slug || idx}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: idx * 0.05 }}
-                  className="group bg-white border border-slate-200 rounded-2xl p-6 hover:shadow-lg hover:shadow-slate-200 transition-all flex items-center gap-6 shadow-sm"
-                >
-                  <div className="w-14 h-14 bg-slate-50 border border-slate-100 rounded-2xl flex items-center justify-center group-hover:bg-primary group-hover:text-white transition-all flex-shrink-0">
-                    <ServiceIcon className="w-7 h-7 text-slate-400 group-hover:text-white transition-colors" />
-                  </div>
+                    {activeTab === "features" && (
+                       <div className="space-y-8">
+                          <div className="space-y-4">
+                             <div className="flex justify-between items-center"><h3 className="text-sm font-bold">Service Stats</h3><button onClick={() => setForm({ ...form, stats: [...(form.stats || []), { value: "", label: "", icon: "Star" }] })} className="text-[#2271b1] text-xs underline">+ Add Stat</button></div>
+                             {form.stats?.map((s:any, i:number) => (
+                                <div key={i} className="flex gap-2 bg-[#f6f7f7] p-2 border border-[#c3c4c7]">
+                                   <input placeholder="Value" value={s.value} onChange={(e) => { const ns = [...form.stats]; ns[i].value = e.target.value; setForm({...form, stats: ns}); }} className="w-20 border border-[#8c8f94] px-2 py-1 text-xs" />
+                                   <input placeholder="Label" value={s.label} onChange={(e) => { const ns = [...form.stats]; ns[i].label = e.target.value; setForm({...form, stats: ns}); }} className="flex-1 border border-[#8c8f94] px-2 py-1 text-xs" />
+                                   <button onClick={() => { const ns = form.stats.filter((_:any,idx:number)=>idx!==i); setForm({...form, stats: ns}); }} className="text-[#d63638] text-xs">Remove</button>
+                                </div>
+                             ))}
+                          </div>
+                          <div className="space-y-4">
+                             <div className="flex justify-between items-center"><h3 className="text-sm font-bold">Key Benefits</h3><button onClick={() => setForm({ ...form, benefits: [...(form.benefits || []), { title: "", description: "", icon: "Shield" }] })} className="text-[#2271b1] text-xs underline">+ Add Benefit</button></div>
+                             {form.benefits?.map((b:any, i:number) => (
+                                <div key={i} className="bg-[#f6f7f7] border border-[#c3c4c7] p-3 space-y-2">
+                                   <input placeholder="Title" value={b.title} onChange={(e) => { const nb = [...form.benefits]; nb[i].title = e.target.value; setForm({...form, benefits: nb}); }} className="w-full border border-[#8c8f94] px-2 py-1 text-xs" />
+                                   <textarea placeholder="Description" rows={2} value={b.description} onChange={(e) => { const nb = [...form.benefits]; nb[i].description = e.target.value; setForm({...form, benefits: nb}); }} className="w-full border border-[#8c8f94] px-2 py-1 text-xs" />
+                                   <button onClick={() => { const nb = form.benefits.filter((_:any,idx:number)=>idx!==i); setForm({...form, benefits: nb}); }} className="text-[#d63638] text-xs">Remove Benefit</button>
+                                </div>
+                             ))}
+                          </div>
+                       </div>
+                    )}
 
-                  <div className="flex-1 min-w-0">
-                    <div className="flex items-center gap-3 mb-1">
-                      <h2 className="text-xl font-extrabold text-slate-900 group-hover:text-primary transition-colors truncate">{service.title}</h2>
-                      <span className="px-2 py-0.5 bg-slate-100 text-slate-500 rounded text-[9px] font-bold uppercase tracking-wider">{service.tag}</span>
-                    </div>
-                    <p className="text-slate-500 text-sm font-medium line-clamp-1">{service.description}</p>
-                  </div>
+                    {activeTab === "steps" && (
+                       <div className="space-y-4">
+                          <button onClick={() => setForm({ ...form, process: [...(form.process || []), { title: "", description: "", icon: "Hammer" }] })} className="text-[#2271b1] text-xs underline font-bold">+ Add Step</button>
+                          {form.process?.map((step:any, i:number) => (
+                             <div key={i} className="bg-[#f6f7f7] border border-[#c3c4c7] p-4 flex gap-4">
+                                <div className="w-8 h-8 bg-[#2271b1] text-white rounded-full flex items-center justify-center shrink-0 text-xs font-bold">{i+1}</div>
+                                <div className="flex-1 space-y-2">
+                                   <input value={step.title} onChange={(e) => { const np = [...form.process]; np[i].title = e.target.value; setForm({...form, process: np}); }} placeholder="Step Title" className="w-full border border-[#8c8f94] px-2 py-1 text-xs font-bold" />
+                                   <textarea value={step.description} onChange={(e) => { const np = [...form.process]; np[i].description = e.target.value; setForm({...form, process: np}); }} placeholder="Description" rows={2} className="w-full border border-[#8c8f94] px-2 py-1 text-xs" />
+                                   <button onClick={() => { const np = form.process.filter((_:any,idx:number)=>idx!==i); setForm({...form, process: np}); }} className="text-[#d63638] text-xs">Remove Step</button>
+                                </div>
+                             </div>
+                          ))}
+                       </div>
+                    )}
 
-                  <div className="flex items-center gap-6 flex-shrink-0">
-                    <div className="hidden md:flex items-center gap-4 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                      <span>{service.faq?.length || 0} FAQs</span>
-                      <span className="w-1 h-1 bg-slate-200 rounded-full" />
-                      <span>{service.process?.length || 0} Steps</span>
+                    {activeTab === "faq" && (
+                       <div className="space-y-4">
+                          <button onClick={() => setForm({ ...form, faq: [...(form.faq || []), { question: "", answer: "" }] })} className="text-[#2271b1] text-xs underline font-bold">+ Add FAQ Item</button>
+                          {form.faq?.map((item:any, i:number) => (
+                             <div key={i} className="bg-white border border-[#c3c4c7] p-4 space-y-3 shadow-sm">
+                                <input value={item.question} onChange={(e) => { const nf = [...form.faq]; nf[i].question = e.target.value; setForm({...form, faq: nf}); }} placeholder="Question" className="w-full border border-[#8c8f94] px-2 py-1 text-xs font-bold" />
+                                <textarea value={item.answer} onChange={(e) => { const nf = [...form.faq]; nf[i].answer = e.target.value; setForm({...form, faq: nf}); }} placeholder="Answer" rows={3} className="w-full border border-[#8c8f94] px-2 py-1 text-xs" />
+                                <button onClick={() => { const nf = form.faq.filter((_:any,idx:number)=>idx!==i); setForm({...form, faq: nf}); }} className="text-[#d63638] text-xs">Remove FAQ</button>
+                             </div>
+                          ))}
+                       </div>
+                    )}
+
+                    {activeTab === "seo" && (
+                       <SeoEditor data={seo} setData={setSeo} pageSlug={form.slug} pageTitle={form.title} pageContent={form} />
+                    )}
+                 </div>
+              </div>
+           </div>
+
+           {/* Sidebar: Publish Box */}
+           <div className="lg:col-span-1 space-y-6 sticky top-4">
+              <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+                 <div className="px-3 py-2 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+                    <h2 className="text-[14px] font-semibold text-[#1d2327]">Publish</h2>
+                 </div>
+                 <div className="p-4 space-y-4 text-[13px] text-[#2c3338]">
+                    <div className="flex flex-col gap-2">
+                       <p><strong>Status:</strong> Draft <Link href="#" className="text-[#2271b1] underline ml-1">Edit</Link></p>
+                       <p><strong>Visibility:</strong> Public <Link href="#" className="text-[#2271b1] underline ml-1">Edit</Link></p>
                     </div>
-                    
-                    <div className="flex items-center gap-2">
-                      <Link href={`/services/${service.slug}`} target="_blank" className="p-2.5 text-slate-400 hover:text-primary transition-all">
-                        <ExternalLink className="w-5 h-5" />
-                      </Link>
-                      <button onClick={() => handleEdit(idx)} className="p-2.5 text-slate-400 hover:text-primary transition-all">
-                        <Pencil className="w-5 h-5" />
-                      </button>
-                      <button onClick={() => handleDeleteService(idx)} className="p-2.5 text-slate-400 hover:text-red-500 transition-all">
-                        <Trash2 className="w-5 h-5" />
-                      </button>
-                    </div>
-                  </div>
-                </motion.div>
-              );
-            })}
-          </div>
-        )}
-      </AnimatePresence>
+                 </div>
+                 <div className="px-3 py-2 bg-[#f6f7f7] border-t border-[#c3c4c7] flex justify-between items-center">
+                    <button onClick={() => setIsEditing(null)} className="text-[#d63638] underline text-[13px]">Cancel</button>
+                    <button
+                      onClick={handleSaveService}
+                      disabled={saving}
+                      className="bg-[#2271b1] text-white px-4 py-1.5 rounded-[3px] text-[13px] font-semibold border border-[#2271b1] hover:bg-[#135e96] flex items-center gap-2"
+                    >
+                      {saving && <Loader2 className="w-3.5 h-3.5 animate-spin" />}
+                      {isEditing < services.length ? "Update" : "Publish"}
+                    </button>
+                 </div>
+              </div>
+           </div>
+        </div>
+      ) : (
+        /* WP List View */
+        <div className="space-y-4">
+           <div className="flex items-center justify-between gap-4">
+              <div className="flex items-center gap-2">
+                 <select className="border border-[#8c8f94] bg-white text-[#2c3338] px-2 py-1 text-[13px] rounded-[3px]">
+                   <option value="">Bulk actions</option>
+                   <option value="delete">Delete Permanently</option>
+                 </select>
+                 <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7]">Apply</button>
+              </div>
+              <div className="flex items-center gap-2">
+                 <input type="text" placeholder="Search Services" value={search} onChange={(e) => setSearch(e.target.value)} className="border border-[#8c8f94] bg-white px-3 py-1 text-[13px] rounded-[3px] outline-none" />
+                 <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7]">Search</button>
+              </div>
+           </div>
+
+           <div className="bg-white border border-[#c3c4c7] rounded-sm shadow-sm overflow-hidden">
+              <table className="w-full text-left border-collapse">
+                 <thead>
+                    <tr className="border-b border-[#c3c4c7] bg-white text-[#1d2327]">
+                       <th className="w-8 py-2 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></th>
+                       <th className="py-2 px-3 text-[14px] font-semibold">Service Name</th>
+                       <th className="py-2 px-3 text-[14px] font-semibold w-40">Category</th>
+                       <th className="py-2 px-3 text-[14px] font-semibold w-32">Status</th>
+                    </tr>
+                 </thead>
+                 <tbody className="text-[13px] text-[#2c3338]">
+                    {filteredServices.map((service, idx) => {
+                       const ServiceIcon = IconComponentMap[service.icon] || Layout;
+                       return (
+                          <tr key={idx} className={`border-b border-[#f0f0f1] group ${idx % 2 === 0 ? "bg-[#f9f9f9]" : "bg-white"} hover:bg-[#f0f0f1]`}>
+                             <td className="py-4 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></td>
+                             <td className="py-4 px-3 align-top">
+                                <div className="flex gap-3">
+                                   <div className="w-10 h-10 bg-white border border-[#c3c4c7] rounded-[3px] flex items-center justify-center text-[#8c8f94] shrink-0">
+                                      <ServiceIcon className="w-5 h-5" />
+                                   </div>
+                                   <div>
+                                      <strong className="text-[#2271b1] block text-[14px]">{service.title}</strong>
+                                      <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                         <button onClick={() => handleEdit(idx)} className="text-[#2271b1] hover:underline text-[12px]">Edit</button>
+                                         <span className="text-[#a7aaad]">|</span>
+                                         <Link href={`/services/${service.slug}`} target="_blank" className="text-[#2271b1] hover:underline text-[12px]">View</Link>
+                                         <span className="text-[#a7aaad]">|</span>
+                                         <button onClick={() => { if(confirm("Delete this service?")) saveToDb(services.filter((_,i)=>i!==idx)); }} className="text-[#d63638] hover:underline text-[12px]">Trash</button>
+                                      </div>
+                                   </div>
+                                </div>
+                             </td>
+                             <td className="py-4 px-3 align-top text-[#50575e]">{service.tag}</td>
+                             <td className="py-4 px-3 align-top font-semibold text-[#00a32a]">Published</td>
+                          </tr>
+                       );
+                    })}
+                 </tbody>
+              </table>
+           </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -5,27 +5,28 @@ import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import {
-  LayoutDashboard, FileText, Briefcase, Users, Star,
+  LayoutDashboard, FileText, Briefcase, Star,
   HelpCircle, ImageIcon, Phone, Settings, LogOut,
-  Shield, Menu, X, ChevronRight, Globe, Folder, Code2
+  Shield, Menu, X, Globe, Folder, Code2, ExternalLink, User, Plus, ChevronDown
 } from "lucide-react";
 
 const navItems = [
   { label: "Dashboard",   href: "/admin",           icon: LayoutDashboard },
-  { label: "Pages",       href: "/admin/pages",      icon: FileText },
-  { label: "Media",       href: "/admin/media",      icon: ImageIcon },
-  { label: "Reviews",     href: "/admin/reviews",    icon: Star },
-  { label: "Projects",    href: "/admin/projects",   icon: Folder },
-  { label: "FAQ",         href: "/admin/faq",        icon: HelpCircle },
-  { label: "Services",    href: "/admin/services",   icon: Briefcase },
+  { label: "Pages",       href: "/admin/pages",      icon: FileText, sub: [{label: "All Pages", href: "/admin/pages"}, {label: "Add New", href: "/admin/pages"}] },
+  { label: "Media",       href: "/admin/media",      icon: ImageIcon, sub: [{label: "Library", href: "/admin/media"}, {label: "Add New", href: "/admin/media"}] },
+  { label: "Reviews",     href: "/admin/reviews",    icon: Star, sub: [{label: "All Reviews", href: "/admin/reviews"}, {label: "Add New", href: "/admin/reviews"}] },
+  { label: "Projects",    href: "/admin/projects",   icon: Folder, sub: [{label: "All Projects", href: "/admin/projects"}, {label: "Add New", href: "/admin/projects"}] },
+  { label: "FAQ",         href: "/admin/faq",        icon: HelpCircle, sub: [{label: "All FAQs", href: "/admin/faq"}, {label: "Add New", href: "/admin/faq"}] },
+  { label: "Services",    href: "/admin/services",   icon: Briefcase, sub: [{label: "All Services", href: "/admin/services"}, {label: "Add New", href: "/admin/services"}] },
   { label: "Submissions", href: "/admin/submissions", icon: Phone },
   { label: "Scripts",     href: "/admin/scripts",    icon: Code2 },
   { label: "Settings",    href: "/admin/settings",   icon: Settings },
 ];
 
-function Sidebar({ collapsed, onClose }: { collapsed?: boolean; onClose?: () => void }) {
+function Sidebar({ onClose }: { onClose?: () => void }) {
   const pathname = usePathname();
   const router = useRouter();
+  const [openSub, setOpenSub] = useState<string | null>(null);
 
   const handleLogout = async () => {
     await fetch("/api/admin/logout", { method: "POST" });
@@ -34,68 +35,74 @@ function Sidebar({ collapsed, onClose }: { collapsed?: boolean; onClose?: () => 
   };
 
   return (
-    <aside className="h-full flex flex-col bg-white border-r border-slate-200 shadow-sm">
-      {/* Brand */}
-      <div className="flex items-center gap-3 px-6 py-8 border-b border-slate-200">
-        <div className="w-10 h-10 bg-primary/10 border border-primary/20 rounded-2xl flex items-center justify-center flex-shrink-0">
-          <Shield className="w-5 h-5 text-primary" />
-        </div>
-        <div className="min-w-0">
-          <p className="text-gray-900 font-bold text-base leading-tight truncate">Eagle Revolution</p>
-          <p className="text-primary/60 text-[10px] uppercase tracking-[0.2em] font-bold">CMS Admin</p>
-        </div>
-        {onClose && (
-          <button onClick={onClose} className="ml-auto text-gray-400 hover:text-gray-900 lg:hidden">
-            <X className="w-5 h-5" />
-          </button>
-        )}
-      </div>
-
-      {/* Nav */}
-      <nav className="flex-1 px-4 py-6 space-y-1 overflow-y-auto custom-scrollbar">
-        {navItems.map(({ label, href, icon: Icon }) => {
+    <aside className="h-full flex flex-col bg-[#1d2327] text-[#f0f0f1] select-none border-r border-[#3c434a]">
+      {/* Main Nav */}
+      <nav className="flex-1 py-1 no-scrollbar">
+        {navItems.map(({ label, href, icon: Icon, sub }) => {
           const active = pathname === href || (href !== "/admin" && pathname.startsWith(href));
+          const hasSub = !!sub;
+          
           return (
-            <Link
-              key={href}
-              href={href}
-              onClick={onClose}
-              className={`flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold transition-all duration-200 group relative ${
-                active
-                  ? "text-primary bg-primary/5 border border-primary/20 shadow-sm"
-                  : "text-slate-600 hover:text-slate-950 hover:bg-slate-50"
-              }`}
+            <div 
+              key={href} 
+              className="relative group"
             >
-              <Icon className={`w-4 h-4 flex-shrink-0 ${active ? "text-primary" : "text-gray-400 group-hover:text-gray-600"}`} />
-              <span className="truncate">{label}</span>
-              {active && (
-                <motion.div 
-                  layoutId="activeNav"
-                  className="absolute left-0 w-1 h-6 bg-primary rounded-r-full"
-                />
+              <Link
+                href={href}
+                onClick={() => {
+                  if (onClose) onClose();
+                }}
+                className={`flex items-center gap-2.5 px-4 py-2.5 text-[14px] transition-colors relative ${
+                  active
+                    ? "bg-[#2271b1] text-white font-semibold"
+                    : "hover:bg-[#2c3338] hover:text-[#72aee6] text-[#c3c4c7]"
+                }`}
+              >
+                <Icon className={`w-[18px] h-[18px] ${active ? "text-white" : "text-[#a7aaad] group-hover:text-[#72aee6]"}`} />
+                <span className="flex-1">{label}</span>
+                {active && (
+                  <div className="absolute right-0 top-0 bottom-0 w-1 bg-[#72aee6]" />
+                )}
+              </Link>
+              
+              {/* WP Style Flyout Submenu */}
+              {hasSub && (
+                <div className="absolute left-[100%] top-0 w-40 bg-[#2c3338] border-y border-r border-[#3c434a] shadow-lg hidden group-hover:block z-[9999]">
+                  <div className="py-1">
+                    {sub.map(s => (
+                       <Link 
+                        key={s.label} 
+                        href={s.href} 
+                        onClick={onClose}
+                        className="block px-4 py-2 text-[13px] text-[#c3c4c7] hover:text-[#72aee6] transition-colors border-b border-[#3c434a] last:border-0"
+                       >
+                          {s.label}
+                       </Link>
+                    ))}
+                  </div>
+                </div>
               )}
-              {active && <ChevronRight className="w-3 h-3 ml-auto text-primary/60" />}
-            </Link>
+            </div>
           );
         })}
       </nav>
 
-      {/* Footer */}
-      <div className="px-4 py-6 border-t border-slate-200 space-y-1">
-        <Link
-          href="/"
-          target="_blank"
-          className="flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-bold text-slate-600 hover:text-slate-950 hover:bg-slate-50 transition-all"
-        >
-          <Globe className="w-4 h-4" />
-          View Website
-        </Link>
+      {/* Footer Actions */}
+      <div className="p-2 bg-[#1d2327] border-t border-[#3c434a]">
+         <Link
+            href="/"
+            target="_blank"
+            className="flex items-center gap-2.5 px-4 py-2 text-[13px] text-[#c3c4c7] hover:text-[#72aee6] transition-colors"
+          >
+            <Globe className="w-4 h-4" />
+            <span>Visit Website</span>
+          </Link>
         <button
           onClick={handleLogout}
-          className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-sm font-medium text-red-500 hover:text-red-600 hover:bg-red-50 transition-all"
+          className="w-full flex items-center gap-2.5 px-3 py-2 text-[13px] text-[#c3c4c7] hover:text-[#d63638] transition-colors rounded"
         >
           <LogOut className="w-4 h-4" />
-          Sign Out
+          <span>Logout</span>
         </button>
       </div>
     </aside>
@@ -111,63 +118,121 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   return (
-    <div className="h-screen flex bg-[#f8fafc] text-slate-900 overflow-hidden font-sans">
-      {/* Desktop sidebar */}
-      <div className="hidden lg:flex w-64 flex-col flex-shrink-0 z-50">
-        <Sidebar />
-      </div>
+    <div className="h-screen flex flex-col bg-[#f0f0f1] text-[#2c3338] overflow-hidden antialiased font-sans">
+      {/* WP Admin Toolbar */}
+      <header className="flex items-center justify-between px-2 h-8 bg-[#1d2327] text-[#c3c4c7] text-[13px] z-[60] flex-shrink-0">
+         <div className="flex items-center h-full">
+            <Link href="/admin" className="hover:bg-[#2c3338] px-3 h-full flex items-center gap-2">
+               <Shield className="w-4 h-4 text-[#72aee6]" />
+               <span className="font-bold text-[#f0f0f1]">Eagle Revolution</span>
+            </Link>
+            <Link href="/" target="_blank" className="hover:bg-[#2c3338] px-3 h-full flex items-center gap-1.5 transition-colors">
+               <Globe className="w-3.5 h-3.5" />
+               <span className="font-medium text-[#c3c4c7]">Visit Site</span>
+            </Link>
+            
+            {/* Standard WP + New Menu */}
+            <div className="relative h-full group">
+               <div className="hover:bg-[#2c3338] px-3 h-full flex items-center gap-1 cursor-pointer">
+                  <Plus className="w-3.5 h-3.5" />
+                  <span>New</span>
+               </div>
+               <div className="absolute left-0 top-full w-40 bg-[#2c3338] border border-[#3c434a] shadow-lg hidden group-hover:block">
+                  <Link href="/admin/pages" className="block px-4 py-2 hover:text-[#72aee6] border-b border-[#3c434a]">Page</Link>
+                  <Link href="/admin/services" className="block px-4 py-2 hover:text-[#72aee6] border-b border-[#3c434a]">Service</Link>
+                  <Link href="/admin/reviews" className="block px-4 py-2 hover:text-[#72aee6] border-b border-[#3c434a]">Review</Link>
+                  <Link href="/admin/projects" className="block px-4 py-2 hover:text-[#72aee6] border-b border-[#3c434a]">Project</Link>
+                  <Link href="/admin/media" className="block px-4 py-2 hover:text-[#72aee6]">Media</Link>
+               </div>
+            </div>
+         </div>
+         <div className="flex items-center h-full">
+            <div className="hover:bg-[#2c3338] px-3 h-full flex items-center gap-2 cursor-pointer group">
+               <span className="text-[#c3c4c7] group-hover:text-[#72aee6]">Howdy, Admin</span>
+               <div className="w-5 h-5 bg-[#3c434a] rounded-sm flex items-center justify-center overflow-hidden border border-[#50575e]">
+                  <User className="w-4 h-4 text-[#a7aaad]" />
+               </div>
+            </div>
+         </div>
+      </header>
 
-      {/* Mobile sidebar overlay */}
-      <AnimatePresence>
-        {mobileOpen && (
-          <>
-            <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              className="fixed inset-0 bg-slate-900/40 backdrop-blur-sm z-40 lg:hidden"
-              onClick={() => setMobileOpen(false)}
-            />
-            <motion.div
-              initial={{ x: -280 }}
-              animate={{ x: 0 }}
-              exit={{ x: -280 }}
-              transition={{ type: "spring", damping: 25, stiffness: 200 }}
-              className="fixed left-0 top-0 bottom-0 w-72 z-50 lg:hidden"
-            >
-              <Sidebar onClose={() => setMobileOpen(false)} />
-            </motion.div>
-          </>
-        )}
-      </AnimatePresence>
-
-      {/* Main content */}
-      <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
-        {/* Mobile top bar */}
-        <div className="lg:hidden flex items-center gap-3 px-4 py-4 border-b border-slate-200 bg-white shadow-sm">
-          <button
-            onClick={() => setMobileOpen(true)}
-            className="p-2 -ml-2 text-gray-500 hover:text-gray-900 transition-colors"
-          >
-            <Menu className="w-6 h-6" />
-          </button>
-          <div className="flex items-center gap-3">
-            <Shield className="w-5 h-5 text-primary" />
-            <span className="text-gray-900 text-base font-bold tracking-tight">Eagle CMS</span>
-          </div>
+      <div className="flex-1 flex overflow-hidden">
+        {/* WP Admin Sidebar - Desktop */}
+        <div className="hidden lg:flex w-40 flex-col flex-shrink-0 z-50">
+          <Sidebar />
         </div>
 
-        {/* Page content */}
-        <main className="flex-1 overflow-y-auto relative custom-scrollbar">
-          <motion.div
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-          >
-            {children}
-          </motion.div>
-        </main>
+        {/* Mobile sidebar overlay */}
+        <AnimatePresence>
+          {mobileOpen && (
+            <>
+              <motion.div
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                className="fixed inset-0 bg-[#00000066] z-[70] lg:hidden"
+                onClick={() => setMobileOpen(false)}
+              />
+              <motion.div
+                initial={{ x: -200 }}
+                animate={{ x: 0 }}
+                exit={{ x: -200 }}
+                transition={{ type: "tween", duration: 0.2 }}
+                className="fixed left-0 top-8 bottom-0 w-48 z-[80] lg:hidden"
+              >
+                <Sidebar onClose={() => setMobileOpen(false)} />
+              </motion.div>
+            </>
+          )}
+        </AnimatePresence>
+
+        {/* Main content container */}
+        <div className="flex-1 flex flex-col min-w-0 overflow-hidden relative">
+          {/* Mobile Menu Trigger */}
+          <div className="lg:hidden flex items-center px-4 py-2 bg-[#1d2327] text-white shadow-sm border-t border-[#3c434a]">
+            <button
+              onClick={() => setMobileOpen(true)}
+              className="p-1 text-[#a7aaad] hover:text-white transition-colors"
+            >
+              <Menu className="w-6 h-6" />
+            </button>
+            <span className="ml-3 text-sm font-semibold uppercase tracking-wider text-[#c3c4c7]">Menu</span>
+          </div>
+
+          {/* Content scrolling area */}
+          <main className="flex-1 overflow-y-auto relative p-3 md:p-4 lg:p-6">
+             {children}
+          </main>
+        </div>
       </div>
+
+      <style jsx global>{`
+        body {
+          background-color: #f0f0f1;
+          font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen-Sans, Ubuntu, Cantarell, "Helvetica Neue", sans-serif;
+        }
+        .no-scrollbar::-webkit-scrollbar {
+          display: none;
+        }
+        .no-scrollbar {
+          -ms-overflow-style: none;
+          scrollbar-width: none;
+        }
+        /* Custom scrollbar to match WP */
+        ::-webkit-scrollbar {
+          width: 10px;
+        }
+        ::-webkit-scrollbar-track {
+          background: #f0f0f1;
+        }
+        ::-webkit-scrollbar-thumb {
+          background: #c3c4c7;
+          border: 2px solid #f0f0f1;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+          background: #a7aaad;
+        }
+      `}</style>
     </div>
   );
 }

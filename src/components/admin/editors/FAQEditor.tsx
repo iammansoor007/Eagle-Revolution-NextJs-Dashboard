@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, 
@@ -31,7 +31,7 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
     }
   }, [data, setData]);
 
-  if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
+  if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-5 h-5 text-[#2271b1] animate-spin" /></div>;
 
   const updateFAQ = (section: string, field: string | null, value: any) => {
     const currentFAQ = data.faq || {
@@ -64,51 +64,45 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
 
   return (
     <div className="bg-white">
-      {/* Tab Navigation */}
-      <div className="border-b border-slate-100 bg-white sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-1 p-4 overflow-x-auto no-scrollbar scroll-smooth">
-          {tabs.map((tab: any) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shrink-0 ${
-                activeTab === tab.id
-                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-              }`}
+      {/* WP Style Sub-tabs */}
+      <div className="flex flex-wrap items-center gap-1 mb-6 text-[13px] border-b border-[#f0f0f1] pb-1">
+        {tabs.map((tab: any, idx: number) => (
+          <React.Fragment key={tab.id}>
+            <button 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`px-1 py-1 transition-colors ${activeTab === tab.id ? 'text-[#1d2327] font-bold' : 'text-[#2271b1] hover:text-[#135e96]'}`}
             >
-              <tab.icon className="w-4 h-4" />
               {tab.label}
             </button>
-          ))}
-        </div>
+            {idx < tabs.length - 1 && <span className="text-[#c3c4c7] px-1">|</span>}
+          </React.Fragment>
+        ))}
       </div>
 
-      <div className="p-10 bg-[#F8FAFC]">
-        <div className="mb-12 pb-8 border-b border-slate-200">
-           <h2 className="text-3xl font-medium text-slate-900 tracking-tight">{activeTabTitle}</h2>
-           <p className="text-sm text-slate-400 mt-2 font-medium">Configure the knowledge base to help customers find answers quickly.</p>
+      <div className="space-y-6">
+        <div className="mb-6">
+           <h2 className={UI.sectionHeader}>{activeTabTitle}</h2>
+           <p className="text-[12px] text-[#646970] -mt-2">Configure the knowledge base to help customers find answers quickly.</p>
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div 
             key={activeTab} 
-            initial={{ opacity: 0, y: 15 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -15 }} 
-            className="space-y-16 pb-20"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="space-y-8 pb-10"
           >
             
             {/* HEADER SECTION */}
             {activeTab === "header" && (
-              <div className="max-w-3xl space-y-10">
-                 <div className={UI.card + " space-y-6"}>
-                    <label className={UI.sectionHeader}>Section Branding</label>
-                    <div className="space-y-2">
+              <div className="max-w-3xl space-y-6">
+                 <div className={UI.card + " space-y-5"}>
+                    <div className="space-y-1.5">
                        <label className={UI.label}>Main Headline</label>
                        <input type="text" value={data.faq?.section?.headline || ""} onChange={(e) => updateFAQ("section", "headline", e.target.value)} className={UI.inputLarge} />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                        <label className={UI.label}>Knowledge Intro Narrative</label>
                        <textarea value={data.faq?.section?.description || ""} onChange={(e) => updateFAQ("section", "description", e.target.value)} rows={4} className={UI.textarea} />
                     </div>
@@ -118,21 +112,21 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
 
             {/* CATEGORIES SECTION */}
             {activeTab === "categories" && (
-              <div className="space-y-10">
+              <div className="space-y-6">
                  <label className={UI.label}>Filtering Taxonomy</label>
-                 <div className="grid grid-cols-3 gap-6">
+                 <div className="grid grid-cols-3 gap-4">
                     {(data.faq?.categories || []).map((cat: any, i: number) => (
-                      <div key={i} className={UI.card + " space-y-6 relative group p-6 rounded-3xl"}>
-                         <div className="flex justify-between items-center mb-2">
-                            <div className="w-10 h-10 bg-primary/5 text-primary rounded-xl flex items-center justify-center border border-primary/10">
+                      <div key={i} className={UI.card + " space-y-4 relative"}>
+                         <div className="flex justify-between items-center">
+                            <div className="w-8 h-8 bg-[#f0f6fb] text-[#2271b1] rounded-[3px] flex items-center justify-center border border-[#dcdcde]">
                                <Filter className="w-4 h-4" />
                             </div>
                             <button onClick={() => {
                                const newC = data.faq.categories.filter((_: any, idx: number) => idx !== i);
                                updateFAQ("categories", null, newC);
-                            }} className="text-slate-200 hover:text-red-500 transition-colors"><Trash2 className="w-4 h-4" /></button>
+                            }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
                          </div>
-                         <div className="space-y-2">
+                         <div className="space-y-1.5">
                             <label className={UI.label + " mb-0"}>Category Label</label>
                             <input type="text" value={cat.label} onChange={(e) => {
                                  const newC = [...data.faq.categories];
@@ -140,13 +134,12 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
                                  newC[i].id = e.target.value.toLowerCase().replace(/\s+/g, '-');
                                  updateFAQ("categories", null, newC);
                                }} className={UI.input + " font-bold"} placeholder="Category Label" />
-                            <p className="text-[9px] text-slate-300 font-mono uppercase tracking-tighter px-1">ID: {cat.id}</p>
+                            <p className="text-[9px] text-slate-400 font-mono uppercase tracking-tighter">ID: {cat.id}</p>
                          </div>
                       </div>
                     ))}
-                    <button onClick={() => updateFAQ("categories", null, [...(data.faq?.categories || []), { id: "new", label: "New Category" }])} className={UI.buttonAdd + " py-12"}>
-                       <Plus className="w-8 h-8 mx-auto" />
-                       <span>Add Category</span>
+                    <button onClick={() => updateFAQ("categories", null, [...(data.faq?.categories || []), { id: "new", label: "New Category" }])} className={UI.buttonAdd}>
+                       + Add Category
                     </button>
                  </div>
               </div>
@@ -154,7 +147,7 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
 
              {/* ITEMS SECTION */}
             {activeTab === "items" && (
-              <div className="space-y-8">
+              <div className="space-y-6">
                  <ContentSelector 
                     type="faq" 
                     label="Knowledge Inventory (Select from Global Library)" 

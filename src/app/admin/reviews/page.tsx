@@ -11,7 +11,8 @@ export default function ReviewsAdminPage() {
   const [testimonials, setTestimonials] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  
+  const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+
   // Form State
   const [form, setForm] = useState({
     name: "",
@@ -24,9 +25,7 @@ export default function ReviewsAdminPage() {
   });
 
   useEffect(() => {
-    fetch("/api/content")
-      .then(res => res.json())
-      .then(json => {
+    fetch("/api/content").then(res => res.json()).then(json => {
         setData(json);
         setTestimonials(json.testimonials?.testimonials || []);
       });
@@ -34,54 +33,26 @@ export default function ReviewsAdminPage() {
 
   const saveToDb = async (newTestimonials: any[]) => {
     setSaving(true);
-    const updatedData = {
-      ...data,
-      testimonials: {
-        ...data.testimonials,
-        testimonials: newTestimonials
-      }
-    };
-
+    const updatedData = { ...data, testimonials: { ...data.testimonials, testimonials: newTestimonials } };
     try {
-      const res = await fetch("/api/content", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData)
-      });
+      const res = await fetch("/api/content", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedData) });
       if (res.ok) {
         setData(updatedData);
         setTestimonials(newTestimonials);
-        setForm({ name: "", position: "", company: "", text: "", avatar: "", rating: 5, videoId: "" });
+        setToast({ type: "ok", msg: "Reviews updated." });
+        setTimeout(() => setToast(null), 3000);
         setIsEditing(null);
-      } else {
-        alert("Failed to save testimonials");
       }
-    } catch (e) {
-      alert("Error saving testimonials");
-    } finally {
-      setSaving(false);
-    }
+    } catch {
+      setToast({ type: "err", msg: "Error saving." });
+    } finally { setSaving(false); }
   };
 
   const handleSaveTestimonial = () => {
-    if (!form.name || !form.text) {
-      alert("Name and review text are required!");
-      return;
-    }
-
+    if (!form.name || !form.text) return alert("Name and review text are required!");
     const newTestimonials = [...testimonials];
-    if (isEditing !== null && isEditing < testimonials.length) {
-      newTestimonials[isEditing] = { ...form };
-    } else {
-      newTestimonials.push({ ...form });
-    }
-
-    saveToDb(newTestimonials);
-  };
-
-  const handleDelete = (idx: number) => {
-    if (!confirm("Are you sure you want to delete this testimonial?")) return;
-    const newTestimonials = testimonials.filter((_, i) => i !== idx);
+    if (isEditing !== null && isEditing < testimonials.length) newTestimonials[isEditing] = { ...form };
+    else newTestimonials.push({ ...form });
     saveToDb(newTestimonials);
   };
 
@@ -90,235 +61,137 @@ export default function ReviewsAdminPage() {
     setForm(testimonials[idx]);
   };
 
-  if (!data) {
-    return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
-  }
+  if (!data) return <div className="flex h-screen items-center justify-center text-[#646970] font-serif">Loading...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto pb-20">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-2 font-medium">
-            <Link href="/admin" className="hover:text-primary transition-colors">Dashboard</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-900 font-bold">Reviews</span>
-          </div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            Customer Testimonials
-          </h1>
-          <p className="text-slate-500 font-medium mt-1">Manage and moderate reviews shown on the website.</p>
-        </div>
-        
-        {!isEditing && (
+    <div className="space-y-4">
+      {/* WP Header Area */}
+      <div className="flex items-center gap-4 mb-2">
+        <h1 className="text-[23px] font-normal text-[#1d2327] font-serif m-0">Reviews</h1>
+        {isEditing === null && (
           <button
-            onClick={() => setIsEditing(testimonials.length)}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02]"
+            onClick={() => {
+              setIsEditing(testimonials.length);
+              setForm({ name: "", position: "", company: "", text: "", avatar: "", rating: 5, videoId: "" });
+            }}
+            className="bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f6f7f7] hover:text-[#135e96] hover:border-[#135e96] px-2 py-1 text-[13px] rounded-[3px] transition-colors"
           >
-            <Plus className="w-5 h-5" />
             Add New Review
           </button>
         )}
       </div>
 
-      <AnimatePresence mode="wait">
-        {isEditing !== null ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-slate-200 rounded-3xl p-8 mb-12 shadow-xl shadow-slate-200/50"
-          >
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
-              <h2 className="text-2xl font-extrabold text-slate-900">
-                {isEditing < testimonials.length ? "Edit Testimonial" : "New Testimonial"}
-              </h2>
-              <button onClick={() => setIsEditing(null)} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {toast && (
+        <div className={`px-4 py-2 border-l-4 text-[13px] bg-white shadow-sm mb-4 ${toast.type === 'ok' ? 'border-[#00a32a]' : 'border-[#d63638]'}`}>
+          {toast.msg}
+        </div>
+      )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* Avatar Column */}
-              <div className="space-y-6">
-                <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Client Identity</label>
-                <div className="space-y-4">
-                  <ImageField 
-                    label="Client Avatar"
-                    value={form.avatar || ""}
-                    onChange={(url) => setForm({ ...form, avatar: url })}
-                    description="Upload a photo or select from library. If empty, initials will be used."
-                  />
-                  <div className="space-y-2">
-                    <label className="text-[10px] uppercase tracking-widest text-slate-500 font-extrabold">Manual Initials / URL</label>
-                    <input
-                      type="text"
-                      value={form.avatar}
-                      onChange={(e) => setForm({ ...form, avatar: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-2 text-slate-900 text-xs font-bold focus:ring-1 focus:ring-primary/20 outline-none transition-all shadow-inner"
-                      placeholder="Enter initials or paste URL"
-                    />
-                  </div>
-                </div>
-<div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Rating (1-5)</label>
-                    <div className="flex items-center gap-4 bg-slate-50 p-3 rounded-xl border border-slate-200 shadow-inner">
-                      <input
-                        type="range"
-                        min="1"
-                        max="5"
-                        step="1"
-                        value={form.rating}
-                        onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })}
-                        className="flex-1 accent-primary"
-                      />
-                      <span className="text-xl font-extrabold text-slate-900">{form.rating}</span>
-                      <Star className="w-5 h-5 text-amber-500 fill-amber-500" />
+      {isEditing !== null ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+           <div className="lg:col-span-3 space-y-6">
+              <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm p-6">
+                 <input
+                   type="text"
+                   value={form.name}
+                   onChange={(e) => setForm({ ...form, name: e.target.value })}
+                   className="w-full border border-[#8c8f94] px-3 py-2 text-[18px] font-medium rounded-[3px] focus:border-[#2271b1] outline-none mb-4"
+                   placeholder="Enter reviewer name"
+                 />
+                 
+                 <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">Position</label>
+                          <input type="text" value={form.position} onChange={(e) => setForm({ ...form, position: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" placeholder="e.g. CEO" />
+                       </div>
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">Company / City</label>
+                          <input type="text" value={form.company} onChange={(e) => setForm({ ...form, company: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" placeholder="e.g. Austin, TX" />
+                       </div>
                     </div>
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">YouTube ID</label>
-                    <input
-                      type="text"
-                      value={form.videoId || ""}
-                      onChange={(e) => setForm({ ...form, videoId: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
-                      placeholder="Optional Video ID"
-                    />
-                  </div>
-                </div>
+
+                    <div className="space-y-1">
+                       <label className="text-[13px] font-bold">Review Text</label>
+                       <textarea rows={6} value={form.text} onChange={(e) => setForm({ ...form, text: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px] italic" />
+                    </div>
+
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">Rating (1-5)</label>
+                          <select value={form.rating} onChange={(e) => setForm({ ...form, rating: Number(e.target.value) })} className="w-full border border-[#8c8f94] px-2 py-1.5 text-[14px] rounded-[3px]">
+                             {[1,2,3,4,5].map(r => <option key={r} value={r}>{r} Stars</option>)}
+                          </select>
+                       </div>
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">YouTube Video ID</label>
+                          <input type="text" value={form.videoId} onChange={(e) => setForm({ ...form, videoId: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" placeholder="Optional" />
+                       </div>
+                    </div>
+                 </div>
               </div>
+           </div>
 
-              {/* Text Column */}
-              <div className="space-y-6">
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Full Name</label>
-                  <input
-                    type="text"
-                    value={form.name}
-                    onChange={(e) => setForm({ ...form, name: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
-                    placeholder="e.g. Sarah Jenkins"
-                  />
-                </div>
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Position</label>
-                    <input
-                      type="text"
-                      value={form.position}
-                      onChange={(e) => setForm({ ...form, position: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
-                      placeholder="e.g. Property Manager"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Company / City</label>
-                    <input
-                      type="text"
-                      value={form.company}
-                      onChange={(e) => setForm({ ...form, company: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner"
-                      placeholder="e.g. Austin, TX"
-                    />
-                  </div>
-                </div>
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Review Content</label>
-                  <textarea
-                    rows={4}
-                    value={form.text}
-                    onChange={(e) => setForm({ ...form, text: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 outline-none transition-all shadow-inner leading-relaxed"
-                    placeholder="The team was incredibly professional..."
-                  />
-                </div>
+           <div className="lg:col-span-1 space-y-6 sticky top-4">
+              <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+                 <div className="px-3 py-2 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+                    <h2 className="text-[14px] font-semibold text-[#1d2327]">Publish</h2>
+                 </div>
+                 <div className="p-4 space-y-3">
+                    <ImageField label="Reviewer Photo" value={form.avatar} onChange={(v) => setForm({ ...form, avatar: v })} />
+                 </div>
+                 <div className="px-3 py-2 bg-[#f6f7f7] border-t border-[#c3c4c7] flex justify-between items-center">
+                    <button onClick={() => setIsEditing(null)} className="text-[#d63638] underline text-[13px]">Cancel</button>
+                    <button onClick={handleSaveTestimonial} disabled={saving} className="bg-[#2271b1] text-white px-4 py-1.5 rounded-[3px] text-[13px] font-semibold hover:bg-[#135e96]">
+                       {saving ? "Saving..." : "Update"}
+                    </button>
+                 </div>
               </div>
-            </div>
-
-            <div className="flex items-center gap-4 border-t border-slate-100 mt-10 pt-8">
-              <button
-                onClick={handleSaveTestimonial}
-                disabled={saving}
-                className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                {saving ? "Publishing Review..." : "Publish Review"}
-              </button>
-              <button
-                onClick={() => setIsEditing(null)}
-                className="bg-slate-100 text-slate-600 px-8 py-3 rounded-2xl font-bold hover:bg-slate-200 transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      <div className="space-y-4">
-        {testimonials.map((test, idx) => (
-          <motion.div 
-            key={idx}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="group bg-white border border-slate-200 rounded-2xl p-5 pr-6 hover:shadow-lg hover:shadow-slate-200 transition-all flex items-center gap-6 shadow-sm"
-          >
-            <div className="relative flex-shrink-0">
-              {test.avatar && (test.avatar.startsWith('http') || test.avatar.startsWith('/uploads')) ? (
-                <img src={test.avatar} alt={test.name} className="w-16 h-16 rounded-xl object-cover border border-slate-100 shadow-sm" />
-              ) : (
-                <div className="w-16 h-16 rounded-xl bg-slate-50 border border-slate-100 flex items-center justify-center text-primary font-bold text-lg uppercase">
-                  {test.avatar || test.name.charAt(0)}
-                </div>
-              )}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-1">
-                <h3 className="text-lg font-bold text-slate-900 truncate">{test.name}</h3>
-                <div className="flex items-center gap-0.5 bg-amber-50 px-2 py-0.5 rounded-full border border-amber-100">
-                  <span className="text-amber-600 font-bold text-[10px]">{test.rating || 5}</span>
-                  <Star className="w-3 h-3 text-amber-500 fill-amber-500" />
-                </div>
-              </div>
-              <p className="text-slate-500 text-sm font-medium line-clamp-1 italic">"{test.text}"</p>
-              <p className="text-slate-400 text-[9px] font-bold uppercase tracking-widest mt-1">{test.position} • {test.company}</p>
-            </div>
-
-            <div className="flex items-center gap-4 flex-shrink-0">
-              {test.videoId && (
-                <span className="hidden md:block text-[9px] font-bold text-primary bg-primary/10 px-2 py-1 rounded-full border border-primary/20 uppercase tracking-widest">
-                  Video
-                </span>
-              )}
-              <div className="flex items-center gap-1">
-                <button
-                  onClick={() => handleEdit(idx)}
-                  className="p-3 text-slate-400 hover:text-primary transition-all rounded-xl hover:bg-slate-50"
-                >
-                  <Pencil className="w-5 h-5" />
-                </button>
-                <button
-                  onClick={() => handleDelete(idx)}
-                  className="p-3 text-slate-400 hover:text-red-500 transition-all rounded-xl hover:bg-slate-50"
-                >
-                  <Trash2 className="w-5 h-5" />
-                </button>
-              </div>
-            </div>
-          </motion.div>
-        ))}
-        
-        {testimonials.length === 0 && !isEditing && (
-          <div className="col-span-full py-20 text-center bg-white border border-slate-200 border-dashed rounded-3xl">
-            <Star className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-            <p className="text-slate-400 font-bold">No reviews yet. Share your success stories!</p>
-          </div>
-        )}
-      </div>
+           </div>
+        </div>
+      ) : (
+        <div className="bg-white border border-[#c3c4c7] rounded-sm shadow-sm overflow-hidden">
+           <table className="w-full text-left border-collapse">
+              <thead>
+                 <tr className="border-b border-[#c3c4c7] bg-white text-[#1d2327]">
+                    <th className="w-8 py-2 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></th>
+                    <th className="py-2 px-3 text-[14px] font-semibold">Reviewer</th>
+                    <th className="py-2 px-3 text-[14px] font-semibold w-64">Text Snippet</th>
+                    <th className="py-2 px-3 text-[14px] font-semibold w-24">Rating</th>
+                    <th className="py-2 px-3 text-[14px] font-semibold w-32">Date</th>
+                 </tr>
+              </thead>
+              <tbody className="text-[13px] text-[#2c3338]">
+                 {testimonials.map((test, idx) => (
+                    <tr key={idx} className={`border-b border-[#f0f0f1] group ${idx % 2 === 0 ? "bg-[#f9f9f9]" : "bg-white"} hover:bg-[#f0f0f1]`}>
+                       <td className="py-4 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></td>
+                       <td className="py-4 px-3 align-top">
+                          <div className="flex gap-3">
+                             <div className="w-10 h-10 bg-[#f0f0f1] border border-[#c3c4c7] rounded-[3px] flex items-center justify-center shrink-0 overflow-hidden">
+                                {test.avatar ? <img src={test.avatar} className="w-full h-full object-cover" /> : <Quote className="w-4 h-4 text-[#8c8f94]" />}
+                             </div>
+                             <div>
+                                <strong className="text-[#2271b1] block text-[14px]">{test.name}</strong>
+                                <span className="text-[#646970]">{test.position} @ {test.company}</span>
+                                <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                   <button onClick={() => handleEdit(idx)} className="text-[#2271b1] hover:underline text-[12px]">Edit</button>
+                                   <span className="text-[#a7aaad]">|</span>
+                                   <button onClick={() => { if(confirm("Delete?")) saveToDb(testimonials.filter((_,i)=>i!==idx)); }} className="text-[#d63638] hover:underline text-[12px]">Trash</button>
+                                </div>
+                             </div>
+                          </div>
+                       </td>
+                       <td className="py-4 px-3 align-top text-[#50575e] italic line-clamp-2">"{test.text}"</td>
+                       <td className="py-4 px-3 align-top">
+                          <div className="flex items-center text-amber-500 font-bold">{test.rating || 5} <Star className="w-3 h-3 fill-current ml-1" /></div>
+                       </td>
+                       <td className="py-4 px-3 align-top text-[#50575e]">Oct 24, 2024</td>
+                    </tr>
+                 ))}
+              </tbody>
+           </table>
+        </div>
+      )}
     </div>
   );
 }

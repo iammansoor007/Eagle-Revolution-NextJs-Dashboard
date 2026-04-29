@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { 
   Save, Loader2, LayoutTemplate, Type, Image as ImageIcon, 
@@ -30,7 +30,7 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
     }
   }, [data, setData]);
 
-  if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-8 h-8 text-primary animate-spin" /></div>;
+  if (!data) return <div className="flex items-center justify-center h-64"><Loader2 className="w-5 h-5 text-[#2271b1] animate-spin" /></div>;
 
   const updateCareers = (section: string, field: string | null, value: any) => {
     const currentCareers = data.careers || {
@@ -64,55 +64,49 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
 
   return (
     <div className="bg-white">
-      {/* Tab Navigation */}
-      <div className="border-b border-slate-100 bg-white sticky top-0 z-10 shadow-sm">
-        <div className="flex items-center gap-1 p-4 overflow-x-auto no-scrollbar scroll-smooth">
-          {tabs.map((tab: any) => (
-            <button
-              key={tab.id}
-              onClick={() => setActiveTab(tab.id)}
-              className={`flex items-center gap-2 px-6 py-3 rounded-xl text-[10px] font-bold uppercase tracking-widest transition-all shrink-0 ${
-                activeTab === tab.id
-                ? "bg-primary text-white shadow-lg shadow-primary/20"
-                : "text-slate-400 hover:text-slate-600 hover:bg-slate-50"
-              }`}
+      {/* WP Style Sub-tabs */}
+      <div className="flex flex-wrap items-center gap-1 mb-6 text-[13px] border-b border-[#f0f0f1] pb-1">
+        {tabs.map((tab: any, idx: number) => (
+          <React.Fragment key={tab.id}>
+            <button 
+              onClick={() => setActiveTab(tab.id)} 
+              className={`px-1 py-1 transition-colors ${activeTab === tab.id ? 'text-[#1d2327] font-bold' : 'text-[#2271b1] hover:text-[#135e96]'}`}
             >
-              <tab.icon className="w-4 h-4" />
               {tab.label}
             </button>
-          ))}
-        </div>
+            {idx < tabs.length - 1 && <span className="text-[#c3c4c7] px-1">|</span>}
+          </React.Fragment>
+        ))}
       </div>
 
-      <div className="p-10 bg-[#F8FAFC]">
-        <div className="mb-12 pb-8 border-b border-slate-200">
-           <h2 className="text-3xl font-medium text-slate-900 tracking-tight">{activeTabTitle}</h2>
-           <p className="text-sm text-slate-400 mt-2 font-medium">Configure the recruitment experience and manage available roles.</p>
+      <div className="space-y-6">
+        <div className="mb-6">
+           <h2 className={UI.sectionHeader}>{activeTabTitle}</h2>
+           <p className="text-[12px] text-[#646970] -mt-2">Configure the recruitment experience and manage available roles.</p>
         </div>
 
         <AnimatePresence mode="wait">
           <motion.div 
             key={activeTab} 
-            initial={{ opacity: 0, y: 15 }} 
-            animate={{ opacity: 1, y: 0 }} 
-            exit={{ opacity: 0, y: -15 }} 
-            className="space-y-16 pb-20"
+            initial={{ opacity: 0 }} 
+            animate={{ opacity: 1 }} 
+            exit={{ opacity: 0 }} 
+            className="space-y-8 pb-10"
           >
             
             {/* HEADER SECTION */}
             {activeTab === "header" && (
-              <div className="max-w-3xl space-y-10">
-                 <div className={UI.card + " space-y-6"}>
-                    <label className={UI.sectionHeader}>Section Branding</label>
-                    <div className="space-y-2">
+              <div className="max-w-3xl space-y-6">
+                 <div className={UI.card + " space-y-5"}>
+                    <div className="space-y-1.5">
                        <label className={UI.label}>Section Badge</label>
-                       <input type="text" value={data.careers?.section?.badge || ""} onChange={(e) => updateCareers("section", "badge", e.target.value)} className={UI.inputPrimary} />
+                       <input type="text" value={data.careers?.section?.badge || ""} onChange={(e) => updateCareers("section", "badge", e.target.value)} className={UI.input} />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                        <label className={UI.label}>Main Headline</label>
                        <input type="text" value={data.careers?.section?.headline || ""} onChange={(e) => updateCareers("section", "headline", e.target.value)} className={UI.inputLarge} placeholder="Expert hands with Visionary minds" />
                     </div>
-                    <div className="space-y-2">
+                    <div className="space-y-1.5">
                        <label className={UI.label}>Recruitment Narrative</label>
                        <textarea value={data.careers?.section?.description || ""} onChange={(e) => updateCareers("section", "description", e.target.value)} rows={4} className={UI.textarea} />
                     </div>
@@ -122,15 +116,15 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
 
             {/* ROLES SECTION */}
             {activeTab === "roles" && (
-              <div className="space-y-10">
+              <div className="space-y-6">
                  <label className={UI.label}>Available Career Opportunities</label>
-                 <div className="grid grid-cols-2 gap-6">
+                 <div className="grid grid-cols-2 gap-4">
                     {(data.careers?.roles || []).map((role: any, i: number) => (
-                      <div key={i} className={UI.card + " flex items-center gap-6 group relative p-6 rounded-3xl"}>
-                         <div className="w-14 h-14 bg-primary/5 text-primary rounded-2xl flex items-center justify-center shrink-0 border border-primary/10 transition-all group-hover:bg-primary group-hover:text-white group-hover:shadow-lg group-hover:shadow-primary/20">
-                            <Briefcase className="w-6 h-6" />
+                      <div key={i} className={UI.card + " flex items-center gap-4 group relative"}>
+                         <div className="w-10 h-10 bg-[#f0f6fb] text-[#2271b1] rounded-[3px] flex items-center justify-center shrink-0 border border-[#dcdcde]">
+                            <Briefcase className="w-5 h-5" />
                          </div>
-                         <div className="flex-1 space-y-2">
+                         <div className="flex-1 space-y-1">
                             <label className={UI.label + " mb-0"}>Job Title</label>
                             <input type="text" value={role.label} onChange={(e) => {
                                  const newR = [...data.careers.roles];
@@ -138,17 +132,15 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
                                  newR[i].value = e.target.value.toLowerCase().replace(/\s+/g, '-');
                                  updateCareers("roles", null, newR);
                                }} className={UI.input + " font-bold"} placeholder="Job Title" />
-                            <p className="text-[9px] text-slate-300 font-mono uppercase px-1">ID: {role.value}</p>
                          </div>
                          <button onClick={() => {
                             const newR = data.careers.roles.filter((_: any, idx: number) => idx !== i);
                             updateCareers("roles", null, newR);
-                         }} className="text-slate-200 hover:text-red-500 opacity-0 group-hover:opacity-100 transition-all absolute top-6 right-6"><Trash2 className="w-5 h-5" /></button>
+                         }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
                       </div>
                     ))}
-                    <button onClick={() => updateCareers("roles", null, [...(data.careers?.roles || []), { label: "New Position", value: "new-position" }])} className={UI.buttonAdd + " py-12"}>
-                       <Plus className="w-10 h-10 mx-auto" />
-                       <span>Post New Career Opportunity</span>
+                    <button onClick={() => updateCareers("roles", null, [...(data.careers?.roles || []), { label: "New Position", value: "new-position" }])} className={UI.buttonAdd}>
+                       + Post New Career Opportunity
                     </button>
                  </div>
               </div>
@@ -156,45 +148,35 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
 
             {/* FORM CONFIG SECTION */}
             {activeTab === "form" && (
-              <div className="grid grid-cols-12 gap-12">
-                 <div className="col-span-7 space-y-10">
-                    <div className="space-y-6">
-                       <label className={UI.label}>Submission Success State</label>
-                       <div className={UI.card + " space-y-8 flex flex-col items-center text-center py-12"}>
-                          <div className="w-20 h-20 bg-green-50 text-green-500 rounded-full flex items-center justify-center shadow-inner">
-                             <CheckCircle className="w-10 h-10" />
+              <div className="grid grid-cols-1 gap-6 max-w-4xl">
+                 <div className="space-y-6">
+                    <label className={UI.label}>Submission Success State</label>
+                    <div className={UI.card + " space-y-6"}>
+                       <div className="grid grid-cols-1 gap-4">
+                          <div className="space-y-1.5">
+                             <label className={UI.label}>Success Headline</label>
+                             <input type="text" value={data.careers?.success?.title || ""} onChange={(e) => updateCareers("success", "title", e.target.value)} className={UI.inputLarge} placeholder="Success Headline" />
                           </div>
-                          <div className="w-full space-y-4">
-                             <div className="space-y-2">
-                                <label className={UI.label}>Success Headline</label>
-                                <input type="text" value={data.careers?.success?.title || ""} onChange={(e) => updateCareers("success", "title", e.target.value)} className={UI.inputLarge + " text-center"} placeholder="Success Headline" />
-                             </div>
-                             <div className="space-y-2">
-                                <label className={UI.label}>Success Narrative</label>
-                                <textarea value={data.careers?.success?.description || ""} onChange={(e) => updateCareers("success", "description", e.target.value)} rows={3} className={UI.textarea + " text-center"} placeholder="Detailed success message..." />
-                             </div>
+                          <div className="space-y-1.5">
+                             <label className={UI.label}>Success Narrative</label>
+                             <textarea value={data.careers?.success?.description || ""} onChange={(e) => updateCareers("success", "description", e.target.value)} rows={3} className={UI.textarea} placeholder="Detailed success message..." />
                           </div>
                        </div>
                     </div>
                  </div>
 
-                 <div className="col-span-5 space-y-10">
-                    <div className="space-y-6">
-                       <label className={UI.label}>Form Input Labels</label>
-                       <div className={UI.card + " space-y-6"}>
-                          {Object.entries(data.careers?.labels || {}).map(([key, val]: [string, any]) => (
-                            <div key={key} className="space-y-2">
-                               <div className="flex items-center gap-2">
-                                  <PenTool className="w-3.5 h-3.5 text-primary/40" />
-                                  <label className={UI.label + " mb-0"}>{key} Field</label>
-                               </div>
-                               <input type="text" value={val} onChange={(e) => {
-                                 const newLabels = { ...data.careers.labels, [key]: e.target.value };
-                                 updateCareers("labels", null, newLabels);
-                               }} className={UI.input} />
-                            </div>
-                          ))}
-                       </div>
+                 <div className="space-y-6">
+                    <label className={UI.label}>Form Input Labels</label>
+                    <div className={UI.card + " space-y-4"}>
+                       {Object.entries(data.careers?.labels || {}).map(([key, val]: [string, any]) => (
+                         <div key={key} className="space-y-1.5">
+                            <label className={UI.label}>{key.charAt(0).toUpperCase() + key.slice(1)} Field Label</label>
+                            <input type="text" value={val} onChange={(e) => {
+                              const newLabels = { ...data.careers.labels, [key]: e.target.value };
+                              updateCareers("labels", null, newLabels);
+                            }} className={UI.input} />
+                         </div>
+                       ))}
                     </div>
                  </div>
               </div>

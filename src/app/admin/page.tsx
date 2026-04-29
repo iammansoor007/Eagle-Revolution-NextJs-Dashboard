@@ -7,180 +7,153 @@ import {
   FileText, Briefcase, Star, HelpCircle,
   ImageIcon, Phone, ArrowUpRight, Activity,
   ChevronRight, LayoutDashboard, Settings, Plus, ExternalLink,
-  Home, Info, Mail, UserCheck, Layers, Image as GalleryIcon
+  Home, Info, Mail, UserCheck, Layers, Image as GalleryIcon, Shield,
+  MessageSquare, Users,
+  Settings2
 } from "lucide-react";
 import { useContent } from "@/hooks/useContent";
 
-// ---- Compact Stat ----
-const StatItem = ({ label, value, icon: Icon, href, delay }: any) => {
-  if (value === 0) return null;
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 10 }}
-      animate={{ opacity: 1, y: 0 }}
-      transition={{ duration: 0.4, delay }}
-    >
-      <Link href={href} className="flex items-center gap-4 bg-white p-5 rounded-2xl border border-slate-100 hover:border-primary/30 hover:shadow-lg transition-all group">
-        <div className="w-10 h-10 rounded-xl bg-slate-50 flex items-center justify-center text-slate-400 group-hover:bg-primary group-hover:text-white transition-all">
-          <Icon className="w-4 h-4" />
-        </div>
-        <div>
-          <p className="text-xl font-bold text-slate-900 tracking-tight leading-none mb-1">{value}</p>
-          <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">{label}</p>
-        </div>
-        <ChevronRight className="w-3.5 h-3.5 ml-auto text-slate-200 group-hover:text-primary transition-all" />
-      </Link>
-    </motion.div>
-  );
-};
-
-// ---- compact management card ----
-const ManageCard = ({ label, href, icon: Icon, delay, color }: any) => (
-  <motion.div
-    initial={{ opacity: 0, y: 10 }}
-    animate={{ opacity: 1, y: 0 }}
-    transition={{ duration: 0.4, delay }}
-  >
-    <Link href={href} className="group block">
-      <div className="bg-white p-5 rounded-2xl border border-slate-100 hover:border-primary/20 hover:shadow-xl transition-all duration-300">
-         <div className="flex items-center gap-4 mb-4">
-            <div className={`w-10 h-10 rounded-xl ${color} flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform`}>
-              <Icon className="w-4 h-4" />
-            </div>
-            <h3 className="text-sm font-bold text-slate-900 tracking-tight">{label}</h3>
-            <ArrowUpRight className="w-3 h-3 ml-auto text-slate-200 group-hover:text-primary transition-all" />
-         </div>
-         <p className="text-[10px] text-slate-400 font-medium leading-relaxed">Customize and manage the {label.toLowerCase()} module.</p>
-      </div>
-    </Link>
-  </motion.div>
-);
-
 export default function AdminDashboard() {
   const { services: servicesRaw, testimonials, faq } = useContent();
-  const [greeting, setGreeting] = useState("");
   const [mounted, setMounted] = useState(false);
 
   useEffect(() => {
     setMounted(true);
-    const hour = new Date().getHours();
-    if (hour < 12) setGreeting("Morning");
-    else if (hour < 18) setGreeting("Afternoon");
-    else setGreeting("Evening");
   }, []);
 
   const servicesData = (servicesRaw as any).services || [];
   const testimonialsData = (testimonials as any).testimonials || [];
   const faqItems = (faq as any).items || [];
 
-  const stats = [
-    { label: "Services", value: servicesData.length, icon: Briefcase, href: "/admin/services", delay: 0.1 },
-    { label: "Reviews", value: testimonialsData.length, icon: Star, href: "/admin/reviews", delay: 0.2 },
-    { label: "FAQs", value: faqItems.length, icon: HelpCircle, href: "/admin/faq", delay: 0.3 },
-  ];
-
-  const templateEditors = [
-    { label: "Home Template", href: "/admin/pages/home", icon: Home, color: "bg-blue-600", delay: 0.1 },
-    { label: "About Template", href: "/admin/pages/about", icon: Info, color: "bg-indigo-600", delay: 0.2 },
-    { label: "Contact Template", href: "/admin/pages/contact", icon: Mail, color: "bg-emerald-600", delay: 0.3 },
-    { label: "Careers Template", href: "/admin/pages/careers", icon: UserCheck, color: "bg-amber-600", delay: 0.4 },
-    { label: "Services Page", href: "/admin/pages/services", icon: Briefcase, color: "bg-sky-600", delay: 0.5 },
-    { label: "Gallery Page", href: "/admin/pages/gallery", icon: GalleryIcon, color: "bg-rose-600", delay: 0.6 },
-    { label: "FAQ Page", href: "/admin/pages/faq", icon: HelpCircle, color: "bg-teal-600", delay: 0.7 },
-  ];
-
-  const managementModules = [
-    { label: "Service Inventory", href: "/admin/services", icon: Layers, color: "bg-slate-700", delay: 0.1 },
-    { label: "Review Bank", href: "/admin/reviews", icon: Star, color: "bg-slate-700", delay: 0.2 },
-    { label: "Project Catalog", href: "/admin/projects", icon: ImageIcon, color: "bg-slate-700", delay: 0.3 },
-    { label: "Knowledge Base", href: "/admin/faq", icon: HelpCircle, color: "bg-slate-700", delay: 0.4 },
-    { label: "Global Settings", href: "/admin/settings", icon: Settings, color: "bg-slate-900", delay: 0.5 },
-  ];
-
   if (!mounted) return null;
 
   return (
-    <div className="max-w-7xl mx-auto p-8 pb-32 space-y-12">
-      
-      {/* Dense Header */}
-      <div className="flex items-center justify-between">
-        <motion.div 
-          initial={{ opacity: 0, x: -10 }}
-          animate={{ opacity: 1, x: 0 }}
-          className="space-y-1"
-        >
-          <h1 className="text-2xl font-bold text-slate-900 tracking-tight">
-            Good {greeting}, <span className="text-primary italic">Admin.</span>
-          </h1>
-          <p className="text-slate-400 font-medium text-xs">
-            Manage your global content from this unified control center.
-          </p>
-        </motion.div>
+    <div className="space-y-6">
 
-        <div className="flex items-center gap-3">
-           <Link href="/" target="_blank" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-100 shadow-sm text-[10px] font-bold text-slate-600 uppercase tracking-widest hover:border-primary/20 transition-all group">
-              <ExternalLink className="w-3.5 h-3.5 text-slate-400 group-hover:text-primary transition-colors" />
-              Preview Site
-           </Link>
-           <Link href="/admin/pages" className="flex items-center gap-2 px-4 py-2 rounded-xl bg-primary text-white shadow-lg shadow-primary/20 text-[10px] font-bold uppercase tracking-widest hover:scale-105 active:scale-95 transition-all">
-              <Plus className="w-3.5 h-3.5" />
-              Page Manager
-           </Link>
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+        {/* At a Glance Widget */}
+        <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+            <h2 className="text-[14px] font-semibold text-[#1d2327]">At a Glance</h2>
+          </div>
+          <div className="p-4 grid grid-cols-2 gap-4">
+            <div className="space-y-3">
+              <Link href="/admin/pages" className="flex items-center gap-2 text-[#2271b1] hover:text-[#135e96] text-[13px]">
+                <FileText className="w-4 h-4 text-[#82878c]" />
+                <span>8 Pages</span>
+              </Link>
+              <Link href="/admin/services" className="flex items-center gap-2 text-[#2271b1] hover:text-[#135e96] text-[13px]">
+                <Briefcase className="w-4 h-4 text-[#82878c]" />
+                <span>{servicesData.length} Services</span>
+              </Link>
+            </div>
+            <div className="space-y-3">
+              <Link href="/admin/reviews" className="flex items-center gap-2 text-[#2271b1] hover:text-[#135e96] text-[13px]">
+                <Star className="w-4 h-4 text-[#82878c]" />
+                <span>{testimonialsData.length} Reviews</span>
+              </Link>
+              <Link href="/admin/faq" className="flex items-center gap-2 text-[#2271b1] hover:text-[#135e96] text-[13px]">
+                <HelpCircle className="w-4 h-4 text-[#82878c]" />
+                <span>{faqItems.length} FAQ Items</span>
+              </Link>
+            </div>
+          </div>
+          <div className="px-4 py-3 bg-[#f6f7f7] border-t border-[#f0f0f1] text-[13px] text-[#646970]">
+            Eagle CMS is running on Next.js 16
+          </div>
         </div>
-      </div>
 
-      {/* Stats Row - Only shows if > 0 */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
-        {stats.map((s) => (
-          <StatItem key={s.label} {...s} />
-        ))}
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12">
-        
-        {/* Template Editors Grid */}
-        <div className="lg:col-span-7 space-y-6">
-           <div className="flex items-center gap-3">
-             <LayoutDashboard className="w-4 h-4 text-primary" />
-             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Template Editors</h2>
-           </div>
-           <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {templateEditors.map((m) => (
-                <ManageCard key={m.label} {...m} />
+        {/* Activity Widget */}
+        <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+            <h2 className="text-[14px] font-semibold text-[#1d2327]">Activity</h2>
+          </div>
+          <div className="p-4 space-y-4">
+            <div className="text-[13px] text-[#646970] font-medium border-b border-[#f0f0f1] pb-2 uppercase tracking-tight">Recently Published</div>
+            <div className="space-y-3">
+              {[
+                { time: "9:42 am", title: "Home Page Updated" },
+                { time: "Yesterday", title: "New Review from John D." },
+                { time: "Oct 24th", title: "Script 'GA4' Activated" },
+              ].map((item, i) => (
+                <div key={i} className="flex gap-3 text-[13px]">
+                  <span className="text-[#646970] w-20 flex-shrink-0">{item.time}</span>
+                  <span className="text-[#2271b1] hover:underline cursor-pointer">{item.title}</span>
+                </div>
               ))}
-           </div>
+            </div>
+          </div>
         </div>
 
-        {/* Global Management Sidebar */}
-        <div className="lg:col-span-5 space-y-6">
-           <div className="flex items-center gap-3">
-             <Activity className="w-4 h-4 text-primary" />
-             <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest">Inventory Management</h2>
-           </div>
-           <div className="bg-white rounded-3xl border border-slate-100 overflow-hidden divide-y divide-slate-50 shadow-sm">
-              {managementModules.map((m) => (
-                <Link 
-                  key={m.label} 
-                  href={m.href}
-                  className="flex items-center justify-between p-5 hover:bg-slate-50 transition-all group"
-                >
-                  <div className="flex items-center gap-4">
-                     <div className={`w-9 h-9 rounded-xl ${m.color} flex items-center justify-center text-white shadow-sm group-hover:scale-110 transition-transform`}>
-                        <m.icon className="w-3.5 h-3.5" />
-                     </div>
-                     <div className="space-y-0.5">
-                        <p className="text-xs font-bold text-slate-700 group-hover:text-slate-900 transition-colors">{m.label}</p>
-                        <p className="text-[9px] text-slate-400 font-medium">Manage shared {m.label.toLowerCase()}</p>
-                     </div>
-                  </div>
-                  <ChevronRight className="w-3.5 h-3.5 text-slate-200 group-hover:text-primary group-hover:translate-x-1 transition-all" />
-                </Link>
-              ))}
-           </div>
+        {/* Quick Links Widget */}
+        <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+            <h2 className="text-[14px] font-semibold text-[#1d2327]">Quick Links</h2>
+          </div>
+          <div className="p-4 space-y-3">
+            {[
+              { label: "Customize Home Page", href: "/admin/pages/home", icon: Home },
+              { label: "Update Services", href: "/admin/services", icon: Layers },
+              { label: "View Submissions", href: "/admin/submissions", icon: Phone },
+              { label: "Configure Site Settings", href: "/admin/settings", icon: Settings },
+            ].map((link, i) => (
+              <Link key={i} href={link.href} className="flex items-center gap-3 text-[#2271b1] hover:text-[#135e96] text-[13px] group">
+                <link.icon className="w-4 h-4 text-[#82878c] group-hover:text-[#2271b1]" />
+                <span>{link.label}</span>
+              </Link>
+            ))}
+          </div>
+        </div>
+
+        {/* CMS Status Widget */}
+        <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+          <div className="px-4 py-3 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+            <h2 className="text-[14px] font-semibold text-[#1d2327]">Eagle CMS Status</h2>
+          </div>
+          <div className="p-6 text-center space-y-4">
+            <div className="w-16 h-16 bg-[#f0f0f1] rounded-full flex items-center justify-center mx-auto">
+              <Shield className="w-8 h-8 text-[#00a32a]" />
+            </div>
+            <div className="space-y-1">
+              <h3 className="text-lg font-medium text-[#1d2327]">Site Health is Good</h3>
+              <p className="text-[13px] text-[#646970]">Your site has no critical issues and is fully optimized for SEO.</p>
+            </div>
+            <Link href="/admin/settings" className="inline-block bg-[#2271b1] text-white text-[13px] px-4 py-1.5 rounded-[3px] hover:bg-[#135e96] transition-colors">
+              Check Settings
+            </Link>
+          </div>
         </div>
 
       </div>
 
+      {/* WP-Style Welcome Panel */}
+      <div className="mt-8 bg-white border border-[#c3c4c7] p-8 rounded-sm shadow-sm">
+        <div className="max-w-3xl">
+          <h2 className="text-2xl font-normal text-[#1d2327] mb-2 font-serif">Welcome to your dashboard</h2>
+          <p className="text-[#646970] text-[15px] mb-8">We’ve assembled some links to get you started:</p>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+            <div>
+              <h3 className="text-[14px] font-bold text-[#1d2327] mb-4">Get Started</h3>
+              <Link href="/admin/pages/home" className="inline-block bg-[#2271b1] text-white px-6 py-2 rounded-[3px] text-[14px] hover:bg-[#135e96] mb-4">Customize Your Site</Link>
+              <p className="text-[13px] text-[#646970]">or, <Link href="/admin/pages" className="text-[#2271b1] hover:underline">manage your pages</Link></p>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-[14px] font-bold text-[#1d2327]">Next Steps</h3>
+              <Link href="/admin/services" className="flex items-center gap-2 text-[#2271b1] text-[13px] hover:underline"><Plus className="w-4 h-4" /> Add a service</Link>
+              <Link href="/admin/reviews" className="flex items-center gap-2 text-[#2271b1] text-[13px] hover:underline"><Plus className="w-4 h-4" /> Add a review</Link>
+              <Link href="/admin/projects" className="flex items-center gap-2 text-[#2271b1] text-[13px] hover:underline"><ImageIcon className="w-4 h-4" /> Manage gallery</Link>
+            </div>
+            <div className="space-y-3">
+              <h3 className="text-[14px] font-bold text-[#1d2327]">More Actions</h3>
+              <Link href="/admin/scripts" className="flex items-center gap-2 text-[#2271b1] text-[13px] hover:underline"><Settings2 className="w-4 h-4" /> Manage Scripts</Link>
+              <Link href="/admin/settings" className="flex items-center gap-2 text-[#2271b1] text-[13px] hover:underline"><Settings className="w-4 h-4" /> Global Settings</Link>
+              <Link href="/" target="_blank" className="flex items-center gap-2 text-[#2271b1] text-[13px] hover:underline"><ExternalLink className="w-4 h-4" /> View frontend</Link>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   );
 }

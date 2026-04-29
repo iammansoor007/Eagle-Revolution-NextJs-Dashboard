@@ -11,7 +11,8 @@ export default function ProjectsAdminPage() {
   const [projects, setProjects] = useState<any[]>([]);
   const [isEditing, setIsEditing] = useState<number | null>(null);
   const [saving, setSaving] = useState(false);
-  
+  const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
+
   // Form State
   const [form, setForm] = useState({
     title: "",
@@ -27,9 +28,7 @@ export default function ProjectsAdminPage() {
   });
 
   useEffect(() => {
-    fetch("/api/content")
-      .then(res => res.json())
-      .then(json => {
+    fetch("/api/content").then(res => res.json()).then(json => {
         setData(json);
         setProjects(json.portfolio?.projects || []);
       });
@@ -37,55 +36,29 @@ export default function ProjectsAdminPage() {
 
   const saveToDb = async (newProjects: any[]) => {
     setSaving(true);
-    const updatedData = {
-      ...data,
-      portfolio: {
-        ...data.portfolio,
-        projects: newProjects
-      }
-    };
-
+    const updatedData = { ...data, portfolio: { ...data.portfolio, projects: newProjects } };
     try {
-      const res = await fetch("/api/content", {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify(updatedData)
-      });
+      const res = await fetch("/api/content", { method: "PUT", headers: { "Content-Type": "application/json" }, body: JSON.stringify(updatedData) });
       if (res.ok) {
         setData(updatedData);
         setProjects(newProjects);
-        setForm({ title: "", category: "", year: "", desc: "", image: "", number: "", location: "", architect: "", accent: "from-primary to-primary/80", featured: false });
+        setToast({ type: "ok", msg: "Projects updated." });
+        setTimeout(() => setToast(null), 3000);
         setIsEditing(null);
-      } else {
-        alert("Failed to save projects");
       }
-    } catch (e) {
-      alert("Error saving projects");
-    } finally {
-      setSaving(false);
-    }
+    } catch {
+      setToast({ type: "err", msg: "Error saving." });
+    } finally { setSaving(false); }
   };
 
   const handleSaveProject = () => {
-    if (!form.title || !form.image) {
-      alert("Project title and image are required!");
-      return;
-    }
-
+    if (!form.title || !form.image) return alert("Project title and image are required!");
     const newProjects = [...projects];
-    if (isEditing !== null && isEditing < projects.length) {
-      newProjects[isEditing] = { ...form };
-    } else {
+    if (isEditing !== null && isEditing < projects.length) newProjects[isEditing] = { ...form };
+    else {
       const number = String(newProjects.length + 1).padStart(2, '0');
       newProjects.push({ ...form, number });
     }
-
-    saveToDb(newProjects);
-  };
-
-  const handleDelete = (idx: number) => {
-    if (!confirm("Are you sure you want to delete this project?")) return;
-    const newProjects = projects.filter((_, i) => i !== idx);
     saveToDb(newProjects);
   };
 
@@ -94,218 +67,132 @@ export default function ProjectsAdminPage() {
     setForm(projects[idx]);
   };
 
-  if (!data) {
-    return <div className="flex h-64 items-center justify-center"><Loader2 className="w-8 h-8 animate-spin text-primary" /></div>;
-  }
+  if (!data) return <div className="flex h-screen items-center justify-center text-[#646970] font-serif">Loading...</div>;
 
   return (
-    <div className="max-w-6xl mx-auto pb-20">
-      {/* Header */}
-      <div className="flex items-center justify-between mb-10">
-        <div>
-          <div className="flex items-center gap-2 text-sm text-slate-500 mb-2">
-            <Link href="/admin" className="hover:text-primary transition-colors">Dashboard</Link>
-            <ChevronRight className="w-3 h-3" />
-            <span className="text-slate-900 font-bold">Projects</span>
-          </div>
-          <h1 className="text-4xl font-extrabold text-slate-900 tracking-tight flex items-center gap-3">
-            Portfolio Projects
-          </h1>
-          <p className="text-slate-500 font-medium mt-1">Showcase your best work to potential clients.</p>
-        </div>
-        
-        {!isEditing && (
+    <div className="space-y-4">
+      {/* WP Header Area */}
+      <div className="flex items-center gap-4 mb-2">
+        <h1 className="text-[23px] font-normal text-[#1d2327] font-serif m-0">Projects</h1>
+        {isEditing === null && (
           <button
-            onClick={() => setIsEditing(projects.length)}
-            className="flex items-center gap-2 bg-primary text-white px-6 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02]"
+            onClick={() => {
+              setIsEditing(projects.length);
+              setForm({ title: "", category: "", year: "", desc: "", image: "", number: "", location: "", architect: "", accent: "from-primary to-primary/80", featured: false });
+            }}
+            className="bg-white border border-[#2271b1] text-[#2271b1] hover:bg-[#f6f7f7] hover:text-[#135e96] hover:border-[#135e96] px-2 py-1 text-[13px] rounded-[3px] transition-colors"
           >
-            <Plus className="w-5 h-5" />
             Add New Project
           </button>
         )}
       </div>
 
-      <AnimatePresence mode="wait">
-        {isEditing !== null ? (
-          <motion.div 
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -20 }}
-            className="bg-white border border-slate-200 rounded-3xl p-8 mb-12 shadow-xl shadow-slate-200/50"
-          >
-            <div className="flex items-center justify-between mb-8 pb-4 border-b border-slate-100">
-              <h2 className="text-2xl font-extrabold text-slate-900">
-                {isEditing < projects.length ? "Edit Project" : "Create New Project"}
-              </h2>
-              <button onClick={() => setIsEditing(null)} className="p-2 text-slate-400 hover:text-slate-900 transition-colors">
-                <X className="w-6 h-6" />
-              </button>
-            </div>
+      {toast && (
+        <div className={`px-4 py-2 border-l-4 text-[13px] bg-white shadow-sm mb-4 ${toast.type === 'ok' ? 'border-[#00a32a]' : 'border-[#d63638]'}`}>
+          {toast.msg}
+        </div>
+      )}
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-10">
-              {/* Image Upload Column */}
-                <ImageField 
-                  label="Project Showcase Image"
-                  value={form.image || ""}
-                  onChange={(url) => setForm({ ...form, image: url })}
-                  description="Choose a high-quality showcase image for this project."
-                />
+      {isEditing !== null ? (
+        <div className="grid grid-cols-1 lg:grid-cols-4 gap-6 items-start">
+           <div className="lg:col-span-3 space-y-6">
+              <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm p-6">
+                 <input
+                   type="text"
+                   value={form.title}
+                   onChange={(e) => setForm({ ...form, title: e.target.value })}
+                   className="w-full border border-[#8c8f94] px-3 py-2 text-[18px] font-medium rounded-[3px] focus:border-[#2271b1] outline-none mb-4"
+                   placeholder="Enter project title"
+                 />
+                 
+                 <div className="space-y-4">
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">Category</label>
+                          <input type="text" value={form.category} onChange={(e) => setForm({ ...form, category: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" placeholder="e.g. ROOFING" />
+                       </div>
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">Location</label>
+                          <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" placeholder="e.g. Dallas, TX" />
+                       </div>
+                    </div>
 
-              {/* Details Column */}
-              <div className="space-y-6">
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Title</label>
-                    <input
-                      type="text"
-                      value={form.title}
-                      onChange={(e) => setForm({ ...form, title: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
-                      placeholder="e.g. Modern Residential Roof"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Category</label>
-                    <input
-                      type="text"
-                      value={form.category}
-                      onChange={(e) => setForm({ ...form, category: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
-                      placeholder="e.g. ROOFING"
-                    />
-                  </div>
-                </div>
+                    <div className="grid grid-cols-2 gap-4">
+                       <div className="space-y-1">
+                          <label className="text-[13px] font-bold">Year</label>
+                          <input type="text" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" placeholder="e.g. 2024" />
+                       </div>
+                       <div className="flex items-center gap-2 pt-6">
+                          <input type="checkbox" id="feat" checked={form.featured} onChange={(e) => setForm({ ...form, featured: e.target.checked })} className="w-4 h-4 border-[#8c8f94] rounded-[3px]" />
+                          <label htmlFor="feat" className="text-[13px] font-semibold">Feature this project</label>
+                       </div>
+                    </div>
 
-                <div className="grid grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Completion Year</label>
-                    <input
-                      type="text"
-                      value={form.year}
-                      onChange={(e) => setForm({ ...form, year: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
-                      placeholder="e.g. 2024"
-                    />
-                  </div>
-                  <div className="space-y-2">
-                    <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Location</label>
-                    <input
-                      type="text"
-                      value={form.location}
-                      onChange={(e) => setForm({ ...form, location: e.target.value })}
-                      className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-bold focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
-                      placeholder="e.g. Dallas, TX"
-                    />
-                  </div>
-                </div>
-
-                <div className="flex items-center gap-3 bg-slate-50 border border-slate-200 rounded-xl px-4 py-3">
-                  <input
-                    type="checkbox"
-                    id="featured-project"
-                    checked={form.featured || false}
-                    onChange={(e) => setForm({ ...form, featured: e.target.checked })}
-                    className="w-5 h-5 text-primary border-slate-300 rounded focus:ring-primary"
-                  />
-                  <label htmlFor="featured-project" className="text-sm font-bold text-slate-700 cursor-pointer">
-                    Feature this project
-                    <span className="block text-xs font-medium text-slate-500 font-normal">Featured projects get a special badge in the gallery.</span>
-                  </label>
-                </div>
-
-                <div className="space-y-2">
-                  <label className="text-xs uppercase tracking-widest text-slate-500 font-extrabold">Project Description</label>
-                  <textarea
-                    rows={4}
-                    value={form.desc}
-                    onChange={(e) => setForm({ ...form, desc: e.target.value })}
-                    className="w-full bg-slate-50 border border-slate-200 rounded-xl px-4 py-3 text-slate-900 font-medium focus:ring-2 focus:ring-primary/20 focus:border-primary outline-none transition-all shadow-inner"
-                    placeholder="Provide some details about the scope of work..."
-                  />
-                </div>
+                    <div className="space-y-1">
+                       <label className="text-[13px] font-bold">Project Description</label>
+                       <textarea rows={6} value={form.desc} onChange={(e) => setForm({ ...form, desc: e.target.value })} className="w-full border border-[#8c8f94] px-3 py-1.5 text-[14px] rounded-[3px]" />
+                    </div>
+                 </div>
               </div>
-            </div>
+           </div>
 
-            <div className="flex items-center gap-4 border-t border-slate-100 mt-10 pt-8">
-              <button
-                onClick={handleSaveProject}
-                disabled={saving}
-                className="flex items-center gap-2 bg-primary text-white px-8 py-3 rounded-2xl font-bold transition-all shadow-lg shadow-primary/20 hover:scale-[1.02] disabled:opacity-50"
-              >
-                {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                {saving ? "Saving Changes..." : "Save Project"}
-              </button>
-              <button
-                onClick={() => setIsEditing(null)}
-                className="bg-slate-100 text-slate-600 px-8 py-3 rounded-2xl font-bold hover:bg-slate-200 transition-all"
-              >
-                Cancel
-              </button>
-            </div>
-          </motion.div>
-        ) : null}
-      </AnimatePresence>
-
-      <div className="space-y-4">
-        {projects.map((project, idx) => (
-          <motion.div 
-            key={idx}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: idx * 0.05 }}
-            className="group bg-white border border-slate-200 rounded-2xl p-4 pr-6 hover:shadow-lg hover:shadow-slate-200 transition-all flex items-center gap-6 shadow-sm"
-          >
-            <div className="w-24 h-24 rounded-xl overflow-hidden flex-shrink-0 bg-slate-50 border border-slate-100">
-              {project.image ? (
-                <img src={project.image} alt={project.title} className="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <ImageIcon className="w-8 h-8 text-slate-200" />
-                </div>
-              )}
-            </div>
-
-            <div className="flex-1 min-w-0">
-              <div className="flex items-center gap-3 mb-1">
-                <h3 className="text-lg font-bold text-slate-900 truncate">{project.title}</h3>
-                <span className="px-2 py-0.5 bg-primary/10 text-primary rounded text-[9px] font-bold uppercase tracking-widest">{project.category || "Project"}</span>
-                {project.featured && (
-                  <span className="px-2 py-0.5 bg-amber-500/10 text-amber-600 rounded text-[9px] font-bold uppercase tracking-widest flex items-center gap-1">
-                    <Star className="w-2.5 h-2.5 fill-amber-500" /> Featured
-                  </span>
-                )}
+           <div className="lg:col-span-1 space-y-6 sticky top-4">
+              <div className="bg-white border border-[#c3c4c7] shadow-sm rounded-sm overflow-hidden">
+                 <div className="px-3 py-2 border-b border-[#c3c4c7] bg-[#f6f7f7]">
+                    <h2 className="text-[14px] font-semibold text-[#1d2327]">Publish</h2>
+                 </div>
+                 <div className="p-4 space-y-3">
+                    <ImageField label="Project Image" value={form.image} onChange={(v) => setForm({ ...form, image: v })} />
+                 </div>
+                 <div className="px-3 py-2 bg-[#f6f7f7] border-t border-[#c3c4c7] flex justify-between items-center">
+                    <button onClick={() => setIsEditing(null)} className="text-[#d63638] underline text-[13px]">Cancel</button>
+                    <button onClick={handleSaveProject} disabled={saving} className="bg-[#2271b1] text-white px-4 py-1.5 rounded-[3px] text-[13px] font-semibold hover:bg-[#135e96]">
+                       {saving ? "Saving..." : "Update"}
+                    </button>
+                 </div>
               </div>
-              <p className="text-slate-500 text-sm font-medium line-clamp-1">{project.desc || "No description provided."}</p>
-              <div className="flex items-center gap-4 mt-2 text-[10px] font-bold text-slate-400 uppercase tracking-widest">
-                <span className="flex items-center gap-1"><Calendar className="w-3 h-3" /> {project.year || "2024"}</span>
-                {project.location && <span className="flex items-center gap-1"><MapPin className="w-3 h-3" /> {project.location}</span>}
-              </div>
-            </div>
-
-            <div className="flex items-center gap-2 flex-shrink-0">
-              <button
-                onClick={() => handleEdit(idx)}
-                className="p-3 text-slate-400 hover:text-primary transition-all rounded-xl hover:bg-slate-50"
-              >
-                <Pencil className="w-5 h-5" />
-              </button>
-              <button
-                onClick={() => handleDelete(idx)}
-                className="p-3 text-slate-400 hover:text-red-500 transition-all rounded-xl hover:bg-slate-50"
-              >
-                <Trash2 className="w-5 h-5" />
-              </button>
-            </div>
-          </motion.div>
-        ))}
-        
-        {projects.length === 0 && (
-          <div className="col-span-full py-20 text-center bg-white border border-slate-200 border-dashed rounded-3xl">
-            <Folder className="w-16 h-16 text-slate-100 mx-auto mb-4" />
-            <p className="text-slate-400 font-bold">No projects found. Start by adding one!</p>
-          </div>
-        )}
-      </div>
+           </div>
+        </div>
+      ) : (
+        <div className="bg-white border border-[#c3c4c7] rounded-sm shadow-sm overflow-hidden">
+           <table className="w-full text-left border-collapse">
+              <thead>
+                 <tr className="border-b border-[#c3c4c7] bg-white text-[#1d2327]">
+                    <th className="w-8 py-2 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></th>
+                    <th className="py-2 px-3 text-[14px] font-semibold">Project</th>
+                    <th className="py-2 px-3 text-[14px] font-semibold w-40">Category</th>
+                    <th className="py-2 px-3 text-[14px] font-semibold w-32">Location</th>
+                    <th className="py-2 px-3 text-[14px] font-semibold w-24">Year</th>
+                 </tr>
+              </thead>
+              <tbody className="text-[13px] text-[#2c3338]">
+                 {projects.map((proj, idx) => (
+                    <tr key={idx} className={`border-b border-[#f0f0f1] group ${idx % 2 === 0 ? "bg-[#f9f9f9]" : "bg-white"} hover:bg-[#f0f0f1]`}>
+                       <td className="py-4 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></td>
+                       <td className="py-4 px-3 align-top">
+                          <div className="flex gap-3">
+                             <div className="w-10 h-10 bg-[#f0f0f1] border border-[#c3c4c7] rounded-[3px] flex items-center justify-center shrink-0 overflow-hidden">
+                                {proj.image ? <img src={proj.image} className="w-full h-full object-cover" /> : <ImageIcon className="w-4 h-4 text-[#8c8f94]" />}
+                             </div>
+                             <div>
+                                <strong className="text-[#2271b1] block text-[14px]">{proj.title} {proj.featured && <Star className="w-3 h-3 inline fill-amber-500 text-amber-500 ml-1" />}</strong>
+                                <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
+                                   <button onClick={() => handleEdit(idx)} className="text-[#2271b1] hover:underline text-[12px]">Edit</button>
+                                   <span className="text-[#a7aaad]">|</span>
+                                   <button onClick={() => { if(confirm("Delete?")) saveToDb(projects.filter((_,i)=>i!==idx)); }} className="text-[#d63638] hover:underline text-[12px]">Trash</button>
+                                </div>
+                             </div>
+                          </div>
+                       </td>
+                       <td className="py-4 px-3 align-top text-[#50575e] uppercase text-[11px] font-bold">{proj.category}</td>
+                       <td className="py-4 px-3 align-top text-[#50575e]">{proj.location}</td>
+                       <td className="py-4 px-3 align-top text-[#50575e]">{proj.year}</td>
+                    </tr>
+                 ))}
+              </tbody>
+           </table>
+        </div>
+      )}
     </div>
   );
 }

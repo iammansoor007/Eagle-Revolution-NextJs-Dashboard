@@ -110,9 +110,11 @@ const Navbar = () => {
                 >
                   <Icon name="Wrench" className="h-4 w-4" />
                   <span>Services</span>
-                  <motion.span animate={{ rotate: activeMegaMenu === "services" ? 180 : 0 }}>
-                    <Icon name="ChevronDown" className="h-4 w-4 ml-1" />
-                  </motion.span>
+                  {services.length > 0 && (
+                    <motion.span animate={{ rotate: activeMegaMenu === "services" ? 180 : 0 }}>
+                      <Icon name="ChevronDown" className="h-4 w-4 ml-1" />
+                    </motion.span>
+                  )}
                   <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-0 h-0.5 bg-primary group-hover:w-4/5 transition-all duration-500" />
                 </Link>
 
@@ -172,7 +174,7 @@ const Navbar = () => {
 
               <div className="flex items-center space-x-1 ml-2">
                 {(companyLinks || []).slice(1).map((link: any) => {
-                  if (link.subLinks) {
+                  if (link.subLinks && link.subLinks.length > 0) {
                     return (
                       <div key={link.label} className="relative group">
                         <Link

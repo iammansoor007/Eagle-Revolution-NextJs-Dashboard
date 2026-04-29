@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import React, { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { Image as ImageIcon, Upload, Search, X, Edit3, Link as LinkIcon, RefreshCw, Plus } from "lucide-react";
 import MediaSelector from "./MediaSelector";
@@ -32,68 +32,49 @@ export default function ImageField({
   };
 
   return (
-    <div className="space-y-4">
+    <div className="space-y-2 mb-6">
       <div className="flex items-center justify-between">
-        <label className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] ml-1 flex items-center gap-2">
-          <ImageIcon className="w-3.5 h-3.5" />
+        <label className="text-[11px] font-bold text-[#1d2327] uppercase block">
           {label}
         </label>
-        {value && (
-          <button
-            onClick={() => onChange("")}
-            className="text-[9px] font-bold text-red-500 uppercase tracking-widest hover:text-red-600 transition-colors"
-          >
-            Clear Image
-          </button>
-        )}
       </div>
 
-      <div className="relative group">
+      <div className="border border-[#c3c4c7] bg-[#f0f0f1] min-h-[150px] relative flex flex-col items-center justify-center p-4">
         {value ? (
-          <div className="relative aspect-video rounded-[2.5rem] overflow-hidden bg-slate-50 border border-slate-100 shadow-sm group">
-            <img src={value} alt={altValue} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" />
-
-            <div className="absolute inset-0 bg-slate-900/0 group-hover:bg-slate-900/40 transition-all duration-300 flex items-center justify-center opacity-0 group-hover:opacity-100">
-              <div className="flex gap-3 transform translate-y-4 group-hover:translate-y-0 transition-transform">
-                <button
-                  onClick={() => setShowSelector(true)}
-                  className="bg-white/90 backdrop-blur-md px-6 py-3 rounded-2xl shadow-xl flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:bg-white transition-all"
-                >
-                  <RefreshCw className="w-3.5 h-3.5" />
-                  Replace
-                </button>
-              </div>
+          <div className="w-full space-y-4">
+            <div className="relative border border-[#c3c4c7] bg-white p-2 shadow-sm inline-block mx-auto max-w-full">
+              <img src={value} alt={altValue} className="max-h-[200px] object-contain block mx-auto" />
             </div>
-
-            <div className="absolute bottom-6 left-6 right-6">
-              <div className="bg-white/90 backdrop-blur-md px-5 py-3 rounded-2xl border border-white/20 flex items-center justify-between">
-                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest truncate max-w-[200px]">
-                  {value.split('/').pop()}
-                </p>
-                <div className="flex items-center gap-2">
-                  <div className="w-2 h-2 rounded-full bg-emerald-500" />
-                  <span className="text-[9px] font-bold text-slate-900 uppercase tracking-widest">Active Asset</span>
-                </div>
-              </div>
+            
+            <div className="flex flex-wrap gap-2 justify-center">
+              <button
+                onClick={() => setShowSelector(true)}
+                className="bg-[#2271b1] text-white text-[13px] px-4 py-1.5 rounded-sm hover:bg-[#135e96] transition-colors font-medium shadow-sm"
+              >
+                Replace Image
+              </button>
+              <button
+                onClick={() => onChange("")}
+                className="text-[#d63638] text-[13px] hover:underline px-4 py-1.5"
+              >
+                Remove
+              </button>
             </div>
           </div>
         ) : (
           <button
             onClick={() => setShowSelector(true)}
-            className="w-full aspect-video rounded-[3rem] border-2 border-dashed border-slate-100 bg-slate-50/50 flex flex-col items-center justify-center gap-4 transition-all hover:border-primary/20 hover:bg-white hover:shadow-2xl hover:shadow-primary/5 group"
+            className="flex flex-col items-center gap-3 text-[#2271b1] hover:text-[#135e96] transition-colors py-10"
           >
-            <div className="w-16 h-16 rounded-[2rem] bg-white border border-slate-100 flex items-center justify-center text-slate-300 group-hover:text-primary group-hover:scale-110 transition-all duration-500 shadow-sm">
-              <Plus className="w-8 h-8" />
+            <div className="w-12 h-12 border-2 border-dashed border-[#c3c4c7] flex items-center justify-center bg-white">
+              <Plus className="w-6 h-6 text-[#c3c4c7]" />
             </div>
-            <div className="text-center">
-              <p className="text-sm font-bold text-slate-900 tracking-tight">Select or Upload Media</p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest mt-1">Open central library</p>
-            </div>
+            <span className="text-[13px] font-medium underline decoration-1 underline-offset-4">Set featured image</span>
           </button>
         )}
       </div>
 
-      {description && <p className="text-[10px] text-slate-400 font-medium ml-1 leading-relaxed">{description}</p>}
+      {description && <p className="text-[12px] text-[#646970] italic mt-1 leading-tight">{description}</p>}
 
       <AnimatePresence>
         {showSelector && (
