@@ -110,93 +110,95 @@ export default function TeamEditor({ pageId, data, setData }: { pageId: string, 
             {/* MEMBERS SECTION */}
             {activeTab === "members" && (
               <div className="space-y-6">
-                 <div className="grid grid-cols-1 gap-6">
-                    {(data.team?.members || []).map((member: any, i: number) => (
-                      <div key={i} className={UI.card + " space-y-6 relative"}>
-                        <div className="flex justify-between items-center text-[10px] font-bold text-[#646970] uppercase tracking-widest border-b border-[#f0f0f1] pb-2">
-                           <span>Leadership Profile #{String(i+1).padStart(2, '0')}</span>
-                           <button onClick={() => {
-                               const newM = data.team.members.filter((_: any, idx: number) => idx !== i);
-                               updateTeam("members", null, newM);
-                           }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
-                        </div>
-                        
-                        <div className="grid grid-cols-2 gap-8">
-                           <div className="space-y-4">
-                              <div className="space-y-1.5">
-                                 <label className={UI.label}>Full Name</label>
-                                 <input type="text" value={member.name} onChange={(e) => {
-                                   const newM = [...data.team.members]; newM[i].name = e.target.value; updateTeam("members", null, newM);
-                                 }} className={UI.input + " font-bold"} />
-                              </div>
-                              <div className="space-y-1.5">
-                                 <label className={UI.label}>Professional Role</label>
-                                 <input type="text" value={member.role} onChange={(e) => {
-                                   const newM = [...data.team.members]; newM[i].role = e.target.value; updateTeam("members", null, newM);
-                                 }} className={UI.input} />
-                              </div>
-                              <div className="space-y-1.5">
-                                 <label className={UI.label}>Top Accent Badge</label>
-                                 <input type="text" value={member.badge1} onChange={(e) => {
-                                   const newM = [...data.team.members]; newM[i].badge1 = e.target.value; updateTeam("members", null, newM);
-                                 }} className={UI.input + " text-[10px] font-bold uppercase"} />
-                              </div>
-                              <div className="space-y-4">
-                                 <label className={UI.label}>Biography Paragraphs</label>
-                                 <div className="space-y-2">
-                                    {(member.description || []).map((desc: string, j: number) => (
-                                      <div key={j} className="flex gap-2">
-                                         <textarea value={desc} onChange={(e) => {
-                                             const newM = [...data.team.members]; newM[i].description[j] = e.target.value; updateTeam("members", null, newM);
-                                           }} rows={2} className={UI.textarea} />
-                                         <button onClick={() => {
-                                            const newM = [...data.team.members]; newM[i].description = member.description.filter((_: any, idx: number) => idx !== j); updateTeam("members", null, newM);
-                                         }} className="text-slate-400 hover:text-[#d63638] self-start"><X className="w-4 h-4" /></button>
-                                      </div>
-                                    ))}
-                                    <button onClick={() => {
-                                        const newM = [...data.team.members]; newM[i].description = [...(member.description || []), ""]; updateTeam("members", null, newM);
-                                      }} className="text-[10px] font-bold text-[#2271b1] uppercase hover:underline">+ Add Bio Segment</button>
-                                 </div>
-                              </div>
-                           </div>
-                           <div className="space-y-6">
-                               <ImageField
-                                 label="Cinematic Portrait"
-                                 value={member.image || ""}
-                                 onChange={(url: string) => {
-                                   const newM = [...data.team.members]; newM[i].image = url; updateTeam("members", null, newM);
-                                 }}
-                                 altValue={member.imageAlt || ""}
-                                 onAltChange={(alt: string) => {
-                                   const newM = [...data.team.members]; newM[i].imageAlt = alt; updateTeam("members", null, newM);
-                                 }}
-                               />
-                              <div className="space-y-4">
-                                 <div className="space-y-1.5">
-                                    <label className={UI.label}>LinkedIn Profile URL</label>
-                                    <input type="text" value={member.linkedin || ""} onChange={(e) => {
-                                       const newM = [...data.team.members]; newM[i].linkedin = e.target.value; updateTeam("members", null, newM);
-                                    }} className={UI.input} placeholder="https://linkedin.com/..." />
-                                 </div>
-                                 <div className="space-y-1.5">
-                                    <label className={UI.label}>Direct Email</label>
-                                    <input type="text" value={member.email || ""} onChange={(e) => {
-                                       const newM = [...data.team.members]; newM[i].email = e.target.value; updateTeam("members", null, newM);
-                                    }} className={UI.input} placeholder="name@eaglerevolution.com" />
-                                 </div>
-                              </div>
-                           </div>
-                        </div>
-                      </div>
-                    ))}
-                    <button 
+                  <div className="space-y-8">
+                     {(data.team?.members || []).map((member: any, i: number) => (
+                       <div key={i} className={UI.card + " space-y-8 relative"}>
+                         <div className="flex justify-between items-center text-[10px] font-bold text-[#646970] uppercase tracking-widest border-b border-[#f0f0f1] pb-2">
+                            <span>Leadership Profile #{String(i+1).padStart(2, '0')}</span>
+                            <button onClick={() => {
+                                const newM = data.team.members.filter((_: any, idx: number) => idx !== i);
+                                updateTeam("members", null, newM);
+                            }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
+                         </div>
+                         
+                         <div className="space-y-8">
+                            <ImageField
+                               label="Cinematic Portrait"
+                               value={member.image || ""}
+                               onChange={(url: string) => {
+                                 const newM = [...data.team.members]; newM[i].image = url; updateTeam("members", null, newM);
+                               }}
+                               altValue={member.imageAlt || ""}
+                               onAltChange={(alt: string) => {
+                                 const newM = [...data.team.members]; newM[i].imageAlt = alt; updateTeam("members", null, newM);
+                               }}
+                            />
+
+                            <div className="space-y-6">
+                               <div className="space-y-4">
+                                  <div className="space-y-1.5">
+                                     <label className={UI.label}>Full Name</label>
+                                     <input type="text" value={member.name} onChange={(e) => {
+                                       const newM = [...data.team.members]; newM[i].name = e.target.value; updateTeam("members", null, newM);
+                                     }} className={UI.input + " font-bold"} />
+                                  </div>
+                                  <div className="space-y-1.5">
+                                     <label className={UI.label}>Professional Role</label>
+                                     <input type="text" value={member.role} onChange={(e) => {
+                                       const newM = [...data.team.members]; newM[i].role = e.target.value; updateTeam("members", null, newM);
+                                     }} className={UI.input} />
+                                  </div>
+                                  <div className="space-y-1.5">
+                                     <label className={UI.label}>Top Accent Badge</label>
+                                     <input type="text" value={member.badge1} onChange={(e) => {
+                                       const newM = [...data.team.members]; newM[i].badge1 = e.target.value; updateTeam("members", null, newM);
+                                     }} className={UI.input + " text-[10px] font-bold uppercase"} />
+                                  </div>
+                               </div>
+
+                               <div className="space-y-4 border-t border-[#f0f0f1] pt-6">
+                                  <label className={UI.label}>Biography Paragraphs</label>
+                                  <div className="space-y-3">
+                                     {(member.description || []).map((desc: string, j: number) => (
+                                       <div key={j} className="flex gap-2">
+                                          <textarea value={desc} onChange={(e) => {
+                                              const newM = [...data.team.members]; newM[i].description[j] = e.target.value; updateTeam("members", null, newM);
+                                            }} rows={3} className={UI.textarea} />
+                                          <button onClick={() => {
+                                             const newM = [...data.team.members]; newM[i].description = member.description.filter((_: any, idx: number) => idx !== j); updateTeam("members", null, newM);
+                                          }} className="text-slate-400 hover:text-[#d63638] self-start"><X className="w-4 h-4" /></button>
+                                       </div>
+                                     ))}
+                                     <button onClick={() => {
+                                         const newM = [...data.team.members]; newM[i].description = [...(member.description || []), ""]; updateTeam("members", null, newM);
+                                       }} className="text-[10px] font-bold text-[#2271b1] uppercase hover:underline">+ Add Bio Segment</button>
+                                  </div>
+                               </div>
+
+                               <div className="space-y-4 border-t border-[#f0f0f1] pt-6">
+                                  <div className="space-y-1.5">
+                                     <label className={UI.label}>LinkedIn Profile URL</label>
+                                     <input type="text" value={member.linkedin || ""} onChange={(e) => {
+                                        const newM = [...data.team.members]; newM[i].linkedin = e.target.value; updateTeam("members", null, newM);
+                                     }} className={UI.input} placeholder="https://linkedin.com/..." />
+                                  </div>
+                                  <div className="space-y-1.5">
+                                     <label className={UI.label}>Direct Email</label>
+                                     <input type="text" value={member.email || ""} onChange={(e) => {
+                                        const newM = [...data.team.members]; newM[i].email = e.target.value; updateTeam("members", null, newM);
+                                     }} className={UI.input} placeholder="name@eaglerevolution.com" />
+                                  </div>
+                               </div>
+                            </div>
+                         </div>
+                       </div>
+                     ))}
+                  </div>  <button 
                       onClick={() => updateTeam("members", null, [...(data.team?.members || []), { name: "New Leader", role: "Management", image: "", badge1: "EXPERTISE", badge2: "QUALITIES", description: [""] }])}
                       className={UI.buttonAdd}
                     >
                       + Recruit New Team Leader
                     </button>
-                 </div>
               </div>
             )}
 

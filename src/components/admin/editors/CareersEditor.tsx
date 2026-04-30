@@ -118,31 +118,31 @@ export default function CareersEditor({ pageId, data, setData }: { pageId: strin
             {activeTab === "roles" && (
               <div className="space-y-6">
                  <label className={UI.label}>Available Career Opportunities</label>
-                 <div className="grid grid-cols-2 gap-4">
-                    {(data.careers?.roles || []).map((role: any, i: number) => (
-                      <div key={i} className={UI.card + " flex items-center gap-4 group relative"}>
-                         <div className="w-10 h-10 bg-[#f0f6fb] text-[#2271b1] rounded-[3px] flex items-center justify-center shrink-0 border border-[#dcdcde]">
-                            <Briefcase className="w-5 h-5" />
-                         </div>
-                         <div className="flex-1 space-y-1">
-                            <label className={UI.label + " mb-0"}>Job Title</label>
-                            <input type="text" value={role.label} onChange={(e) => {
-                                 const newR = [...data.careers.roles];
-                                 newR[i].label = e.target.value;
-                                 newR[i].value = e.target.value.toLowerCase().replace(/\s+/g, '-');
-                                 updateCareers("roles", null, newR);
-                               }} className={UI.input + " font-bold"} placeholder="Job Title" />
-                         </div>
-                         <button onClick={() => {
-                            const newR = data.careers.roles.filter((_: any, idx: number) => idx !== i);
-                            updateCareers("roles", null, newR);
-                         }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
-                      </div>
-                    ))}
-                    <button onClick={() => updateCareers("roles", null, [...(data.careers?.roles || []), { label: "New Position", value: "new-position" }])} className={UI.buttonAdd}>
-                       + Post New Career Opportunity
-                    </button>
-                 </div>
+                  <div className="space-y-4">
+                     {(data.careers?.roles || []).map((role: any, i: number) => (
+                       <div key={i} className={UI.card + " flex items-center gap-4 group relative"}>
+                          <div className="w-10 h-10 bg-[#f0f6fb] text-[#2271b1] rounded-[3px] flex items-center justify-center shrink-0 border border-[#dcdcde]">
+                             <Briefcase className="w-5 h-5" />
+                          </div>
+                          <div className="flex-1 space-y-1">
+                             <label className={UI.label + " mb-0"}>Job Title</label>
+                             <input type="text" value={role.label} onChange={(e) => {
+                                  const newR = [...data.careers.roles];
+                                  newR[i].label = e.target.value;
+                                  newR[i].value = e.target.value.toLowerCase().replace(/\s+/g, '-');
+                                  updateCareers("roles", null, newR);
+                                }} className={UI.input + " font-bold"} placeholder="Job Title" />
+                          </div>
+                          <button onClick={() => {
+                             const newR = data.careers.roles.filter((_: any, idx: number) => idx !== i);
+                             updateCareers("roles", null, newR);
+                          }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
+                       </div>
+                     ))}
+                     <button onClick={() => updateCareers("roles", null, [...(data.careers?.roles || []), { label: "New Position", value: "new-position" }])} className={UI.buttonAdd}>
+                        + Post New Career Opportunity
+                     </button>
+                  </div>
               </div>
             )}
 

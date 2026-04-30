@@ -11,7 +11,7 @@ interface ContentSelectorProps {
   label: string;
 }
 
-export default function ContentSelector({ type, selectedItems, onSelect, label }: ContentSelectorProps) {
+export default function ContentSelector({ type, selectedItems = [], onSelect, label }: ContentSelectorProps) {
   const [items, setItems] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [search, setSearch] = useState("");

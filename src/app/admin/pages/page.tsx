@@ -16,6 +16,7 @@ export default function PagesDashboard() {
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
   const [actionLoading, setActionLoading] = useState(false);
   const [filter, setFilter] = useState("all");
+  const [bulkAction, setBulkAction] = useState("");
 
   // New Page Form
   const [newPage, setNewPage] = useState({
@@ -76,6 +77,23 @@ export default function PagesDashboard() {
       } catch (err) { alert("Bulk delete failed."); }
       finally { setActionLoading(false); }
     }
+
+    if (action === 'publish' || action === 'draft') {
+      const status = action === 'publish' ? 'published' : 'draft';
+      setActionLoading(true);
+      try {
+        const res = await fetch("/api/admin/pages", {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ action: 'status', ids: selectedIds, status })
+        });
+        if (res.ok) {
+          setSelectedIds([]);
+          fetchPages();
+        }
+      } catch (err) { alert("Bulk status update failed."); }
+      finally { setActionLoading(false); }
+    }
   };
 
   const handleIndividualAction = async (e: React.MouseEvent, action: string, id: string) => {
@@ -99,6 +117,19 @@ export default function PagesDashboard() {
         });
         if (res.ok) fetchPages();
       } catch (err) { alert("Duplication failed."); }
+    }
+
+    if (action === 'status') {
+      const page = pages.find(p => p._id === id);
+      const newStatus = page.status === 'published' ? 'draft' : 'published';
+      try {
+        const res = await fetch(`/api/admin/pages/${id}`, {
+          method: "PATCH",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ status: newStatus })
+        });
+        if (res.ok) fetchPages();
+      } catch (err) { alert("Status update failed."); }
     }
   };
 
@@ -154,12 +185,20 @@ export default function PagesDashboard() {
         <div className="flex items-center gap-2">
           <select 
             className="border border-[#8c8f94] bg-white text-[#2c3338] px-2 py-1 text-[13px] rounded-[3px] outline-none focus:border-[#2271b1] focus:ring-1 focus:ring-[#2271b1]"
-            onChange={(e) => handleBulkAction(e.target.value)}
+            value={bulkAction}
+            onChange={(e) => setBulkAction(e.target.value)}
           >
             <option value="">Bulk actions</option>
+            <option value="publish">Mark as Published</option>
+            <option value="draft">Mark as Draft</option>
             <option value="delete">Delete Permanently</option>
           </select>
-          <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7] transition-colors">Apply</button>
+          <button 
+            onClick={() => { handleBulkAction(bulkAction); setBulkAction(""); }}
+            className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7] transition-colors"
+          >
+            Apply
+          </button>
         </div>
 
         <div className="flex items-center gap-2">
@@ -221,6 +260,10 @@ export default function PagesDashboard() {
                       <Link href={`/admin/pages/${page._id}`} className="text-[#2271b1] hover:underline text-[12px]">Edit</Link>
                       <span className="text-[#a7aaad]">|</span>
                       <button onClick={(e) => handleIndividualAction(e, 'duplicate', page._id)} className="text-[#2271b1] hover:underline text-[12px]">Duplicate</button>
+                      <span className="text-[#a7aaad]">|</span>
+                      <button onClick={(e) => handleIndividualAction(e, 'status', page._id)} className="text-[#2271b1] hover:underline text-[12px]">
+                        {page.status === 'published' ? 'Keep as Draft' : 'Publish Now'}
+                      </button>
                       <span className="text-[#a7aaad]">|</span>
                       <Link href={`/${page.slug}`} target="_blank" className="text-[#2271b1] hover:underline text-[12px]">View</Link>
                       <span className="text-[#a7aaad]">|</span>

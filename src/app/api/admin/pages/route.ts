@@ -36,7 +36,7 @@ export async function POST(req: Request) {
 export async function PATCH(req: Request) {
   try {
     await connectToDatabase();
-    const { action, ids } = await req.json();
+    const { action, ids, status } = await req.json();
     
     if (action === 'duplicate' && ids && Array.isArray(ids)) {
       const sourcePages = await Page.find({ _id: { $in: ids } });
@@ -50,11 +50,19 @@ export async function PATCH(req: Request) {
           template: source.template,
           content: source.content,
           seo: source.seo,
-          status: 'published'
+          status: 'draft'
         });
         newPages.push(duplicate);
       }
       return NextResponse.json(newPages);
+    }
+
+    if (action === 'status' && ids && Array.isArray(ids)) {
+      await Page.updateMany(
+        { _id: { $in: ids } },
+        { $set: { status: status || 'draft' } }
+      );
+      return NextResponse.json({ success: true });
     }
     
     return NextResponse.json({ error: 'Invalid Action' }, { status: 400 });

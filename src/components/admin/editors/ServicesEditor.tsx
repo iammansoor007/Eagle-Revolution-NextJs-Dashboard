@@ -104,12 +104,12 @@ export default function ServicesEditor({ pageId, data, setData }: { pageId: stri
                     <label className={UI.label}>Intro Badge</label>
                     <input type="text" value={data.services?.badge || ""} onChange={(e) => updateServices(null, "badge", e.target.value)} className={UI.input} />
                   </div>
-                  <div className="space-y-1.5">
+                  <div className="space-y-4">
                     <label className={UI.label}>Main Headline Architect</label>
-                    <div className="grid grid-cols-3 gap-2">
-                      <input type="text" value={data.services?.headline?.prefix || ""} onChange={(e) => updateServices("headline", "prefix", e.target.value)} className={UI.input} placeholder="Prefix" />
-                      <input type="text" value={data.services?.headline?.highlight || ""} onChange={(e) => updateServices("headline", "highlight", e.target.value)} className={UI.input + " font-bold border-[#2271b1]"} placeholder="Highlighted" />
-                      <input type="text" value={data.services?.headline?.suffix || ""} onChange={(e) => updateServices("headline", "suffix", e.target.value)} className={UI.input} placeholder="Suffix" />
+                    <div className="space-y-2">
+                      <input type="text" value={data.services?.headline?.prefix || ""} onChange={(e) => updateServices("headline", "prefix", e.target.value)} className={UI.input} placeholder="Prefix Text" />
+                      <input type="text" value={data.services?.headline?.highlight || ""} onChange={(e) => updateServices("headline", "highlight", e.target.value)} className={UI.input + " font-bold border-[#2271b1]"} placeholder="Highlighted Text" />
+                      <input type="text" value={data.services?.headline?.suffix || ""} onChange={(e) => updateServices("headline", "suffix", e.target.value)} className={UI.input} placeholder="Suffix Text" />
                     </div>
                   </div>
                   <div className="space-y-1.5">

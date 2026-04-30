@@ -84,10 +84,13 @@ export default function ServicesAdminPage() {
   const [toast, setToast] = useState<{ type: "ok" | "err"; msg: string } | null>(null);
   const [filter, setFilter] = useState("all");
   const [search, setSearch] = useState("");
+  const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [bulkAction, setBulkAction] = useState("");
 
   const [form, setForm] = useState<any>({
     title: "", slug: "", tagline: "", description: "", overviewTitle: "", overview: "", overviewImage: "",
-    cta: { text: "Start Your Project", link: "/contact" }, icon: "Layout", tag: "", features: [], stats: [], benefits: [], process: [], faq: []
+    cta: { text: "Start Your Project", link: "/contact" }, icon: "Layout", tag: "", status: "published", features: [], stats: [], benefits: [], process: [], faq: []
   });
 
   useEffect(() => {
@@ -131,14 +134,38 @@ export default function ServicesAdminPage() {
   };
 
   const handleEdit = (idx: number) => {
-    const service = services[idx];
-    setForm({ ...service, overviewTitle: service.overviewTitle || "Craftsmanship Without Compromise.", cta: service.cta || { text: "Start Your Project", link: "/contact" } });
-    setSeo(service.seo || {});
-    setIsEditing(idx);
     setActiveTab("general");
   };
 
-  const filteredServices = services.filter(s => s.title.toLowerCase().includes(search.toLowerCase()));
+  const handleBulkAction = async (action: string) => {
+    if (!selectedIds.length) return;
+    
+    let newServices = [...services];
+    if (action === 'delete') {
+      if (!confirm(`Delete ${selectedIds.length} services?`)) return;
+      newServices = services.filter(s => !selectedIds.includes(s.id));
+    } else if (action === 'publish' || action === 'draft') {
+      const newStatus = action === 'publish' ? 'published' : 'draft';
+      newServices = services.map(s => selectedIds.includes(s.id) ? { ...s, status: newStatus } : s);
+    } else {
+      return;
+    }
+
+    saveToDb(newServices);
+    setSelectedIds([]);
+  };
+
+  const toggleStatus = (idx: number) => {
+    const newServices = [...services];
+    const s = newServices[idx];
+    newServices[idx] = { ...s, status: s.status === 'published' ? 'draft' : 'published' };
+    saveToDb(newServices);
+  };
+
+  const filteredServices = services.filter(s => 
+    s.title.toLowerCase().includes(search.toLowerCase()) && 
+    (filter === 'all' || s.status === filter)
+  );
 
   if (!data) return <div className="flex h-screen items-center justify-center text-[#646970] font-serif">Loading...</div>;
 
@@ -327,19 +354,45 @@ export default function ServicesAdminPage() {
       ) : (
         /* WP List View */
         <div className="space-y-4">
-           <div className="flex items-center justify-between gap-4">
-              <div className="flex items-center gap-2">
-                 <select className="border border-[#8c8f94] bg-white text-[#2c3338] px-2 py-1 text-[13px] rounded-[3px]">
-                   <option value="">Bulk actions</option>
-                   <option value="delete">Delete Permanently</option>
-                 </select>
-                 <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7]">Apply</button>
-              </div>
-              <div className="flex items-center gap-2">
-                 <input type="text" placeholder="Search Services" value={search} onChange={(e) => setSearch(e.target.value)} className="border border-[#8c8f94] bg-white px-3 py-1 text-[13px] rounded-[3px] outline-none" />
-                 <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7]">Search</button>
-              </div>
-           </div>
+            {/* Filter Links */}
+            <div className="flex items-center gap-2 text-[13px] mb-2">
+              <button onClick={() => setFilter("all")} className={`${filter === 'all' ? 'text-black font-bold' : 'text-[#2271b1] hover:text-[#135e96] underline decoration-transparent hover:decoration-current'}`}>
+                All <span className="text-[#646970] font-normal">({services.length})</span>
+              </button>
+              <span className="text-[#c3c4c7]">|</span>
+              <button onClick={() => setFilter("published")} className={`${filter === 'published' ? 'text-black font-bold' : 'text-[#2271b1] hover:text-[#135e96] underline decoration-transparent hover:decoration-current'}`}>
+                Published <span className="text-[#646970] font-normal">({services.filter(s => s.status === 'published').length})</span>
+              </button>
+              <span className="text-[#c3c4c7]">|</span>
+              <button onClick={() => setFilter("draft")} className={`${filter === 'draft' ? 'text-black font-bold' : 'text-[#2271b1] hover:text-[#135e96] underline decoration-transparent hover:decoration-current'}`}>
+                Drafts <span className="text-[#646970] font-normal">({services.filter(s => s.status === 'draft').length})</span>
+              </button>
+            </div>
+
+            <div className="flex items-center justify-between gap-4">
+               <div className="flex items-center gap-2">
+                  <select 
+                    className="border border-[#8c8f94] bg-white text-[#2c3338] px-2 py-1 text-[13px] rounded-[3px] outline-none"
+                    value={bulkAction}
+                    onChange={(e) => setBulkAction(e.target.value)}
+                  >
+                    <option value="">Bulk actions</option>
+                    <option value="publish">Mark as Published</option>
+                    <option value="draft">Mark as Draft</option>
+                    <option value="delete">Delete Permanently</option>
+                  </select>
+                  <button 
+                    onClick={() => { handleBulkAction(bulkAction); setBulkAction(""); }}
+                    className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7]"
+                  >
+                    Apply
+                  </button>
+               </div>
+               <div className="flex items-center gap-2">
+                  <input type="text" placeholder="Search Services" value={search} onChange={(e) => setSearch(e.target.value)} className="border border-[#8c8f94] bg-white px-3 py-1 text-[13px] rounded-[3px] outline-none focus:border-[#2271b1]" />
+                  <button className="bg-white border border-[#8c8f94] text-[#2c3338] px-3 py-1 text-[13px] rounded-[3px] hover:bg-[#f6f7f7]">Search</button>
+               </div>
+            </div>
 
            <div className="bg-white border border-[#c3c4c7] rounded-sm shadow-sm overflow-hidden">
               <table className="w-full text-left border-collapse">
@@ -356,16 +409,27 @@ export default function ServicesAdminPage() {
                        const ServiceIcon = IconComponentMap[service.icon] || Layout;
                        return (
                           <tr key={idx} className={`border-b border-[#f0f0f1] group ${idx % 2 === 0 ? "bg-[#f9f9f9]" : "bg-white"} hover:bg-[#f0f0f1]`}>
-                             <td className="py-4 px-3 align-top"><input type="checkbox" className="w-4 h-4 border-[#8c8f94] rounded-[3px]" /></td>
+                             <td className="py-4 px-3 align-top">
+                                <input 
+                                  type="checkbox" 
+                                  checked={selectedIds.includes(service.id)}
+                                  onChange={() => setSelectedIds(prev => prev.includes(service.id) ? prev.filter(i => i !== service.id) : [...prev, service.id])}
+                                  className="w-4 h-4 border-[#8c8f94] rounded-[3px]" 
+                                />
+                             </td>
                              <td className="py-4 px-3 align-top">
                                 <div className="flex gap-3">
                                    <div className="w-10 h-10 bg-white border border-[#c3c4c7] rounded-[3px] flex items-center justify-center text-[#8c8f94] shrink-0">
                                       <ServiceIcon className="w-5 h-5" />
                                    </div>
                                    <div>
-                                      <strong className="text-[#2271b1] block text-[14px]">{service.title}</strong>
+                                      <strong className="text-[#2271b1] block text-[14px]">{service.title} {service.status === 'draft' && <span className="text-[#646970] font-normal italic">— Draft</span>}</strong>
                                       <div className="flex items-center gap-2 mt-1 opacity-0 group-hover:opacity-100 transition-opacity">
                                          <button onClick={() => handleEdit(idx)} className="text-[#2271b1] hover:underline text-[12px]">Edit</button>
+                                         <span className="text-[#a7aaad]">|</span>
+                                         <button onClick={() => toggleStatus(idx)} className="text-[#2271b1] hover:underline text-[12px]">
+                                           {service.status === 'draft' ? 'Publish' : 'Set as Draft'}
+                                         </button>
                                          <span className="text-[#a7aaad]">|</span>
                                          <Link href={`/services/${service.slug}`} target="_blank" className="text-[#2271b1] hover:underline text-[12px]">View</Link>
                                          <span className="text-[#a7aaad]">|</span>
@@ -375,7 +439,11 @@ export default function ServicesAdminPage() {
                                 </div>
                              </td>
                              <td className="py-4 px-3 align-top text-[#50575e]">{service.tag}</td>
-                             <td className="py-4 px-3 align-top font-semibold text-[#00a32a]">Published</td>
+                             <td className="py-4 px-3 align-top">
+                                <span className={`font-semibold ${service.status === 'draft' ? 'text-[#d63638]' : 'text-[#00a32a]'}`}>
+                                   {service.status === 'draft' ? 'Draft' : 'Published'}
+                                </span>
+                             </td>
                           </tr>
                        );
                     })}

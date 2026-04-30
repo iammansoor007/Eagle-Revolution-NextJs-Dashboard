@@ -114,34 +114,37 @@ export default function FAQEditor({ pageId, data, setData }: { pageId: string, d
             {activeTab === "categories" && (
               <div className="space-y-6">
                  <label className={UI.label}>Filtering Taxonomy</label>
-                 <div className="grid grid-cols-3 gap-4">
-                    {(data.faq?.categories || []).map((cat: any, i: number) => (
-                      <div key={i} className={UI.card + " space-y-4 relative"}>
-                         <div className="flex justify-between items-center">
-                            <div className="w-8 h-8 bg-[#f0f6fb] text-[#2271b1] rounded-[3px] flex items-center justify-center border border-[#dcdcde]">
-                               <Filter className="w-4 h-4" />
-                            </div>
-                            <button onClick={() => {
-                               const newC = data.faq.categories.filter((_: any, idx: number) => idx !== i);
-                               updateFAQ("categories", null, newC);
-                            }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
-                         </div>
-                         <div className="space-y-1.5">
-                            <label className={UI.label + " mb-0"}>Category Label</label>
-                            <input type="text" value={cat.label} onChange={(e) => {
-                                 const newC = [...data.faq.categories];
-                                 newC[i].label = e.target.value;
-                                 newC[i].id = e.target.value.toLowerCase().replace(/\s+/g, '-');
-                                 updateFAQ("categories", null, newC);
-                               }} className={UI.input + " font-bold"} placeholder="Category Label" />
-                            <p className="text-[9px] text-slate-400 font-mono uppercase tracking-tighter">ID: {cat.id}</p>
-                         </div>
-                      </div>
-                    ))}
-                    <button onClick={() => updateFAQ("categories", null, [...(data.faq?.categories || []), { id: "new", label: "New Category" }])} className={UI.buttonAdd}>
-                       + Add Category
-                    </button>
-                 </div>
+                  <div className="space-y-4">
+                     {(data.faq?.categories || []).map((cat: any, i: number) => (
+                       <div key={i} className={UI.card + " space-y-4 relative"}>
+                          <div className="flex justify-between items-center border-b border-[#f0f0f1] pb-2">
+                             <div className="flex items-center gap-2">
+                                <div className="w-6 h-6 bg-[#f0f6fb] text-[#2271b1] rounded-[3px] flex items-center justify-center border border-[#dcdcde]">
+                                   <Filter className="w-3 h-3" />
+                                </div>
+                                <span className="text-[10px] font-bold text-[#646970]">Filter Category #{i+1}</span>
+                             </div>
+                             <button onClick={() => {
+                                const newC = data.faq.categories.filter((_: any, idx: number) => idx !== i);
+                                updateFAQ("categories", null, newC);
+                             }} className="text-slate-400 hover:text-[#d63638] transition-colors"><Trash2 className="w-4 h-4" /></button>
+                          </div>
+                          <div className="space-y-1.5">
+                             <label className={UI.label}>Category Label</label>
+                             <input type="text" value={cat.label} onChange={(e) => {
+                                  const newC = [...data.faq.categories];
+                                  newC[i].label = e.target.value;
+                                  newC[i].id = e.target.value.toLowerCase().replace(/\s+/g, '-');
+                                  updateFAQ("categories", null, newC);
+                                }} className={UI.input + " font-bold"} placeholder="Category Label" />
+                             <p className="text-[9px] text-slate-400 font-mono uppercase tracking-tighter">System ID: {cat.id}</p>
+                          </div>
+                       </div>
+                     ))}
+                     <button onClick={() => updateFAQ("categories", null, [...(data.faq?.categories || []), { id: "new", label: "New Category" }])} className={UI.buttonAdd}>
+                        + Add Category
+                     </button>
+                  </div>
               </div>
             )}
 
